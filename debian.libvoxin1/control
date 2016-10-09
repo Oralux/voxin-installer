@@ -1,0 +1,25 @@
+Source: libvoxin1
+Maintainer: Gilles Casse <gcasse@oralux.org>
+Section: sound
+Priority: optional
+Standards-Version: 3.9.2
+Build-Depends: debhelper (>= 9)
+
+Package: libvoxin1
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: Voxin, text-to-speech based on IBM TTS.
+ Voxin is an easily installable add-on which provides yet another
+ text-to-speech to blind users of GNU/Linux.
+
+Package: libvoxin1-dev
+Section: libdevel
+Architecture: any
+Priority: optional
+Depends:
+ libvoxin1 (= ${binary:Version}),
+ ${shlibs:Depends},
+ ${misc:Depends},
+Description: Voxin, text-to-speech based on IBM TTS.
+ This package contains the development headers for the library found in
+ libvoxin. Non-developers likely have little use for this package.

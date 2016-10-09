@@ -1,0 +1,25 @@
+Helper scripts to build the libvoxin debian packages.
+
+Example: packages for Ubuntu 16.10
+
+* build i386 packages under VM1 (Ubuntu 16.10 32 bits)
+cd libvoxin-debian
+./release.sh
+
+# the build.i386 directory contains all the i386 packages
+
+* build amd64 packages under VM2 (Ubuntu 16.10 64 bits)
+cd libvoxin-debian
+./release.sh
+
+# the build.amd64 directory contains all the amd64 packages
+
+* sign these packages
+cd libvoxin-debian
+./sign.sh
+
+# the signed packages are available in build.i386.sig and build.amd64.sig
+
+* copy the packages to the voxin installer
+rm $VOXIN_INSTALLER/packages/all/{voxind*,libvoxin*}
+cp build.{i386,amd64}.sig/*deb $VOXIN_INSTALLER/packages/all

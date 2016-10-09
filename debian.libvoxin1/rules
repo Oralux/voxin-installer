@@ -1,0 +1,75 @@
+#!/usr/bin/make -f
+
+export DH_VERBOSE=1
+soname=libvoxin.so.1
+version=$(shell dpkg-parsechangelog|sed -n -e 's/^Version: //p'|cut -d- -f1|cut -d. -f2-3)
+full_version=$(shell dpkg-parsechangelog|sed -n -e 's/^Version: //p'|cut -d- -f1)
+
+
+DEB_HOST_MULTIARCH ?= $(shell dpkg-architecture -qDEB_HOST_MULTIARCH)
+export DEB_BUILD_HARDENING=1
+RFS=$(CURDIR)/debian/rfs
+LIBDIR=$(RFS)/usr/lib/$(DEB_HOST_MULTIARCH)
+
+build: build-arch build-indep
+
+build-arch: build-stamp
+
+build-indep: build-stamp
+
+build-stamp:
+	dh_testdir
+	RFS=$(RFS) ./build.sh libvoxin
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp
+	./clean.sh
+	dh_clean 
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_clean -k 
+	dh_installdirs
+	install -o root -g root -d -m755 debian/libvoxin1/DEBIAN debian/libvoxin1/usr/share/doc/libvoxin1 debian/libvoxin1/usr/lib/$(DEB_HOST_MULTIARCH)
+	install -o root -g root -m644 debian/changelog debian/libvoxin1/usr/share/doc/libvoxin1/changelog.Debian
+	rm $(LIBDIR)/libcommon.a
+	cp -a $(LIBDIR)/. debian/libvoxin1/usr/lib/$(DEB_HOST_MULTIARCH)
+#	find debian/libvoxin1/usr/share/doc -type f | xargs gzip -9fn
+	install -o root -g root -m644 debian/copyright debian/libvoxin1/usr/share/doc/libvoxin1/ 
+	install -o root -g root -m755 debian/postinst debian/prerm debian/libvoxin1/DEBIAN/
+#
+	install -o root -g root -d -m755 debian/libvoxin1-dev/DEBIAN debian/libvoxin1-dev/usr/include debian/libvoxin1-dev/usr/lib/$(DEB_HOST_MULTIARCH) debian/libvoxin1-dev/usr/share/doc/libvoxin1-dev
+	install -o root -g root -m644 debian/changelog debian/libvoxin1-dev/usr/share/doc/libvoxin1-dev/changelog.Debian
+	install -o root -g root -m644 src/api/eci.h debian/libvoxin1-dev/usr/include/eci.h
+	ln -s libvoxin.so.$(full_version) debian/libvoxin1-dev/usr/lib/$(DEB_HOST_MULTIARCH)/libvoxin.so
+	rm debian/libvoxin1/usr/lib/$(DEB_HOST_MULTIARCH)/libvoxin.so
+#	rm -rf $(RFS)
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installdocs
+#	dh_installman debian/libvoxin1.1
+	dh_link
+#	rm $(LIBDIR)/libvoxin.so
+#	dh_strip --dbg-package=libvoxin1-dbg
+	dh_compress
+	dh_fixperms
+	dh_makeshlibs -V
+	dh_shlibdeps -L libvoxin1 -l debian/libvoxin1/usr/lib
+	dh_installdeb -v
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install

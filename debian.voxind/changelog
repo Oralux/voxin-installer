@@ -1,0 +1,11 @@
+voxind (1.1.2-1) UNRELEASED; urgency=medium
+
+  * New upstream release.
+
+ -- Gilles Casse <gcasse@oralux.org>  Sun, 9 Oct 2016 06:17:44 +0200
+
+voxind (1.0.0-1) UNRELEASED; urgency=medium
+
+  * Initial release.
+
+ -- Gilles Casse <gcasse@oralux.org>  Sat, 23 Jan 2016 11:29:06 +0100
