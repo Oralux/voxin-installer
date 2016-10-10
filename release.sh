@@ -4,6 +4,8 @@
 
 PV=$MAJ.$MIN.$REV
 
+#apt-get install debhelper
+
 function build_pkg() {
     local PN=$1
     local ARCH=
