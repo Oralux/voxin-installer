@@ -9,7 +9,7 @@ PKG=1
 # github url + sha256sum
 ARCHIVE=$MAJ.$MIN.$REV.tar.gz
 URL=https://github.com/Oralux/libvoxin/archive/$ARCHIVE
-SHA256=f2b923a35cbe7ed85a73132232f5fa319cbe2d7ca291c63a0273a468ab6dcd81
+SHA256=6ec242b25c940701ce57ff20bd81ebf76304aeee76373c824d8a117f43aa87e7
 
 # gnupg key used to sign packages
 SIGNING_KEY=AED093E5
