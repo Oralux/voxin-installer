@@ -6,6 +6,16 @@ PV=$MAJ.$MIN.$REV
 
 #apt-get install debhelper
 
+LIST="build-essential wget dpkg-dev fakeroot debhelper lintian"
+dpkg -l $LIST &> /dev/null
+if [ "$?" != "0" ]; then
+	echo "Install the following packages: $LIST"
+	exit 1
+fi
+
+#apt-get update
+#fakeroot 
+
 function build_pkg() {
     local PN=$1
     local ARCH=
