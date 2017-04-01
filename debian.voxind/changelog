@@ -1,3 +1,9 @@
+voxind (1.1.5-1) UNRELEASED; urgency=medium
+
+  * New upstream release: xml filter
+
+ -- Gilles Casse <gcasse@oralux.org>  Sat, 1 Apr 2017 18:15:00 +0200
+
 voxind (1.1.4-1) UNRELEASED; urgency=medium
 
   * New upstream release: fix spurious spellings in the punctuation filter
