@@ -1,3 +1,15 @@
+libvoxin1 (1.1.7-1) UNRELEASED; urgency=medium
+
+  * New upstream release: enable charset conversion with transliteration
+
+ -- Gilles Casse <gcasse@oralux.org>  Mon, 17 Apr 2017 12:37:18 +0200
+
+libvoxin1 (1.1.6-1) UNRELEASED; urgency=medium
+
+  * New upstream release: fix: converts text to the expected charset
+
+ -- Gilles Casse <gcasse@oralux.org>  Sun, 16 Apr 2017 19:13:55 +0200
+
 libvoxin1 (1.1.5-1) UNRELEASED; urgency=medium
 
   * New upstream release: xml filter
