@@ -1,3 +1,9 @@
+voxind (1.1.8-1) UNRELEASED; urgency=medium
+
+  * New upstream release: convert xml predefined entities
+
+ -- Gilles Casse <gcasse@oralux.org>  Sun, 1 Oct 2017 18:56:22 +0200
+
 voxind (1.1.7-1) UNRELEASED; urgency=medium
 
   * New upstream release: enable charset conversion with transliteration
