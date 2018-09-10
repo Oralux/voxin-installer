@@ -7,11 +7,7 @@ PV=$MAJ.$MIN.$REV
 #apt-get install debhelper
 
 LIST="build-essential wget dpkg-dev fakeroot debhelper lintian"
-dpkg -l $LIST &> /dev/null
-if [ "$?" != "0" ]; then
-	echo "Install the following packages: $LIST"
-	exit 1
-fi
+dpkg -L $LIST &> /dev/null || apt-get install -y $LIST
 
 #apt-get update
 #fakeroot 

@@ -1,3 +1,9 @@
+voxind (1.1.10-1) UNRELEASED; urgency=medium
+
+  * New release (don't add supplementary spaces when an xml entity is replaced)
+
+ -- Gilles Casse <gcasse@oralux.org>  Sun, 22 Jul 2018 17:41:56 +0100
+
 voxind (1.1.8-1) UNRELEASED; urgency=medium
 
   * New upstream release: convert xml predefined entities

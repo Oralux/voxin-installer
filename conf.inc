@@ -1,7 +1,7 @@
 # libvoxin/voxind program version
 MAJ=1
 MIN=1
-REV=8
+REV=10
 
 # packages version
 PKG=1
@@ -9,7 +9,7 @@ PKG=1
 # github url + sha256sum
 ARCHIVE=$MAJ.$MIN.$REV.tar.gz
 URL=https://github.com/Oralux/libvoxin/archive/$ARCHIVE
-SHA256=6e35656913c0ad8b9d5a88dc41fd11f2cb8b2440835281556658884780ea6c05
+SHA256=ea4ba781ce5b5098721558a781a5409d6d3611c1b9be50ce4a1b72a7743070f3
 
 # gnupg key used to sign packages
 SIGNING_KEY=AED093E5
