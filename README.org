@@ -1,0 +1,21 @@
+Helper scripts to build the libvoxin debian packages.
+
+* Build amd64 packages 
+#+BEGIN_SRC shell
+cd libvoxin-debian
+./release.sh
+#+END_SRC
+
+The build directory contains all the amd64 packages
+
+* Sign these packages
+#+BEGIN_SRC shell
+cd libvoxin-debian
+./sign.sh
+#+END_SRC
+
+The signed packages are available in build.sig
+
+* Copy the packages to the voxin installer
+rm $VOXIN_INSTALLER/packages/all/{voxind*,libvoxin*}
+cp build.sig/*deb $VOXIN_INSTALLER/packages/all
