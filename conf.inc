@@ -1,7 +1,7 @@
 # libvoxin/voxind program version
 MAJ=1
 MIN=3
-REV=0
+REV=1
 # package version
 PKG=1
 
@@ -9,8 +9,8 @@ PKG=1
 # if DEV is set, the downloaded sources are from master branch
 # (development branch) or otherwise the sources corresponding to
 # tag=$MAJ.$MIN.$REV
-#DEV=
-DEV=1
+DEV=
+#DEV=1
 
 URL=https://github.com/Oralux/libvoxin/archive
 ARCHIVE=$MAJ.$MIN.$REV.tar.gz
