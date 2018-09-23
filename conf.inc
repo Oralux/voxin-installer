@@ -14,7 +14,7 @@ DEV=
 
 URL=https://github.com/Oralux/libvoxin/archive
 ARCHIVE=$MAJ.$MIN.$REV.tar.gz
-SHA256=ea4ba781ce5b5098721558a781a5409d6d3611c1b9be50ce4a1b72a7743070f3
+SHA256=20c8e468258f0a314cb5524bec327b9ea591d32502afe2f80d7b43ca3bd0c1d5
 
 #####
 VERSION=$MAJ.$MIN.$REV-$PKG

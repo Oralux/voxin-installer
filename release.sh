@@ -1,4 +1,4 @@
-#!/bin/bash -exv
+#!/bin/bash -e
 
 BASE=$(realpath $(dirname "$0"))
 
