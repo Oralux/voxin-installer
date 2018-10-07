@@ -143,7 +143,42 @@ License: LGPL-2.1+
  On Debian systems, you can find the GNU Lesser General Public License
  version 2.1 in the file /usr/share/common-licenses/LGPL-2.1.
 EOF
-	}
+}
+
+getScripts() {
+	local name=$1
+	local version=$2
+	local dst=$3
+
+	local maj=${version%%.*}
+	local dir=$dst/DEBIAN
+
+	[ "$name" != "libvoxin1" ] && return
+
+	cat<<EOF>"$dir"/preinst
+#!/bin/sh
+
+set -e
+
+case "\$1" in
+	 install|upgrade)
+		# remove any $name.so file 
+		if [ "\$DPKG_MAINTSCRIPT_ARCH" = amd64 ]; then
+		   ARCHDIR=/usr/lib/x86_64-linux-gnu
+		else
+			ARCHDIR=/usr/lib/i386-linux-gnu
+		fi
+	    rm -f \$ARCHDIR/libvoxin.so*
+        ;;
+     *) ;;
+esac
+
+exit 0
+EOF
+
+	chmod 755 "$dir"/preinst
+
+}
 
 
 [ ! -d build ] && mkdir build
@@ -182,13 +217,14 @@ while [ "$i" -lt "$MAX_NAME" ]; do
 	cd "$BASE"
 	doc=$dst/usr/share/doc/$NAME
 	mkdir -p "$doc"
-	getCopyright $doc/copyright
+	getCopyright "$doc/copyright"
 	#iconv -f ISO88591 -t utf-8 $BASE/all/opt/IBM/ibmtts/doc/license.txt >> $doc/copyright
 	
-	getChangelog $NAME $VERSION $doc/changelog.Debian
-	gzip -9n $doc/changelog.Debian
-	[ -n "$OVERRIDE" ] && getOverride $NAME $dst "$OVERRIDE" || true
-	buildpkg $NAME $VERSION "$DESCRIPTION" $dst
+	getChangelog "$NAME" "$VERSION" "$doc/changelog.Debian"
+	gzip -9n "$doc/changelog.Debian"
+	[ -n "$OVERRIDE" ] && getOverride "$NAME" "$dst" "$OVERRIDE" || true
+	getScripts "$NAME" "$LIBVOXIN_VERSION" "$dst"
+	buildpkg "$NAME" "$VERSION" "$DESCRIPTION" "$dst"
 	
 	lintian ${PKGDIR}/${NAME}_${VERSION}_${ARCH}.deb || true
 

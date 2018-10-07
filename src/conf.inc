@@ -40,10 +40,10 @@ getOverride() {
 }
 
 buildpkg() {
-	local name="$1"
-	local version="$2"
-	local description="$3"
-	local dst="$4"
+	local name=$1
+	local version=$2
+	local description=$3
+	local dst=$4
 	
 	pushd "$dst"
 	find . ! -path "./DEBIAN/*" -type f | xargs md5sum > DEBIAN/md5sums
