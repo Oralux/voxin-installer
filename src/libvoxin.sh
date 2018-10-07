@@ -1,15 +1,40 @@
-#!/bin/bash -e
+#!/bin/bash -xe
 
-BASE=$(realpath $(dirname "$0"))
+BASE=$(realpath $(dirname "$0")/..)
+. $BASE/src/conf.inc
 
-. ./conf.inc
+if [ -n "$LIBVOXIN_VERSION" ]; then
+	unset DEV
+	ARCHIVE=$LIBVOXIN_VERSION.tar.gz
+else
+	LIBVOXIN_VERSION=1.x.x-dev
+	DEV=1
+	ARCHIVE=master.zip
+fi
 
-PV=$MAJ.$MIN.$REV
+VERSION=$LIBVOXIN_VERSION-1
 
 #apt-get install debhelper
 
 LIST="build-essential wget dpkg-dev fakeroot debhelper lintian"
 dpkg -L $LIST &> /dev/null || apt-get install -y $LIST
+
+download()
+{
+    if [ ! -e "$ARCHIVE" ]; then
+	   	wget $LIBVOXIN_URL/$ARCHIVE
+    fi
+	if [ -z "$DEV" ]; then
+		a=$(sha256sum "$ARCHIVE" | cut -f1 -d" ")
+		if [ "$a" != "$LIBVOXIN_SHA256" ]; then
+			echo "$ARCHIVE: sha256 mismatch !"
+			exit 1
+		fi
+		[ ! -d libvoxin-$LIBVOXIN_VERSION ] && tar -zxf "$ARCHIVE" || true
+	else
+		[ ! -d libvoxin-master ] && unzip "$ARCHIVE" || true
+	fi
+}
 
 getControl() {
 	local name=$1
@@ -97,21 +122,6 @@ EOF
 	
 }
 
-getOverride() {
-	local name=$1
-	local dst=$2
-	local label=$3
- 	mkdir -p $dst/usr/share/lintian/overrides
-
-# 	echo "\
-##The $name package adds files to a global 32 bits rootfilesystem" > $dst/usr/share/lintian/overrides/$name
-	rm -f $dst/usr/share/lintian/overrides/$name
- 	for label in $label; do
- 		echo "$name binary: $label" >> $dst/usr/share/lintian/overrides/$name
- 	done
-}
-
-
 getCopyright() {
 	local file=$1
 	cat <<EOF>$file
@@ -136,27 +146,9 @@ EOF
 	}
 
 
-buildpkg() {
-	local name=$1
-	local version=$2
-	local description=$3
-	local dst=$4
-	
-	pushd "$dst"
-	find . ! -path "./DEBIAN/*" -type f | xargs md5sum > DEBIAN/md5sums
-	local size=$(du -s .|cut -f1)
-	getControl $name $version $size "$description" DEBIAN/control "$ARCH"
-	cd ..
-	fakeroot dpkg-deb --build ${name} $PKGDIR
-	popd
-}
-
-
 [ ! -d build ] && mkdir build
 cd build
 download
-extract
-
 
 cd libvoxin*
 ./build.sh -R
@@ -183,7 +175,9 @@ while [ "$i" -lt "$MAX_NAME" ]; do
 	rfs32=$dst/$RFS32
 	
 	mkdir -p "$dst"/DEBIAN
-	tar -C "$dst" -zxf $ARCHIVE_DIR/$NAME-$PV-*.tgz
+	CPU=$ARCH
+	[ "$ARCH" = amd64 ] && CPU=x86_64 
+	tar -C "$dst" -zxf $ARCHIVE_DIR/$NAME-*$CPU.tgz
 	
 	cd "$BASE"
 	doc=$dst/usr/share/doc/$NAME
