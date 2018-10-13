@@ -232,6 +232,10 @@ while [ "$i" -lt "$MAX_NAME" ]; do
 done
 
 
+cat <<EOF>$PKGDIR/README
 
+The libvoxin packages were built using libvoxin-debian:
+https://github.com/Oralux/libvoxin-debian
 
+EOF
 
