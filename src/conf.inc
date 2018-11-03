@@ -10,13 +10,14 @@ LIBSTDCPP_URL=http://archive.debian.org/debian/pool/main/g/gcc-2.95/${LIBSTDCPP_
 #-- libvoxin/voxind
 LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 
-# download sources from master branch (development)
+# select the libvoxin sources (development or tag)
+# - development (master branch)
 LIBVOXIN_VERSION=
-# uncomment the two following lines to download sources from the 1.3.2 tag instead
-#LIBVOXIN_VERSION=1.3.2
-#LIBVOXIN_SHA256=20c8e468258f0a314cb5524bec327b9ea591d32502afe2f80d7b43ca3bd0c1d5
-
+# - from the 1.3.3 tag instead (+sha256)
+#LIBVOXIN_VERSION=1.3.3
+#LIBVOXIN_SHA256=29a211d46f75ee1b8f3922e871554777a64815b1a4a2ff8f3c41e58012af2ea6
 #####
+
 PKGDIR=$BASE/build/packages
 TMPDIR=$BASE/build/tmp
 RFS32=/opt/voxin/rfs32

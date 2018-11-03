@@ -40,7 +40,7 @@ Example:
  $0
 
 # build all packages
- $0 -lr
+ $0 -clr
 
 " 
 

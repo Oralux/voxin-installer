@@ -66,7 +66,7 @@ getChangelog() {
 	cat <<EOF>$file
 $name ($version) UNRELEASED; urgency=medium
 
-  * New upstream release: dedicated 32 bits rfs directory
+  * New upstream release: dedicated 32 bits rfs directory, improved say command
 
  -- Gilles Casse <gcasse@oralux.org>  $date
 
@@ -184,17 +184,20 @@ EOF
 [ ! -d build ] && mkdir build
 cd build
 download
-
-cd libvoxin*
+if [ "$LIBVOXIN_VERSION" = "1.x.x-dev" ]; then
+	cd libvoxin-master
+else
+	cd libvoxin-$LIBVOXIN_VERSION
+fi
 ./build.sh -R
 ARCHIVE_DIR=$PWD/build/x86_64/release
 cd ..
 
 mkdir -p "$PKGDIR"
-declare -a NAMES=(libvoxin1 libvoxin1-dev voxind)
-declare -a ARCHS=(amd64 all all)
-declare -a OVERRIDES=("missing-depends-line symlink-should-be-absolute" "" "missing-depends-line symlink-should-be-absolute binary-without-manpage arch-independent-package-contains-binary-or-object binary-or-shlib-defines-rpath")
-declare -a DESCRIPTIONS=("eases the integration of voxin on 64 bits architectures" "header file" "32 bits daemon linked to the ibmtts libraries")
+declare -a NAMES=(libvoxin1 libvoxin1-dev voxind voxin-say)
+declare -a ARCHS=(amd64     all           all    amd64)
+declare -a OVERRIDES=("missing-depends-line symlink-should-be-absolute" "" "missing-depends-line symlink-should-be-absolute binary-without-manpage arch-independent-package-contains-binary-or-object binary-or-shlib-defines-rpath" "missing-depends-line symlink-should-be-absolute binary-without-manpage")
+declare -a DESCRIPTIONS=("eases the integration of voxin on 64 bits architectures" "header file" "32 bits daemon linked to the ibmtts libraries" "Converts text to speech written to the standard output or the supplied file")
 MAX_NAME=${#NAMES[@]}
 i=0
 while [ "$i" -lt "$MAX_NAME" ]; do
