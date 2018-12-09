@@ -1,14 +1,11 @@
 The voxin installer installs voxin and its dependencies on various GNU/Linux distributions (e.g. Arch Linux, Debian, Fedora, Slackware, Ubuntu,...). 
 
-This git repository has been copied from libvoxin-debian and replaces it.
-
 The current goal is to provide :
 - distribution-independent tarballs (in /opt directory), 
-- a few minimal and stable debian packages, easily converted to other package format, for the other directpries (/usr, ...) 
+- a few minimal and stable debian packages, easily converted to other package format, for other directories (/usr, ...) 
 - no dependencies on foreign architectures (the x86_64 binaries won't require multi-arch support from the distribution for x86 binaries).
 
-* Requirement
-Firstly, install the voxin-viavoice archive supplied by Oralux.
+This git repository has been copied from libvoxin-debian and replaces it.
 
 * Build
 ** default
