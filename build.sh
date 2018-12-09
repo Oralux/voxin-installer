@@ -4,23 +4,15 @@ BASE=$(dirname $(realpath "$0"))
 NAME=$(basename "$0")
 
 
+echo "Work in progress"
+exit 1
+
 usage() {
 	echo "
 Usage: 
  $NAME [options]
 
-Build the libvoxin packages and their dependencies.
-
-Packages
-- libvoxin and voxind,
-- (optionally) voxin-rfs32: a minimal 32 bits rootfilesystem supplying standard libraries (built by [[https://buildroot.org][Buildroot]] ) 
-- (optionally) voxin-libstdc++: old libstdc++ library needed by ibmtts
-
-Requirement
-Firstly, install the voxin-viavoice packages supplied by Oralux.
-
-Voxind will be installed in a 32 bits root filesystem to lower
-dependencies issues with the host filesystem.
+This script builds the voxin installer.
 
 Note that a minimal 32 bits root filesystem is needed as input to this
 script (see README.org).
@@ -57,7 +49,6 @@ while true; do
   case "$1" in
     -c) CLEAN=1; shift;;
     -h) HELP=1; shift;;
-    -i) INSTALL=1; shift;;
     -l) CPP=1; shift;;
     -r) RFS32=1; shift;;
     --) shift; break;;

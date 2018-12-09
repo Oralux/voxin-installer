@@ -1,3 +1,12 @@
+# select the voxin installer sources (development or tag)
+# - development (master branch)
+# - from the 1.3.3 tag instead (+sha256)
+#VOXIN_VERSION=
+#VOXIN_VERSION=2.0
+#VOXIN_SHA256=29a211d46f75ee1b8f3922e871554777a64815b1a4a2ff8f3c41e58012af2ea6
+#####
+VOXIN_VERSION=
+
 #-- voxin-rfs32
 BR_OUTPUT=/opt/BUILDROOT/buildroot-2017.02.9/output
 BR_SRC=$BR_OUTPUT/target

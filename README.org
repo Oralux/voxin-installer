@@ -1,12 +1,14 @@
-Helper scripts to build the libvoxin debian packages.
+The voxin installer installs voxin and its dependencies on various GNU/Linux distributions (e.g. Arch Linux, Debian, Fedora, Slackware, Ubuntu,...). 
 
-* Packages
-- libvoxin and voxind,
-- (optionally) voxin-rfs32: a minimal 32 bits rootfilesystem supplying standard libraries (built by [[https://buildroot.org][Buildroot]] ) 
-- (optionally) voxin-libstdc++: old libstdc++ library needed by ibmtts
+This git repository has been copied from libvoxin-debian and replaces it.
+
+The current goal is to provide :
+- distribution-independent tarballs (in /opt directory), 
+- a few minimal and stable debian packages, easily converted to other package format, for the other directpries (/usr, ...) 
+- no dependencies on foreign architectures (the x86_64 binaries won't require multi-arch support from the distribution for x86 binaries).
 
 * Requirement
-Firstly, install the voxin-viavoice packages supplied by Oralux.
+Firstly, install the voxin-viavoice archive supplied by Oralux.
 
 * Build
 ** default
@@ -16,7 +18,7 @@ voxin-rfs32 and voxin-libstdc++ are supposed to be already installed (supplied i
 *** sources [[https://github.com/Oralux/libvoxin][libvoxin]] 
 *** compil
 #+BEGIN_SRC shell
-cd libvoxin-debian
+cd voxin-installer
 ./build.sh
 #+END_SRC
 	
