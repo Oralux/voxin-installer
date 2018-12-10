@@ -29,7 +29,7 @@ LIBVOXIN_VERSION=
 
 PKGDIR=$BASE/build/packages
 TMPDIR=$BASE/build/tmp
-RFS32=/opt/voxin/rfs32
+RFS32=/opt/oralux/voxin/rfs32
 
 # gnupg key used to sign packages
 SIGNING_KEY=AED093E5
