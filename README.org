@@ -72,3 +72,37 @@ cd libvoxin-debian
 rm $VOXIN_INSTALLER/packages/all/{voxind*,libvoxin*}
 cp build.sig/*deb $VOXIN_INSTALLER/packages/all
 
+* Minimal rfs32 root filesystem
+** standard 32 bits libraries
+
+These libraries can be built for example by [[https://buildroot.org][Buildroot]] (see its config in src/buildroot/).
+Or install the voxin-rfs32 tarball supplied by Oralux.
+The tree is basically :
+
+#+BEGIN_SRC shell
+tree rfs32
+
+rfs32
+├── lib
+│   ├── ld-2.23.so
+│   ├── ld-linux.so.2 -> ld-2.23.so
+│   ├── libc-2.23.so
+│   ├── libc.so.6 -> libc-2.23.so
+│   ├── libdl-2.23.so
+│   ├── libdl.so.2 -> libdl-2.23.so
+│   ├── libm-2.23.so
+│   ├── libm.so.6 -> libm-2.23.so
+│   ├── libpthread-2.23.so
+│   └── libpthread.so.0 -> libpthread-2.23.so
+├── lib32 -> lib
+└── usr
+    ├── bin
+    ├── lib
+    └── lib32 -> lib
+
+
+#+END_SRC
+
+** old libstdc++ library
+install voxin-libstdc++ provided by Oralux or check https://github.com/Oralux/libvoxin-debian
+

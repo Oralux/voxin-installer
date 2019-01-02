@@ -1,16 +1,12 @@
-# select the voxin installer sources (development or tag)
-# - development (master branch)
-# - from the 1.3.3 tag instead (+sha256)
-#VOXIN_VERSION=
-#VOXIN_VERSION=2.0
-#VOXIN_SHA256=29a211d46f75ee1b8f3922e871554777a64815b1a4a2ff8f3c41e58012af2ea6
-#####
-VOXIN_VERSION=
+# The BASE variable should be set before including this file
+#
+VOXIN_VER=2.0
 
 #-- voxin-rfs32
-BR_OUTPUT=/opt/BUILDROOT/buildroot-2017.02.9/output
-BR_SRC=$BR_OUTPUT/target
-BR_GLIBC_LICENSE=$BR_OUTPUT/build/glibc-2.23/LICENSES 
+# Buildroot
+BR_VER=2017.02.9
+BR_URL=https://buildroot.org/downloads/buildroot-${BR_VER}.tar.gz
+# BR_PKG defines below
 
 #-- voxin-libstdc++
 LIBSTDCPP_ORIG_NAME=libstdc++2.10-glibc2.2
@@ -30,37 +26,24 @@ LIBVOXIN_VERSION=
 PKGDIR=$BASE/build/packages
 TMPDIR=$BASE/build/tmp
 RFS32=/opt/oralux/voxin/rfs32
+BR_PKG="$PKGDIR/buildroot_${BR_VER}.txz"
+RFS_PKG="$PKGDIR/rfs_${VOXIN_VER}.txz"
+RFS_DIR=$TMPDIR/rfs
+#RFS32_PKG="$PKGDIR/${NAME}.txz"
 
 # gnupg key used to sign packages
 SIGNING_KEY=AED093E5
 
-getOverride() {
-	local name=$1
-	local dst=$2
-	local label=$3
- 	mkdir -p $dst/usr/share/lintian/overrides
-
-#	echo "\
-## The $name package adds files to a global 32 bits rootfilesystem used
-#" > $dst/usr/share/lintian/overrides/$name
-	rm -f $dst/usr/share/lintian/overrides/$name
- 	for label in $label; do
- 		echo "$name binary: $label" >> $dst/usr/share/lintian/overrides/$name
- 	done
+debianIsPackageInstalled() {
+	local deb=$1
+	grep -A1 "Package: $deb$" /var/lib/dpkg/status | grep "Status: install ok installed" &> /dev/null
 }
 
-buildpkg() {
-	local name=$1
-	local version=$2
-	local description=$3
-	local dst=$4
-	
-	pushd "$dst"
-	find . ! -path "./DEBIAN/*" -type f | xargs md5sum > DEBIAN/md5sums
-	local size=$(du -s .|cut -f1)
-	getControl $name $version $size "$description" DEBIAN/control "$ARCH"
-	cd ..
-	fakeroot dpkg-deb --build ${name} $PKGDIR
-	popd
+debianDoesPackageExist() {
+	local deb=$1
+	grep "Package: $deb$" /var/lib/apt/lists/*_Packages &> /dev/null
 }
 
+leave() {
+		echo -e "$1" && exit $2
+}

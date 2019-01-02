@@ -3,63 +3,27 @@
 BASE=$(realpath $(dirname "$0")/..)
 . $BASE/src/conf.inc
 
-NAME=voxin-rfs32
-VERSION=1.0-1
+#NAME=voxin-rfs32
+#TARBALL=$PKGDIR/${NAME}.txz
 
-FILES=$TMPDIR/$NAME.files
-#RFS32=/opt/voxin/rfs32
+if [ ! -f "$BR_PKG" ]; then
+	echo "
+Buildroot tarball not found: $BR_PKG
+You may want to run buildroot.sh
+"
+	exit 1
+fi
 
-getChangelog() {
-	local name=$1
-	local version=$2
-	local file=$3
-	local date=$(LANG=en_US.UTF-8 date -R)
-	cat <<EOF>$file
-$name ($version) UNRELEASED; urgency=medium
+rm -rf "$RFS_DIR"
+mkdir -p "$RFS_DIR"
 
-  * Initial archive from buildroot (2017.02.9)
-
- -- Gilles Casse <gcasse@oralux.org>  $date
-
-EOF
-	
-}
-
-
-#rm -rf "$TMPDIR" "$PKGDIR"
-rm -rf "$TMPDIR" "$PKGDIR/${NAME}_${VERSION}_all.deb"
-mkdir -p "$PKGDIR" "$TMPDIR"
-
-
-cat<<EOF>"$FILES"
-lib/libdl-2.23.so
-lib/libdl.so.2
-lib/libpthread-2.23.so
-lib/ld-2.23.so
-lib/libc-2.23.so
-lib/libpthread.so.0
-lib/ld-linux.so.2
-lib/libm.so.6
-lib/libc.so.6
-lib/libm-2.23.so
-etc/issue
-etc/os-release
-EOF
-
-dst=$TMPDIR/$NAME	
-rfs32=$dst/$RFS32
-
-mkdir -p "$rfs32"
-rsync -av --files-from="$FILES" "$BR_SRC/" $rfs32/
+LIST="./etc/issue ./etc/os-release ./lib/ld-2.23.so ./lib/ld-linux.so.2 ./lib/libc-2.23.so ./lib/libc.so.6 ./lib/libdl-2.23.so ./lib/libdl.so.2 ./lib/libm-2.23.so ./lib/libm.so.6 ./lib/libpthread-2.23.so ./lib/libpthread.so.0 ./usr/share/doc/glibc*/copyright"
+rfs32=$RFS_DIR/$RFS32
+mkdir -p $rfs32
+tar -C "$rfs32" -xf "$BR_PKG" --wildcards $LIST
 find $rfs32 -type f -executable ! -name "ld-*" -exec chmod a-x {} \;
 
-doc=$(dirname $rfs32)/share/doc/$NAME
-mkdir -p "$doc"
-cp $BR_GLIBC_LICENSE $doc/copyright
-#iconv -f ISO88591 -t utf-8 $BASE/all/opt/IBM/ibmtts/doc/license.txt >> $doc/copyright
+#fakeroot bash -c "tar -C $dst -Jcf $TARBALL ."
+#echo $TARBALL
 
-getChangelog $NAME $VERSION $doc/changelog
-gzip -9n $doc/changelog
-#buildpkg $NAME $VERSION "Voxin: 32 bits root filesystem" $dst
 
-tar -C $dst -Jcf $PKGDIR/${NAME}_${VERSION}.txz .
