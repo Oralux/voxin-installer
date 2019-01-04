@@ -2,6 +2,9 @@
 #
 VOXIN_VER=2.0
 
+# TODO
+ARCH=x86_64
+
 #-- voxin-rfs32
 # Buildroot
 BR_VER=2017.02.9
@@ -33,12 +36,15 @@ DEP_LIST="make gcc wget fakeroot unzip"
 PKGDIR=$BASE/build/packages
 TMPDIR=$BASE/build/tmp
 DWLDIR=$BASE/build/download
+SRCDIR=$BASE/src
 BR_PKG="$PKGDIR/buildroot_${BR_VER}.txz"
 RFS_PKG="$PKGDIR/rfs_${VOXIN_VER}.txz"
-RFS_DIR=$TMPDIR/rfs
-VOXINDIR=$RFS_DIR/opt/oralux/voxin
+RFSDIR=$TMPDIR/rfs
+VOXINDIR=$RFSDIR/opt/oralux/voxin
 RFS32=$VOXINDIR/rfs32
 #RFS32_PKG="$PKGDIR/${NAME}.txz"
+DOC=$VOXINDIR/usr/share/doc
+
 
 # gnupg key used to sign packages
 SIGNING_KEY=AED093E5
@@ -88,7 +94,7 @@ buildBuildroot() {
 	if [ -d "$targetDir" ]; then
 		doc=$targetDir/usr/share/doc/glibc-$GLIBC_VER
 		mkdir -p "$doc"
-		cp $GLIBC_LICENSE $doc/copyright	
+		cp $GLIBC_LICENSE $doc/copyright
 		fakeroot bash -c "tar -C \"$targetDir\" -Jcf $tarball ."	
 		echo $tarball
 	else
@@ -101,13 +107,13 @@ getMinimalRFS32FromBuildroot() {
 	if [ ! -f "$BR_PKG" ]; then
 		echo "
 Buildroot tarball not found: $BR_PKG
-You may want to run buildroot.sh
+You may want to run build.sh -b
 "	
 		exit 1
 	fi
 
-	rm -rf "$RFS_DIR"
-	mkdir -p "$RFS_DIR"
+	rm -rf "$RFSDIR"
+	mkdir -p "$RFSDIR"
 
 	mkdir -p $RFS32
 	tar -C "$RFS32" -xf "$BR_PKG" --wildcards $RFS32_LIST
@@ -149,6 +155,7 @@ getLibvoxin() {
 		version=1.x.x-dev
 		dev=1
 		archive=master.zip
+		[ -e "$DWLDIR"/$archive ] && mv "$DWLDIR"/$archive "$DWLDIR"/$archive.old
 	fi
 	archivep="$DWLDIR/$archive"
 	
@@ -193,6 +200,26 @@ getLibvoxin() {
 	# libvoxin_1.3.3.x86_64.txz
 	# voxin-pkg_1.3.3.any.txz
 
-	tar -C "$RFS_DIR" -xf build/x86_64/release/libvoxin_*.x86_64.txz
+	tar -C "$RFSDIR" -xf build/$ARCH/release/libvoxin_*.$ARCH.txz
 	cd "$pwd"	
+}
+
+buildReleaseTarball() {
+	local dir="voxin-installer_$VOXIN_VER"
+	local workdir="$TMPDIR/$dir"
+	rm -rf "$workdir"
+	mkdir -p "$workdir"	
+	cp -a "$RFSDIR" "$workdir"
+	cp -a "$SRCDIR/tools" "$workdir"
+	fakeroot bash -c "tar -C \"$TMPDIR\" -Jcf \"$PKGDIR/$dir.$ARCH.txz\" $dir"
+	echo "$PKGDIR/$dir.$ARCH.txz"
+}
+
+addFiles() {
+	local files=$1
+	if [ -f "$files" ]; then
+		for i in $(cat "$files"); do
+			tar -C "$RFSDIR" -xf $i
+		done
+	fi
 }
