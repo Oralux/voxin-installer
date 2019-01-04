@@ -1,82 +1,41 @@
-The voxin installer installs voxin and its dependencies on various GNU/Linux distributions (e.g. Arch Linux, Debian, Fedora, Slackware, Ubuntu,...). 
+The voxin installer installs voxin and its dependencies on various GNU/Linux distributions (e.g. Arch Linux, Debian, Fedora, Slackware, Slint, Ubuntu,...). 
 
-The current goal is to provide :
+The current goal is to provide:
 - distribution-independent tarballs (in /opt directory), 
-- a few minimal and stable debian packages, easily converted to other package format, for other directories (/usr, ...) 
+- a few minimal and stable debian packages, easily converted to other package format (/usr, ...), 
 - no dependencies on foreign architectures (the x86_64 binaries won't require multi-arch support from the distribution for x86 binaries).
 
-This git repository has been copied from libvoxin-debian and replaces it.
+This git repository has been initially copied from libvoxin-debian and replaces it.
+
+The standard 32 bits libraries are built by [[https://buildroot.org][Buildroot]] .
 
 * Build
-** default
-By default, only libvoxin and voxind are built. 
-voxin-rfs32 and voxin-libstdc++ are supposed to be already installed (supplied in voxin > 1.15).
+By default, libvoxin is built, and installed into the local opt/oralux/voxin directory.
+A minimal 32 bits rootfilesystem is supposed to be already available (see paragraph "minimal 32 bits rootfilesystem").
 
-*** sources [[https://github.com/Oralux/libvoxin][libvoxin]] 
-*** compil
+** Command
 #+BEGIN_SRC shell
 cd voxin-installer
 ./build.sh
 #+END_SRC
 	
-** (optionally) build voxin-libstdc++
-*** sources from [[http://archive.debian.org/debian/pool/main/g/gcc-2.95/${ORIG_NAME}_2.95.4-27_i386.deb][Debian Archive]]
+Sequence followed:
+- extract files from the minimal 32 bits rfs
+- download libstdc++2.10-glibc2.2 from archive.debian.org
+- build [[https://github.com/Oralux/libvoxin][libvoxin]] 
 
-voxin-libstdc++ installs the libstdc++ library in the /opt/voxin/rfs32 directory.
+** Minimal 32 bits rootfilesystem
+The rootfilesystem can be (re)built if needed; it is a relatively intensive process (more than one hour, 3.5 GB of storage space).
 
-*** compil
-To build the voxin-libstdc++ package:
-
+*** Command
 #+BEGIN_SRC shell
-cd libvoxin-debian
-./build.sh -l
+cd voxin-installer
+./build.sh -b
 #+END_SRC
+	
+*** Standard 32 bits libraries
 
-** (optionally) build voxin-rfs32
-*** sources from [[https://buildroot.org][Buildroot]]
-The standard 32 bits libraries are built by [[https://buildroot.org][Buildroot]] (see its configuration in src/buildroot/).
-The minimal tree is:
-
-#+BEGIN_SRC shell
-tree rfs32
-
-rfs32
-├── lib
-│   ├── ld-2.23.so
-│   ├── ld-linux.so.2 -> ld-2.23.so
-│   ├── libc-2.23.so
-│   ├── libc.so.6 -> libc-2.23.so
-│   ├── libdl-2.23.so
-│   ├── libdl.so.2 -> libdl-2.23.so
-│   ├── libm-2.23.so
-│   ├── libm.so.6 -> libm-2.23.so
-│   ├── libpthread-2.23.so
-│   └── libpthread.so.0 -> libpthread-2.23.so
-├── lib32 -> lib
-└── usr
-    ├── bin
-    ├── lib
-    └── lib32 -> lib
-
-
-#+END_SRC
-
-*** compil
-
-#+BEGIN_SRC shell
-cd libvoxin-debian
-./build.sh -r
-#+END_SRC
-
-* Copy the packages to the voxin installer
-rm $VOXIN_INSTALLER/packages/all/{voxind*,libvoxin*}
-cp build.sig/*deb $VOXIN_INSTALLER/packages/all
-
-* Minimal rfs32 root filesystem
-** standard 32 bits libraries
-
-These libraries can be built for example by [[https://buildroot.org][Buildroot]] (see its config in src/buildroot/).
-Or install the voxin-rfs32 tarball supplied by Oralux.
+The rootfilesystem is built by [[https://buildroot.org][Buildroot]] (see its config in src/buildroot/).
 The tree is basically :
 
 #+BEGIN_SRC shell
@@ -103,6 +62,4 @@ rfs32
 
 #+END_SRC
 
-** old libstdc++ library
-install voxin-libstdc++ provided by Oralux or check https://github.com/Oralux/libvoxin-debian
 
