@@ -21,15 +21,21 @@ done
 
 unset PLAY
 for i in aplay paplay; do
-	a=$(which $i) && PLAY=$i && break
+	PLAY=$(which $i 2>/dev/null) && break
 done
-
-[ -z "$PLAY" ] && echo "install aplay or paplay" && exit 1
 
 ./setConf.sh "$RFSDIR"
 
 export LD_LIBRARY_PATH="$RFSDIR/$VOXINDIR/lib"
-"$RFSDIR/$VOXINDIR"/bin/voxin-say $@ | $PLAY
+
+if [ -n "$PLAY" ]; then
+	"$RFSDIR/$VOXINDIR"/bin/voxin-say | $PLAY || unset PLAY 
+fi
+
+if [ -z "$PLAY" ]; then
+	"$RFSDIR/$VOXINDIR"/bin/voxin-say -w /tmp/voxin-say.$$.wav
+	echo "/tmp/voxin-say.$$.wav"
+fi
 
 #"$VOXINDIR"/bin/voxin-say."$(uname -m)" $@
 
