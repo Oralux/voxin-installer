@@ -13,35 +13,24 @@ identify_fedora()
     DISTRIB_RELEASE="$(awk -F'=' '/^VERSION_ID=/{print $2}' /etc/os-release)"
     
     case "$DISTRIB_ID" in
-	"fedora")
-	    case "$DISTRIB_RELEASE" in
-            25|26) status=0;;			
-	    esac
-	    ;;
+		"fedora")
+			case "$DISTRIB_RELEASE" in
+				#            25|26) status=0;;			
+				*) DISTRIB_RELEASE=latest;;
+			esac
+			;;
     esac
     return $status
 }
 
 installSystem()
 {
-    SUFFIX=i686.rpm
-    
-# install libstdc++2.10
-    LIBSTD=compat-libstdc++-296
-    rpm -q "$LIBSTD" &>> "$LOG"
-    if [ "$?" != "0" ]; then
-	dnf install -q -y "$LIBSTD" &>> "$LOG"
-    fi
-
-    dnf install -q -y packages/all/libvoxin-*"$ARCH".rpm &>> "$LOG"
-    dnf install -q -y packages/all/voxind-*i686.rpm &>> "$LOG"
+    dnf install -q -y packages/all/voxin-*"$ARCH".rpm &>> "$LOG"
 }
 
 uninstallSystem()
 {	
-    echo TODO
-    dnf remove -y libvoxin voxind
-    # dnf remove -y compat-libstdc++-296
+    dnf remove -y voxin
 }
 
 installSystem_sd()
@@ -64,8 +53,8 @@ sd_install()
     installSystem_sd || return 1
     local Packages="packages/$DISTRIB_ID.$DISTRIB_RELEASE"
     if [ ! -e "$Packages" ]; then
-	echo; gettext "Sorry, the speech dispatcher packages are not yet included in this archive."
-	return 1
+		echo; gettext "Sorry, the speech dispatcher packages are not yet included in this archive."
+		return 1
     fi
     
     dnf install -q -y "$Packages"/speech-dispatcher-voxin-*."$ARCH".rpm &>> "$LOG"
@@ -77,7 +66,7 @@ sd_uninstall()
 {
     spd_conf_unset ibmtts
     spd_conf_set espeak
-    yum remove speech-dispatcher-voxin
+    dnf remove speech-dispatcher-voxin
     return 0
 }
 
@@ -89,19 +78,18 @@ install_gettext()
 
 uninstallLang()
 {
-    rm -rf /opt/IBM/ibmtts
-    rm -rf /var/opt/IBM/ibmtts
+    return 0
 }
 
 installLang()
 {
     if [ "$TERM" = "dumb" ];
     then
-	LESS=cat
-	CLEAR=
+		LESS=cat
+		CLEAR=
     else
-	LESS="less -e"
-	CLEAR=clear
+		LESS="less -e"
+		CLEAR=clear
     fi
 
     askLicense || return 1
@@ -117,10 +105,6 @@ installLang()
     ./install.sh || return 1
     
     cd ..
-    return 0
-}
-
-installPunctuationFilter() {
     return 0
 }
 

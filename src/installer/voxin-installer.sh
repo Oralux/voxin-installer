@@ -15,9 +15,9 @@ fi
 
 if [ "$(id -u)" != "0" ]; then
     if [ -n "$GETTEXT" ]; then
-	echo; gettext "Please run voxin-installer as root. "
+		echo; gettext "Please run voxin-installer as root. "
     else
-	echo -n "Please run voxin-installer as root. "
+		echo -n "Please run voxin-installer as root. "
     fi	
     exit 0
 fi  
@@ -25,9 +25,9 @@ fi
 check_distro
 if [ "$?" != "0" ]; then
     if [ -n "$GETTEXT" ]; then
-	echo; gettext "Sorry, this distribution is not yet supported. "
+		echo; gettext "Sorry, this distribution is not yet supported. "
     else
-	echo -n "Sorry, this distribution is not yet supported. "
+		echo -n "Sorry, this distribution is not yet supported. "
     fi
     exit 0
 fi
@@ -48,12 +48,12 @@ with_verbose=0
 
 while true ; do
     case "$1" in
-	-l|--lang) with_silent=1; with_lang=1; shift;;
-	-s|--sd) with_silent=1; with_sd=1; shift;;
-	-u|--uninstall) with_uninstall=1; shift;;
-	-v|--verbose) with_verbose=1; shift;;
-	--) shift ; break;;
-	*) usage; exit 1;;
+		-l|--lang) with_silent=1; with_lang=1; shift;;
+		-s|--sd) with_silent=1; with_sd=1; shift;;
+		-u|--uninstall) with_uninstall=1; shift;;
+		-v|--verbose) with_verbose=1; shift;;
+		--) shift ; break;;
+		*) usage; exit 1;;
     esac
 done
 
@@ -97,18 +97,16 @@ askInstallLang && {
 }
 
 isSpeechDispatcherAvailable && askInstallSpeechDriver && {
-	sd_install || exit 1
-	installed=1
-	orcaConf
+		sd_install || exit 1
+		installed=1
+		orcaConf
     }
 
 if [ "$installed" = "0" ]; then
     askUninstall && {
-	uninstall
-	exit 0
+		uninstall
+		exit 0
     }
-else
-    installPunctuationFilter
 
     echo; gettext "The changes will be taken into account on next boot. "
 fi

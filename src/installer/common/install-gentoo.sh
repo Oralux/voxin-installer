@@ -133,20 +133,6 @@ installLang()
     return 0
 }
 
-installPunctuationFilter() {
-    # installing the punctuation filter
-    local INIFILTER=/opt/IBM/ibmtts/bin/inifilter
-    local SRC=./common
-    local DEST=/opt/IBM/ibmtts/lib
-    diff "$SRC"/puncfilter.so "$DEST" &>> "$LOG"
-    if [ "$?" != "0" ]; then
-	cp -a "$SRC"/puncfilter.so* "$DEST"
-	if [ "$?" = "0" ]; then
-	    "$INIFILTER" /filter:2 /path:"$DEST"/puncfilter.so /lang:all /ECIINI:/var/opt/IBM/ibmtts/cfg/ /name:"Punctuation Filter" /autoload:n
-	fi
-    fi
-}
-
 getArch() {
     case "$(uname -m)" in
 	x86_64|ia64)

@@ -7,14 +7,14 @@ askInstallLang()
 {
     local status
     if [ ! -d "mnt" ]; then
-	status=1
+		status=1
     elif [ ! -e "/opt/IBM/ibmtts" ]; then
-	status=0
+		status=0
     else
-	echo; gettext "Do you want to install a new language?"
-	echo; gettext "If yes, press the ENTER key."
-	yes
-	status=$?
+		echo; gettext "Do you want to install a new language?"
+		echo; gettext "If yes, press the ENTER key."
+		yes
+		status=$?
     fi
     return $status
 }
@@ -58,21 +58,21 @@ askLicense()
     echo; gettext "1. Do you want to read again the End-User Agreement?"
     echo; gettext "If yes, press the ENTER key."    
     yes && {
-	if [ "$TERM" != "dumb" ]; then
-	    echo; gettext "Please use the space bar to scroll through the document."
-	fi
-	
-	case "$LANG" in
-	    fr*)
-		AGREEMENT="LICENSE/AGREEMENT-fr"
-		;;
-	    *)
-		AGREEMENT="LICENSE/AGREEMENT"
-		;;
-	esac
-	
-	$CLEAR
-	iconv -f ISO8859-1 $AGREEMENT | $LESS 
+		if [ "$TERM" != "dumb" ]; then
+			echo; gettext "Please use the space bar to scroll through the document."
+		fi
+		
+		case "$LANG" in
+			fr*)
+				AGREEMENT="LICENSE/AGREEMENT-fr"
+				;;
+			*)
+				AGREEMENT="LICENSE/AGREEMENT"
+				;;
+		esac
+		
+		$CLEAR
+		iconv -f ISO8859-1 $AGREEMENT | $LESS 
     }
 
     $CLEAR
@@ -83,8 +83,8 @@ askLicense()
     echo; gettext "2. Do you want to read again the IBM License Agreement?"
     echo; gettext "If yes, press the ENTER key."    
     yes && {
-	$CLEAR
-	$LESS LICENSE/IBM.txt
+		$CLEAR
+		$LESS LICENSE/IBM.txt
     }
 
     $CLEAR
@@ -95,8 +95,8 @@ askLicense()
     echo; gettext "3. Do you want to read again the LGPL License?"
     echo; gettext "If yes, press the ENTER key."    
     yes && {
-	$CLEAR
-	$LESS LICENSE/LGPL.txt
+		$CLEAR
+		$LESS LICENSE/LGPL.txt
     }	
 
     $CLEAR

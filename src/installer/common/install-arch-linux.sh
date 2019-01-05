@@ -19,7 +19,7 @@ removeMultilibSection() {
     stop="$(wc -l "$RFS"/pacman.conf | cut -f1 -d" " )"
 
     if [ -n "$start" ]; then
-	stop1="$(grep -n '^\[' "$RFS"/pacman.conf | cut -f1 -d: | \
+		stop1="$(grep -n '^\[' "$RFS"/pacman.conf | cut -f1 -d: | \
 		       while read x; do \
 			   if [ "$x" -gt "$start" ]; then \
 			       echo "$x"; \
@@ -27,12 +27,12 @@ removeMultilibSection() {
 			   fi; \
 		       done; \
 	     )"
-	if [ -n "$stop1" ]; then	
-	    stop=$(($stop1-1))
-	fi
+		if [ -n "$stop1" ]; then	
+			stop=$(($stop1-1))
+		fi
     fi
     if [ -n "$start" ] && [ -n "$stop" ]; then 
-	sed -i "$start,$stop d" "$RFS"/pacman.conf
+		sed -i "$start,$stop d" "$RFS"/pacman.conf
     fi    
 }
 
@@ -50,12 +50,12 @@ buildRFS() {
     sed -e "s@/etc/pacman.d/mirrorlist@$RFS/mirrorlist@g" -e "/Architecture/ s,auto,i686,"  /etc/pacman.conf > "$RFS"/pacman.conf
     removeMultilibSection
     pacman --noconfirm --root "$RFS" --cachedir "$RFS"/var/cache/pacman/pkg --config "$RFS"/pacman.conf -Sy \
-	2>>"$LOG" 1>&2 || return 1
+		   2>>"$LOG" 1>&2 || return 1
 
     LIST="glibc"
     for p in $LIST; do
-	echo; gettext "Installing package: "; echo -n $p
-	pacman --noconfirm --root "$RFS" --cachedir "$RFS"/var/cache/pacman/pkg --config "$RFS"/pacman.conf -S "$p" \
+		echo; gettext "Installing package: "; echo -n $p
+		pacman --noconfirm --root "$RFS" --cachedir "$RFS"/var/cache/pacman/pkg --config "$RFS"/pacman.conf -S "$p" \
      	       2>>"$LOG" 1>&2 || return 1
     done    
 }
@@ -63,15 +63,15 @@ buildRFS() {
 installLibCPP() {
     LIBSTD=libstdc++2.10-glibc2.2_2.95.4-27_i386
     pacman --noconfirm --root "$RFS" --cachedir "$RFS"/var/cache/pacman/pkg --config "$RFS"/pacman.conf -U "$Packages"/$LIBSTD*i686.pkg.tar.xz \
-	   2>>"$LOG" 1>&2 || return 1       
+		   2>>"$LOG" 1>&2 || return 1       
 }
 
 getSuffix() {
     SUFFIX32=i686.pkg.tar.xz
     if [ "$ARCH" = amd64 ]; then
-	SUFFIX=x86_64.pkg.tar.xz
+		SUFFIX=x86_64.pkg.tar.xz
     else
-	SUFFIX=$SUFFIX32
+		SUFFIX=$SUFFIX32
     fi    
 }
 
@@ -79,7 +79,7 @@ installLibvoxin() {
     getSuffix
 
     pacman --noconfirm --root "$RFS" --cachedir "$RFS"/var/cache/pacman/pkg --config "$RFS"/pacman.conf -U "$Packages"/voxind*$SUFFIX32 \
-	   2>>"$LOG" 1>&2 || return 1
+		   2>>"$LOG" 1>&2 || return 1
 
     LIBVOXIN="$(ls "$Packages"/libvoxin*$SUFFIX 2>/dev/null)"
     pacman -U --noconfirm --force "$LIBVOXIN" 2>>"$LOG" 1>&2 || return 1
@@ -93,13 +93,7 @@ installSystem()
 
 uninstallSystem()
 {
-    unlink /usr/lib/libibmeci.so       
-    for i in / /var/; do
-	unlink ${i}opt/IBM
-    done    
-    pacman --noconfirm -R libvoxin    
-
-    rm -rf "$RFS"
+    pacman --noconfirm -R voxin
 }
 
 installSystem_sd()
@@ -149,19 +143,14 @@ install_gettext()
     . gettext.sh
 }
 
-uninstallLang()
-{
-    return 0
-}
-
 installLang()
 {
     if [ "$TERM" = "dumb" ]; then
-	LESS=cat
-	CLEAR=
+		LESS=cat
+		CLEAR=
     else
-	LESS="less -e"
-	CLEAR=clear
+		LESS="less -e"
+		CLEAR=clear
     fi
 
     askLicense || return 1
@@ -183,9 +172,9 @@ installLang()
     Control=rte/control
     Data=rte/data    
     if [ -e "$RFS"/opt/IBM/ibmtts/bin/inifilter ]; then
-	# $Control/prerm
-	cmd="$(grep opt "$Control"/prerm)"
-	eval chroot "$RFS" "$cmd" 
+		# $Control/prerm
+		cmd="$(grep opt "$Control"/prerm)"
+		eval chroot "$RFS" "$cmd" 
     fi
     "$Control"/preinst
     # inst
@@ -194,7 +183,7 @@ installLang()
     #$Control/postinst 1
     # symlinks for chroot
     for i in libetidev.so libibmeci.so; do
-	ln -sf /opt/IBM/ibmtts/lib/"$i" "$RFS"/usr/lib/
+		ln -sf /opt/IBM/ibmtts/lib/"$i" "$RFS"/usr/lib/
     done
 
     grep opt rte/control/postinst | grep -v ln | while read cmd; do eval chroot "$RFS" "$cmd"; done
@@ -213,8 +202,8 @@ installLang()
     installLibvoxin
 
     for i in / /var/; do
-	mkdir -p ${i}opt/IBM
-	ln -sf /opt/voxin${i}opt/IBM/ibmtts ${i}opt/IBM
+		mkdir -p ${i}opt/IBM
+		ln -sf /opt/voxin${i}opt/IBM/ibmtts ${i}opt/IBM
     done
 
     # for d in sys proc /dev/pts /dev; do
@@ -224,27 +213,13 @@ installLang()
     cd "$BASE"
 }
 
-installPunctuationFilter() {
-    # installing the punctuation filter
-    local INIFILTER=/opt/IBM/ibmtts/bin/inifilter
-    local SRC=common
-    local DEST="$RFS"/opt/IBM/ibmtts/lib
-    diff "$SRC"/puncfilter.so "$DEST" &>> "$LOG"
-    if [ "$?" != "0" ]; then
-	cp -a "$SRC"/puncfilter.so* "$DEST"
-	if [ "$?" = "0" ]; then
-	    chroot "$RFS" "$INIFILTER" /filter:2 /path:"$DEST"/puncfilter.so /lang:all /ECIINI:/var/opt/IBM/ibmtts/cfg/ /name:"Punctuation Filter" /autoload:n
-	fi
-    fi
-}
-
 getArch() {
     case "$(uname -m)" in
-	x86_64|ia64)
-	    ARCH=amd64
+		x86_64|ia64)
+			ARCH=amd64
     	    ;;
-	*)
-	    ARCH=i386
+		*)
+			ARCH=i386
     	    ;;
     esac
 }
