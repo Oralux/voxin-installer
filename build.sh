@@ -62,5 +62,6 @@ mkdir -p "$PKGDIR" "$DWLDIR" "$RFS32"
 getMinimalRFS32FromBuildroot
 getOldLibstdc++
 getLibvoxin
+buildInstaller
 [ -n "$TARBALLS" ] && addFiles "$TARBALLS"
 buildReleaseTarball

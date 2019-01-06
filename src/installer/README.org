@@ -1,0 +1,123 @@
+#+TITLE:     Voxin README
+#+AUTHOR:
+
+For support or feedback, please send a mail to contact@oralux.org
+
+* General Install
+
+Just run ./voxin-installer.sh as root and answer to the questions.
+For example, on Ubuntu with voxin-enu-2.0:
+
+#+BEGIN_ASCII 
+cd voxin-2.0
+cd voxin-enu-2.0
+sudo ./voxin-installer.sh
+#+END_ASCII 
+
+** Voxin updates
+Your download url is usually permanent and points on the last voxin release.
+
+The releases are announced in the [[http://voxin.oralux.net/rss.xml][Voxin RSS feed]].
+
+Please note that a release does not yet automatically backup your previous Voxin installation.
+
+Voxin is released several times a year: 
+- to complete the list of compatible distros (usually after user request),
+- to add new features and fixes (libvoxin offers paths of improvement). 
+
+The [[http://voxin.oralux.net/update/][voxin updates]] includes free softwares and does not include the IBM TTS packages.
+
+** Orca
+
+For Orca/Speech Dispatcher users: the newly installed TTS will be taken in account at the next start of Orca/Speech-dispatcher.
+So, you may want to reboot your system.
+Then, if needed, configure Orca as indicated below.
+
+In the Orca Preferences window, Speech tab:
+- set "Speech system" to "Speech Dispatcher"
+- set "Speech synthesizer" to ibmtts
+
+then press the Apply button.
+
+On some distros, the Orca preferences window is by default hidden and can be displayed using this command line:
+
+orca -s
+
+** Speech Dispatcher
+
+The voxin-installer installs the speech-dispatcher-voxin package and updates your speechd.conf files: DefaultModule is then set to ibmtts.
+Please note that the Speech Dispatcher server will take in account the new configuration after its restart, for example at next reboot.
+
+** Emacspeak
+
+The [[http://soft.oralux.net/emacspeak/][emacspeak installer]] helps to install Emacspeak with eSpeak and Voxin.
+
+If the sound is choppy under Alsa, please copy the asoundrc file from emacspeak to your home directory as ~/.asoundrc
+For example:
+cp emacspeak-45.0/share/emacs/site-lisp/emacspeak/servers/linux-outloud/asoundrc $HOME/.asoundrc
+
+** Speakup connector
+You may want to install speechd-up (interface between Speakup and Speech Dispatcher).
+
+We proposed voxinup, the Speakup connector for Voxin; but incompatibilities with the graphical desktop appeared for example in Vinux 5.1.
+The [[https://soft.oralux.net/speakup][voxinup_install]] helped to install "voxinup" in Arch Linux or Debian based distros.
+The original Speakup connector, "spk-connect-ttsynth", was renamed to "voxinup" to ease at least the typing.
+
+** How to uninstall Voxin?
+Voxin 2.0 can be uninstalled with this command line as root:
+
+./voxin-installer.sh -u
+
+* Compatible GNU/Linux Distributions
+** Voxin 2.0
+|-----------+-------|
+| Archlinux |    xx |
+| Debian    |    9x |
+| Fedora    |   28x |
+| Slint     |    xx |
+| Ubuntu    | 18.04 |
+|-----------+-------|
+
+** Voxin 1.15
+|-----------------+------------------------|
+| Archlinux       | 2017-01-14             |
+| Debian          | 8, 9                   |
+| Fedora          | 25, 26                 |
+| Kali            | 2016.2, 2017.2, 2017.3 |
+| Sonar GNU/Linux | 16.07                  |
+| Ubuntu          | from 14.04 to 18.04    |
+| Vinux           | 5.1                    |
+|-----------------+------------------------|
+
+* Future Updates
+
+Voxin comes with binary packages for Orca and Speech Dispatcher compatible with various GNU/Linux distributions.
+
+However, these binaries will have to be rebuilt to match forthcoming releases of your distro. 
+
+Please note, that the user can rebuilt them.
+
+If you prefer to download [[http://voxin.oralux.net/update/][forthcoming voxin updates]], please visit the update page or subscribe to the [[http://voxin.oralux.net/rss.xml][Voxin RSS feed]].
+
+* voxin-say command
+
+voxin-say is a command which converts text to speech.
+
+#+BEGIN_ASCII 
+EXAMPLES :
+
+# Say 'hello world' and redirect output to an external audio player:
+voxin-say "hello world" | aplay
+
+# Read file.txt and save speech to an audio file:
+voxin-say -f file.txt -w file.wav
+voxin-say -f file.txt > file.wav
+
+# The following command is incorrect because no output is supplied:
+voxin-say "Hello all"
+
+# Correct command to read a file in French at 500 words per minute, use 4 jobs to speed up conversion
+voxin-say -f file.txt -l fr -s 500 -j 4 -w audio.wav
+
+#+END_ASCII
+

@@ -1,0 +1,124 @@
+# Voxin po file
+# Copyright (C) 2016, Oralux.org Association
+# This file is distributed under the LGPL license.
+# Gilles Casse <gcasse@oralux.org>, January 2016.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: voxin-installer 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-12-11 21:45+0100\n"
+"PO-Revision-Date: 2016-12-11 21:49+0100\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../common/ask.sh:58
+msgid "1. Do you want to read again the End-User Agreement?"
+msgstr "1. ¿Quieres volver a leer el Acuerdo de Usuario Final"
+
+#: ../common/ask.sh:83
+msgid "2. Do you want to read again the IBM License Agreement?"
+msgstr "2. ¿Quieres volver a leer el contrato de licencia de IBM?"
+
+#: ../common/ask.sh:95
+msgid "3. Do you want to read again the LGPL License?"
+msgstr "3. ¿Quieres leer de nuevo la licencia LGPL?"
+
+#: ../common/ask.sh:54
+msgid "Do you agree the licenses?"
+msgstr "¿Quieres volver a leer las licencias?"
+
+#: ../common/ask.sh:14
+msgid "Do you want to install a new language?"
+msgstr "¿Quieres instalar un nuevo idioma?"
+
+#: ../common/ask.sh:46
+msgid "Do you want to uninstall the TTS?"
+msgstr "¿Quieres desinstalar el TTS"
+
+#: ../common/ask.sh:37
+msgid "Do you want to use the TTS with:"
+msgstr "¿Desea usar el TTS con:"
+
+#: ../common/init.sh:85
+msgid "Enter path (or Control C to quit): "
+msgstr "Introduzca la ruta (o Control C para salir):"
+
+#: ../common/init.sh:83
+msgid "Example of path: /home/user1/voxin-enu-0.43.tgz"
+msgstr "Ejemplo de ruta: /home/user1/voxin-enu-0.43.tgz"
+
+#: ../voxin-installer.sh:122
+msgid "Good Bye. "
+msgstr "Adiós. "
+
+#: ../common/ask.sh:15 ../common/ask.sh:39 ../common/ask.sh:55
+#: ../common/ask.sh:59 ../common/ask.sh:84 ../common/ask.sh:96
+msgid "If yes, press the ENTER key."
+msgstr "Si está de acuerdo, pulse la tecla Entrar."
+
+#: ../common/ask.sh:47
+msgid "If you agree please type OK "
+msgstr "Si está de acuerdo por favor escriba OK "
+
+#: ../common/ask.sh:79
+msgid "If you agree to the End-User Agreement, press the ENTER key"
+msgstr ""
+"Si está de acuerdo con el Acuerdo de Usuario Final, pulse la tecla Entrar."
+
+#: ../common/ask.sh:91
+msgid "If you agree to the IBM license agreement, press the ENTER key"
+msgstr ""
+"Si está de acuerdo con el contrato de licencia de IBM, pulse la tecla Entrar."
+
+#: ../common/ask.sh:103
+msgid "If you agree to the LGPL license, press the ENTER key"
+msgstr "Si está de acuerdo con la licencia LGPL, pulse la tecla Entrar."
+
+#: ../common/init.sh:82
+msgid "If you already bought an older voxin archive then type its path below."
+msgstr "Si ya compraste un archivo de voxin más antiguo, escribe su ruta de acceso a continuación."
+
+#: ../voxin-installer.sh:92
+msgid "Initialization; please wait... "
+msgstr "inicialización; por favor espera... "
+
+#: ../common/install-arch-linux.sh:44
+msgid "Installing a 32 bits system in /opt/voxin..."
+msgstr "Instalación de un sistema de 32 bits en /opt/voxin..."
+
+#: ../common/install-arch-linux.sh:55
+msgid "Installing package: "
+msgstr "Instalación del paquete : "
+
+#: ../common/init.sh:46
+msgid "Operation completed. "
+msgstr "Operación completada. "
+
+#: ../voxin-installer.sh:18
+msgid "Please run voxin-installer as root. "
+msgstr "Por favor, ejecute este programa como root. "
+
+#: ../common/ask.sh:62
+msgid "Please use the space bar to scroll through the document."
+msgstr "Utilice la barra espaciadora para desplazarse por el documento."
+
+#: ../common/init.sh:81
+msgid "Sorry, the IBM TTS runtime is not included in this update."
+msgstr "Lo sentimos, el tiempo de ejecución de IBM TTS no está incluido en esta actualización."
+
+#: ../common/install-debian.sh:95
+msgid ""
+"Sorry, the speech dispatcher packages are not yet included in this archive."
+msgstr ""
+"Lo sentimos, los paquetes speech-dispatcher discurso aún no están incluidos "
+"en este archivo."
+
+#: ../voxin-installer.sh:28
+msgid "Sorry, this distribution is not yet supported. "
+msgstr "Lo sentimos, la distribución de Linux aún no es compatible. "
+
+#: ../voxin-installer.sh:119
+msgid "The changes will be taken into account on next boot. "
+msgstr "Los cambios se tendrán en cuenta en el siguiente inicio. "

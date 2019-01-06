@@ -40,6 +40,7 @@ SRCDIR=$BASE/src
 BR_PKG="$PKGDIR/buildroot_${BR_VER}.txz"
 RFS_PKG="$PKGDIR/rfs_${VOXIN_VER}.txz"
 RFSDIR=$TMPDIR/rfs
+INSTALLDIR=$TMPDIR/voxin-installer_$VOXIN_VER
 VOXINDIR=$RFSDIR/opt/oralux/voxin
 RFS32=$VOXINDIR/rfs32
 #RFS32_PKG="$PKGDIR/${NAME}.txz"
@@ -204,6 +205,7 @@ getLibvoxin() {
 	cd "$pwd"	
 }
 
+
 buildReleaseTarball() {
 	local dir="voxin-installer_$VOXIN_VER"
 	local workdir="$TMPDIR/$dir"
@@ -222,4 +224,12 @@ addFiles() {
 			tar -C "$RFSDIR" -xf $i
 		done
 	fi
+}
+
+
+buildInstaller() {
+	rm -rf "$INSTALLDIR"
+	mkdir -p "$INSTALLDIR"
+	cp -a src/installer/* "$INSTALLDIR"
+	
 }
