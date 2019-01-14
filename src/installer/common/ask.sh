@@ -6,7 +6,8 @@
 askInstallLang()
 {
     local status
-    if [ ! -d "mnt" ]; then
+	local list=$(getViavoiceTarballs)
+    if [ -z "list" ]; then
 		status=1
     elif [ ! -e "/opt/IBM/ibmtts" ]; then
 		status=0
@@ -51,7 +52,23 @@ askUninstall()
 
 askLicense()
 {
-    echo; gettext "Do you agree the licenses?"
+	local VIAVOICE_ARCHIVE=$(getViavoiceAllTarball)
+	local VIAVOICE_AGREEMENT=opt/oralux/voxin/share/doc/voxin-viavoice-all/AGREEMENT
+	local VIAVOICE_LICENSE=opt/IBM/ibmtts/doc/IBM.txt
+	local LIBVOXIN_ARCHIVE=$(getVoxinTarball)
+	local LIBVOXIN_LGPL=opt/oralux/voxin/share/doc/libvoxin/LGPL.txt
+	local LESS
+	local CLEAR
+	
+    if [ "$TERM" = "dumb" ]; then
+		LESS=cat
+		CLEAR=
+    else
+		LESS="less -e"
+		CLEAR=clear
+    fi
+
+	echo; gettext "Do you agree the licenses?"
     echo; gettext "If yes, press the ENTER key."    
     yes && return 0
 
@@ -63,16 +80,12 @@ askLicense()
 		fi
 		
 		case "$LANG" in
-			fr*)
-				AGREEMENT="LICENSE/AGREEMENT-fr"
-				;;
-			*)
-				AGREEMENT="LICENSE/AGREEMENT"
-				;;
+			fr*) VIAVOICE_AGREEMENT="${VIAVOICE_AGREEMENT}-fr";;
+			*) ;;
 		esac
 		
 		$CLEAR
-		iconv -f ISO8859-1 $AGREEMENT | $LESS 
+		tar -Oxf "$VIAVOICE_ARCHIVE" "$VIAVOICE_AGREEMENT" | $LESS 
     }
 
     $CLEAR
@@ -84,7 +97,7 @@ askLicense()
     echo; gettext "If yes, press the ENTER key."    
     yes && {
 		$CLEAR
-		$LESS LICENSE/IBM.txt
+		tar -Oxf "$VIAVOICE_ARCHIVE" "$VIAVOICE_LICENSE" | $LESS 
     }
 
     $CLEAR
@@ -96,7 +109,7 @@ askLicense()
     echo; gettext "If yes, press the ENTER key."    
     yes && {
 		$CLEAR
-		$LESS LICENSE/LGPL.txt
+		tar -Oxf "$LIBVOXIN_ARCHIVE" "$LIBVOXIN_LGPL" | $LESS 
     }	
 
     $CLEAR

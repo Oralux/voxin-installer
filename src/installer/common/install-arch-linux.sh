@@ -145,14 +145,6 @@ install_gettext()
 
 installLang()
 {
-    if [ "$TERM" = "dumb" ]; then
-		LESS=cat
-		CLEAR=
-    else
-		LESS="less -e"
-		CLEAR=clear
-    fi
-
     askLicense || return 1
 
     [ -d "$RFS/tmp" ] || return 1
@@ -222,4 +214,8 @@ getArch() {
 			ARCH=i386
     	    ;;
     esac
+}
+
+isSpeechDispatcherVoxinInstalled() {
+	return 0
 }

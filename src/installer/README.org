@@ -1,4 +1,4 @@
-#+TITLE:     Voxin README
+#+TITLE:     Voxin %VERSION% README
 #+AUTHOR:
 
 For support or feedback, please send a mail to contact@oralux.org
@@ -6,11 +6,11 @@ For support or feedback, please send a mail to contact@oralux.org
 * General Install
 
 Just run ./voxin-installer.sh as root and answer to the questions.
-For example, on Ubuntu with voxin-enu-2.0:
+For example, on Ubuntu with voxin-enu-%VERSION%:
 
 #+BEGIN_ASCII 
-cd voxin-2.0
-cd voxin-enu-2.0
+cd voxin-%VERSION%
+cd voxin-enu-%VERSION%
 sudo ./voxin-installer.sh
 #+END_ASCII 
 
@@ -64,19 +64,15 @@ The [[https://soft.oralux.net/speakup][voxinup_install]] helped to install "voxi
 The original Speakup connector, "spk-connect-ttsynth", was renamed to "voxinup" to ease at least the typing.
 
 ** How to uninstall Voxin?
-Voxin 2.0 can be uninstalled with this command line as root:
+Voxin %VERSION% can be uninstalled with this command line as root:
 
 ./voxin-installer.sh -u
 
 * Compatible GNU/Linux Distributions
-** Voxin 2.0
-|-----------+-------|
-| Archlinux |    xx |
-| Debian    |    9x |
-| Fedora    |   28x |
-| Slint     |    xx |
-| Ubuntu    | 18.04 |
-|-----------+-------|
+** Voxin %VERSION%
+|--------|
+| Debian |
+|--------|
 
 ** Voxin 1.15
 |-----------------+------------------------|

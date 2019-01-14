@@ -29,7 +29,7 @@ LIBVOXIN_VERSION=
 #LIBVOXIN_SHA256=29a211d46f75ee1b8f3922e871554777a64815b1a4a2ff8f3c41e58012af2ea6
 
 # Dependencies
-DEP_LIST="make gcc wget fakeroot unzip"
+DEP_LIST="make gcc wget fakeroot unzip emacs"
 
 #####
 
@@ -228,8 +228,22 @@ addFiles() {
 
 
 buildInstaller() {
+	local pwd=$PWD
+
 	rm -rf "$INSTALLDIR"
 	mkdir -p "$INSTALLDIR"
 	cp -a src/installer/* "$INSTALLDIR"
-	
+	cd "$INSTALLDIR"
+
+	emacs README.org --batch -f org-ascii-export-to-ascii --kill
+	sed -i -e "s/%VERSION%/$VOXIN_VER/" -e '/^[[:space:]]*[=~_]\+$/d' README.txt 
+	rm README.org
+
+	cd po
+	for i in de es fr; do
+		./install_po.sh $i
+	done
+
+
+	cd "$pwd"
 }

@@ -2,8 +2,6 @@
 
 BASE=$(realpath "$(dirname "$0")/..")
 
-## TODO (conf)
-
 # look for the current installation path (local or system-wide)
 LOCAL1=$BASE/rfs
 LOCAL2=$BASE/.oralux/rfs
@@ -24,6 +22,7 @@ for i in aplay paplay; do
 	PLAY=$(which $i 2>/dev/null) && break
 done
 
+#TODO
 ./setConf.sh "$RFSDIR"
 
 export LD_LIBRARY_PATH="$RFSDIR/$VOXINDIR/lib"

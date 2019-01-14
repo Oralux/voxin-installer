@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 # This file is under the LGPL license
 # 2007-2019, Gilles Casse <gcasse@oralux.org>
 #
@@ -13,7 +13,7 @@ if [ "$?" = "0" ]; then
     GETTEXT=0
 fi
 
-if [ "$(id -u)" != "0" ]; then
+if [ "$UID" != "0" ]; then
     if [ -n "$GETTEXT" ]; then
 		echo; gettext "Please run voxin-installer as root. "
     else
@@ -32,6 +32,12 @@ if [ "$?" != "0" ]; then
     exit 0
 fi
 
+check_speech_dispatcher_voxin
+if [ "$?" != "0" ]; then
+	echo; gettext "Sorry, this installer does not provide a compatible replacement version for speech-dispatcher-voxin."
+    exit 0
+fi
+			
 TEMP=`getopt -o hlsuv --long help,lang,sd,uninstall,verbose -- "$@"`
 if [ $? != 0 ] ; then
     usage
@@ -80,24 +86,29 @@ if [ "$with_uninstall" = "1" ]; then
     exit 0
 fi
 
-check_runtime
-
 echo; gettext "Log file: $LOG"
 echo; gettext "Initialization; please wait... "
-installSystem
+installDir=/
+installSystem "$installDir"
 
 installed=0
 askInstallLang && {
-    installLang || exit 1
+    installLang "$installDir" || exit 1
     installed=1
-    wavfile="$(mktemp)"
-    ./say/say -w "$wavfile" "Voxin: OK"
-    (paplay "$wavfile" || aplay "$wavfile") &>> "$LOG"
-    rm "$wavfile"
+
+	unset PLAY
+	for i in aplay paplay; do
+		PLAY=$(which $i 2>/dev/null) && break
+	done
+
+	export LD_LIBRARY_PATH="$installDir"/opt/oralux/voxin/lib
+	if [ -n "$PLAY" ]; then
+		"$installDir"/opt/oralux/voxin/bin/voxin-say "Voxin: OK" | $PLAY &>> "$LOG"
+	fi
 }
 
 isSpeechDispatcherAvailable && askInstallSpeechDriver && {
-		sd_install || exit 1
+		sd_install "$installDir" || exit 1
 		installed=1
 		orcaConf
     }

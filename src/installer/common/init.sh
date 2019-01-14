@@ -6,6 +6,12 @@
 LOG="$PWD/log/voxin.log"
 rm -f "$LOG"
 
+
+leave() {
+	echo -e "$1"
+	exit $2
+}
+
 init_gettext()
 {
     export TEXTDOMAINDIR="$1"
@@ -79,34 +85,140 @@ check_distro()
     return $status
 }
 
+# if the speech-dispatcher-voxin package is already installed, check
+# if this installer provides a compatible replacement version
+check_speech_dispatcher_voxin() {
+	local status=0
+	$(isSpeechDispatcherVoxinInstalled)
+	if [ $? = 0 ]; then 
+		local deb=$(getSpeechDispatcherDebPackage)
+		[ -z "$deb" ] && status=1
+	fi	
+	return $status
+}
+
 merge_old_archive()
 {
     local archive="$1"
 }
 
-check_runtime()
-{
-    local status=0
-    local archive
-    local dir
-    if [ ! -d "mnt/rte" ]; then
-		status=1
-		echo; gettext "Sorry, the IBM TTS runtime is not included in this update."
-		echo; gettext "If you already bought an older voxin archive then type its path below."
-		echo; gettext "Example of path: /home/user1/voxin-enu-0.43.tgz"
-		while [ 1 ]; do
-			echo ; gettext "Enter path (or Control C to quit): "
-			read -e archive
-			if [ -f "$archive" ]; then
-				(tar -ztf "$archive" | grep -e ".*/.*/mnt/rte") &>> $LOG
-				if [ "$?" = "0" ]; then
-					dir="$(tar -ztf "$archive" | grep -e ".*/.*/mnt/$")"
-					tar -zxf "$archive" "$dir" --strip-components=2
-					status=$?
-					break;
-				fi
+# getTarballVersion
+# Example:
+# input=name_1.2.3.x86_64.txz
+# output=1.2.3
+getTarballVersion() {
+	[ $# != 1 ] && return
+	echo "$1" | sed 's+.*_\(.*\)\..*\..*+\1+'
+}
+
+# getMajMinVersion
+# Example:
+# input=1.2.3
+# output=1.2
+getMajMinVersion() {
+	[ $# != 1 ] && return
+	echo "$1" | sed 's/\(.*\..*\)\..*/\1/'
+}
+
+# getDebPackageVersion
+# Example:
+# input: name_1.2.3-5voxin1_amd64.deb
+# output: 1.2.3
+getDebPackageVersion() {
+	[ $# != 1 ] && return
+	local deb=$1
+	echo "$deb" | sed 's+.*_\(.*\)-.*+\1+'
+}
+
+getSpeechDispatcherDebPackage() {
+	local list=$(ls packages/all/$arch/speech-dispatcher-voxin_*.deb 2>/dev/null)
+	local i
+	local availableVersion
+	local deb
+	local sd=$(which speech-dispatcher 2>/dev/null)
+
+	[ -z "$sd" ] && return
+
+	local installedVersion=$($sd -v | head -n1| cut -f2 -d" ")
+	if [ -n "$list" ]; then
+		for i in $list; do
+			availableVersion=$(getDebPackageVersion "$i")
+			local ver1=$(getMajMinVersion $availableVersion)
+			local ver2=$(getMajMinVersion $installedVersion)
+			if [ "$ver1" = "$ver2" ]; then
+				deb=$i
+				break
 			fi
 		done
-    fi
-    return $status
+	fi
+	echo "$deb"
 }
+
+getVoxinDebPackage() {
+	ls packages/all/$arch/voxin-pkg_*.deb 2>/dev/null
+}
+
+getLibvoxinTarball() {
+	ls packages/all/$arch/libvoxin_*.txz 2>/dev/null
+}
+
+getViavoiceAllTarball() {
+	ls packages/all/$arch/voxin-viavoice-all_*.txz 2>/dev/null
+}
+
+getViavoiceTarballs() {
+	ls packages/all/$arch/voxin-viavoice_*.txz 2>/dev/null
+}
+
+postInstViavoiceTarball() {
+	[ $# != 2 ] && return 1
+
+	local rfsdir=$1
+	local destdir=$2
+	local inidir=$rfsdir/opt/IBM/ibmtts/etc
+	local newconf=$rfsdir/var/opt/IBM/ibmtts/cfg/eci.ini
+	local rfs32=$rfsdir/opt/oralux/voxin/rfs32
+	local LANG
+	local i
+
+	if [ ! -f "$inidir/all.ini" ]; then
+		echo "Notice: no $inidir/all.ini"
+		return 0
+	fi
+
+	# get list of installed languages
+	LANG=$(find "$inidir/../lib" -regex ".*/...50.so" | sed "s+.*/\(.*\)50.so+\1+")
+
+	if [ -z "$LANG" ]; then
+		echo "No language found in $inidir/../lib"
+		return 1
+	fi
+
+	cp "$inidir/all.ini" "$newconf" 
+	if [ $? != 0 ]; then
+		echo "Write error: $inidir/all.ini"
+		return 1
+	fi
+
+	for i in $LANG; do
+		if [ -e "$inidir/$i.ini" ]; then
+			cat "$inidir/$i.ini" >> "$newconf"
+			if [ $? != 0 ]; then
+				echo "Write error: $inidir/all.ini"
+				return 1
+			fi
+		else
+			echo "Notice: no $inidir/$i.ini"		
+			return 1
+		fi
+	done
+
+	sed -i "s#=/opt/#=$destdir/opt/#" "$newconf"
+	if [ $? != 0 ]; then
+		echo "Write error: $newconf"
+		return 1
+	fi
+
+	return 0
+}
+

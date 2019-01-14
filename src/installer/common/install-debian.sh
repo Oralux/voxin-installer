@@ -3,6 +3,12 @@
 # 2007-2019, Gilles Casse <gcasse@oralux.org>
 #
 
+debianIsPackageInstalled() {
+	[ $# != 1 ] && return
+	local deb=$1
+	grep -A1 "Package: $deb$" /var/lib/dpkg/status | grep "Status: install ok installed" &> /dev/null
+}
+
 identify_debian() 
 {
     local status=1
@@ -47,22 +53,67 @@ identify_debian()
 
 installSystem()
 {	
-    local Packages="packages/$DISTRIB_ID.$DISTRIB_RELEASE"
+	[ $# != 1 ] && return 1
+	local rfsdir=$1
+	local status=0
+	local voxinDeb=$(getVoxinDebPackage)
+	local libvoxinTarball=$(getLibvoxinTarball)
 
+	if [ ! -d "$rfsdir"]; then
+		echo "Install directory not found: $rfsdir" >> "$LOG"
+		return 1
+	fi
+	
     apt-get -q update >> "$LOG"
+	status=$?
+	if [ "$status" != 0 ]; then
+		echo "apt-get update failure!" >> "$LOG"
+		return "$status"
+	fi
 
-	VOXIN=$(ls "$Packages"/voxin_*_$ARCH.deb 2>/dev/null)
+	if [ -z "$voxinDeb" ]; then
+		echo "voxin deb not found!" >> "$LOG"
+		return 1
+	fi
+	
+	if [ -z "$libvoxinTarball" ]; then
+		echo "libvoxin pkg not found!" >> "$LOG"
+		return 1
+	fi
 
-	[ -z "$VOXIN" ] && VOXIN="$(ls packages/all/voxin_*_$ARCH.deb)"
+	for i in libvoxin1 voxind; do
+		apt-get remove --yes --purge $i &>> "$LOG"
+	done
+	
+	dpkg -i "$voxinDeb" &>> "$LOG"
+	status=$?
+	if [ "$status" != 0 ]; then
+		local oldSymlink="/usr/lib/libibmeci.so"
+		if [ -e "$oldSymlink" ]; then
+			echo "delete old symlink: $oldSymlink" >> "$LOG"
+			mv "$oldSymlink" "$oldSymlink.orig"
+			dpkg -i "$voxinDeb" &>> "$LOG"
+			status=$?
+		fi
+		if [ "$status" != 0 ]; then
+			echo "Can't install $voxinDeb!" >> "$LOG"
+			return "$status"
+		fi
+	fi
 
-    dpkg -i "$VOXIN" &>> "$LOG"
-
+	tar -C "$rfsdir" -xf "$libvoxinTarball" 
+	status=$?
+	if [ "$status" != 0 ]; then
+		echo "Error: untar failure ($libvoxinTarball)" >> "$LOG"
+	fi	
+	
+	return "$status"
 }
 
 
 uninstallSystem()
 {	
-    apt-get remove --yes --purge voxin
+    apt-get remove --yes --purge voxin-pkg &>> "$LOG"
 }
 
 
@@ -84,19 +135,23 @@ orcaConf()
 
 isSpeechDispatcherAvailable()
 {
-    return 0
+	debianIsPackageInstalled speech-dispatcher
+}
+
+isSpeechDispatcherVoxinInstalled() {
+	debianIsPackageInstalled speech-dispatcher-voxin || debianIsPackageInstalled speech-dispatcher-ibmtts
 }
 
 sd_install()
 {
-    installSystem_sd || return 1
-    local Packages="packages/$DISTRIB_ID.$DISTRIB_RELEASE"
-    if [ ! -e "$Packages" ]; then
-		echo; gettext "Sorry, the speech dispatcher packages are not yet included in this archive."
-		return 1
-    fi
-    
-    dpkg -i "$Packages"/speech-dispatcher-voxin_*_$ARCH.deb &>> "$LOG"
+	[ $# != 1 ] && return 1
+	
+	local rfsdir=$1
+	local deb=$(getSpeechDispatcherDebPackage)
+	[ -z "$deb" ] && return 1
+	
+	dpkg -i "$deb" &>> "$LOG" || return 1
+	
     spd_conf_set ibmtts
     return 0
 }
@@ -124,28 +179,21 @@ uninstallLang()
 
 installLang()
 {
-    if [ "$TERM" = "dumb" ];
-    then
-		LESS=cat
-		CLEAR=
-    else
-		LESS="less -e"
-		CLEAR=clear
-    fi
+	[ $# != 1 ] && return 1
+	local rfsdir=$1
+	local status
 
     askLicense || return 1
 
-    cd mnt
-    # if [ "$ARCH" = "amd64" ]; then
-    # 	export LD_LIBRARY_PATH=/usr/lib
-    # fi
-    
-    # preserve directory metadata
-    install -d 0755 /opt/IBM /var/opt/IBM
-    sed -i 's+tar -C / -oxf -+tar -C / --no-overwrite-dir -xf -+' install.sh 
-    ./install.sh || return 1
-    
-    cd ..
+	getViavoiceTarballs | while read i; do
+		tar -C "$rfsdir" --no-overwrite-dir -xf "$i"
+		status=$?
+		if [ "$status" != 0 ]; then
+			echo "Error: untar failure ($libvoxinTarball)" >> "$LOG"
+			return $status
+		fi
+	done
+
     return 0
 }
 
