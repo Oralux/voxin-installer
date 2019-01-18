@@ -15,17 +15,22 @@ Note that a minimal 32 bits root filesystem is needed as input to this
 script (see README.org).
 
 Options: 
--c, --clean clean-up:  delete the build directory and object files (buildroot, tarballs,...)
+-c, --clean clean-up:  delete the build directory and object files (buildroot, 
+                       tarballs,...)
 -h, --help             display this help 
--b, --buildroot        (optionally) build a 32 bits rootfilesystem using buildroot (https://buildroot.org). 
+-b, --buildroot        (optionally) build a 32 bits rootfilesystem using 
+                       buildroot (https://buildroot.org). 
                        see its configuration in src/buildroot/
--t, --tarballs <file>  extracts the list of supplied tarballs (voxin-viavoice-all.txz,...)
-                       <file> contains one tarball per line 
-
+-t, --tarballs <file>  extracts the list of supplied tarballs 
+                       (voxin-viavoice-all.txz,...) into the root filesystem.
+                       <file> contains one tarball per line (full pathname) 
 
 Example:
 # build all
  $0
+
+# build all, extract and merge the tarballs in list.txt
+ $0 -t list.txt
 
 " 
 
@@ -62,6 +67,7 @@ mkdir -p "$PKGDIR" "$DWLDIR" "$RFS32"
 getMinimalRFS32FromBuildroot
 getOldLibstdc++
 getLibvoxin
+getSpeechDispatcherVoxin
 buildInstaller
 [ -n "$TARBALLS" ] && addFiles "$TARBALLS"
 buildReleaseTarball

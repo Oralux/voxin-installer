@@ -29,7 +29,7 @@ LIBVOXIN_VERSION=
 #LIBVOXIN_SHA256=29a211d46f75ee1b8f3922e871554777a64815b1a4a2ff8f3c41e58012af2ea6
 
 # Dependencies
-DEP_LIST="make gcc wget fakeroot unzip emacs"
+DEP_LIST="make gcc wget fakeroot unzip emacs md5sum"
 
 #####
 
@@ -45,7 +45,9 @@ VOXINDIR=$RFSDIR/opt/oralux/voxin
 RFS32=$VOXINDIR/rfs32
 #RFS32_PKG="$PKGDIR/${NAME}.txz"
 DOC=$VOXINDIR/usr/share/doc
-
+OLD_VOXIN_URL=https://voxin.oralux.net/update/voxin-update-1.15.tgz
+OLD_VOXIN_SD_PATH=voxin-1.15/voxin-update-1.15/packages/ubuntu.17.04/speech-dispatcher-voxin_0.8.6-5voxin1_amd64.deb
+OLD_VOXIN_SD_SUB_DIR=4
 
 # gnupg key used to sign packages
 SIGNING_KEY=AED093E5
@@ -131,7 +133,7 @@ getOldLibstdc++() {
 	mkdir -p "$workdir"
 	cd "$workdir"
 	if [ ! -e "$archivep" ]; then
-		wget -P "$DWLDIR" $LIBSTDCPP_URL
+		wget -P "$DWLDIR" "$LIBSTDCPP_URL"
 	fi
 	ar -x "$archivep"
 	tar -xf data.tar.gz
@@ -139,7 +141,8 @@ getOldLibstdc++() {
 	cd "$pwd"
 }
 
-
+# build the libvoxin tarballs from github
+# install build/$arch/release/libvoxin_$version.$archx.txz in the rfsdir
 getLibvoxin() {
 	local archive
 	local archivep
@@ -174,7 +177,7 @@ getLibvoxin() {
 	
 	# download
 	if [ ! -e "$archivep" ]; then
-		wget -P "$DWLDIR" $LIBVOXIN_URL/$archive
+		wget -P "$DWLDIR" "$LIBVOXIN_URL/$archive"
 	fi
 
 	if [ -n "$dev" ]; then
@@ -197,14 +200,47 @@ getLibvoxin() {
 	fi
 	./build.sh -r
 
-	# libibmeci-fake_1.3.3.any.txz
+	# libibmeci-fake_1.3.3.all.txz
 	# libvoxin_1.3.3.x86_64.txz
-	# voxin-pkg_1.3.3.any.txz
+	# voxin-pkg_1.3.3.all.txz
 
-	tar -C "$RFSDIR" -xf build/$ARCH/release/libvoxin_*.$ARCH.txz
+	local tarball=$(ls $PWD/build/$ARCH/release/libvoxin_*.$ARCH.txz)
+	tar -C "$RFSDIR" -xf $tarball
+
+
+	# debian package
+	
+	local description="Description: voxin pseudo package\n Voxin is an easily installable add-on which provides yet another\n text-to-speech to blind users of GNU/Linux.\n"
+	tarball=$(ls $PWD/build/$ARCH/release/libvoxin-pkg_*.all.txz)
+	local name=libvoxin1
+	local depends=libc6
+	local arch
+	case "$ARCH" in
+		x86_64) arch=amd64;;
+		*) leave "TODO: arch=$ARCH" 1;;
+	esac
+	buildDebPackage "$tarball" "$name" "$version" "$arch" "$depends" "$description"
+	
 	cd "$pwd"	
 }
 
+# installs the speech-dispatcher-voxin debian package(s)
+getSpeechDispatcherVoxin() {
+	# The old speech-dispatcher-voxin 0.8.x package is extracted from the old voxin 1.15 update tarball
+	# This package can be rebuild in following for example:
+	# https://github.com/Oralux/speech-dispatcher-voxin-debian
+	#
+	local basename="$(basename $OLD_VOXIN_URL)"
+	local archivep="$PKGDIR/$basename"
+
+	if [ ! -e "$archivep" ]; then	
+		if [ ! -e "$DWLDIR/$basename" ]; then	
+			wget -P "$DWLDIR" "$OLD_VOXIN_URL"
+		fi
+		tar --one-top-level="$PKGDIR" --strip-components="$OLD_VOXIN_SD_SUB_DIR" -xf "$DWLDIR/$basename" "$OLD_VOXIN_SD_PATH"
+	fi
+	
+}
 
 buildReleaseTarball() {
 	local dir="voxin-installer_$VOXIN_VER"
@@ -244,6 +280,46 @@ buildInstaller() {
 		./install_po.sh $i
 	done
 
-
 	cd "$pwd"
+}
+
+buildDebPackage() {
+	[ "$#" -lt 6 ] && return 1
+	local tarball=$1
+	local name=$2
+	local version=$3
+	local arch=$4
+	local depends=$5
+	local description=$6
+	local replaces=$7
+	
+	which md5sum > /dev/null || leave "install md5sum" 1
+
+	local debdir="$TMPDIR"/deb.d
+	[ -e "$debdir" ] && rm -rf "$debdir"
+	mkdir -p "$debdir"/{DEBIAN,data}
+	cd "$debdir"/data
+
+	tar -xf "$tarball"
+	find . -type f | xargs md5sum >> ../DEBIAN/md5sums
+	local size=$(du -scb . | head -n1 | cut -f1)
+	cd ..
+	cat <<EOF>DEBIAN/control
+Package: $name
+Version: $version
+Architecture: $arch
+Maintainer: <contact@oralux.org>
+Installed-Size: $size
+Depends: $depends
+Section: sound
+EOF
+
+	[ -n "$replaces" ] && echo "Replaces: $replaces" >> DEBIAN/control
+	echo -e "$description" >> DEBIAN/control
+
+	cp "$tarball" data.tar.xz
+	echo 2.0 > debian-binary
+	tar -C DEBIAN -Jcf control.tar.xz ./control ./md5sums
+
+	ar -r "$PKGDIR/${name}_${version}_${arch}".deb debian-binary control.tar.xz data.tar.xz 
 }

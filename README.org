@@ -11,7 +11,7 @@ The standard 32 bits libraries are built by [[https://buildroot.org][Buildroot]]
 
 * Build
 By default, libvoxin is built, and installed into the local opt/oralux/voxin directory.
-A minimal 32 bits rootfilesystem is supposed to be already available (see paragraph "minimal 32 bits rootfilesystem").
+A minimal 32 bits rootfilesystem is supposed to be already available (see paragraph "minimal 32 bits rootfilesystem"). 
 
 ** Command
 #+BEGIN_SRC shell
@@ -25,7 +25,9 @@ Sequence followed:
 - build [[https://github.com/Oralux/libvoxin][libvoxin]] 
 
 ** Minimal 32 bits rootfilesystem
-The rootfilesystem can be (re)built if needed; it is a relatively intensive process (more than one hour, 3.5 GB of storage space).
+The buildroot tarball is expected to be found in build/packages/buildroot_2017.02.9.txz .
+This tarball can be (re)built if needed; it is a relatively intensive process (more than one hour, 3.5 GB of storage space).
+An archive should be available from Oralux and 
 
 *** Command
 #+BEGIN_SRC shell
