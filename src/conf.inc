@@ -2,9 +2,6 @@
 #
 VOXIN_VER=2.0
 
-# TODO
-ARCH=x86_64
-
 #-- voxin-rfs32
 # Buildroot
 BR_VER=2017.02.9
@@ -29,7 +26,7 @@ LIBVOXIN_VERSION=
 #LIBVOXIN_SHA256=29a211d46f75ee1b8f3922e871554777a64815b1a4a2ff8f3c41e58012af2ea6
 
 # Dependencies
-DEP_LIST="make gcc wget fakeroot unzip emacs md5sum"
+DEP_LIST="make gcc wget fakeroot unzip emacs md5sum rsync"
 
 #####
 
@@ -38,7 +35,6 @@ TMPDIR=$BASE/build/tmp
 DWLDIR=$BASE/build/download
 SRCDIR=$BASE/src
 BR_PKG="$PKGDIR/buildroot_${BR_VER}.txz"
-RFS_PKG="$PKGDIR/rfs_${VOXIN_VER}.txz"
 RFSDIR=$TMPDIR/rfs
 INSTALLDIR=$TMPDIR/voxin-installer_$VOXIN_VER
 VOXINDIR=$RFSDIR/opt/oralux/voxin
@@ -141,16 +137,22 @@ getOldLibstdc++() {
 	cd "$pwd"
 }
 
-# build the libvoxin tarballs from github
-# install build/$arch/release/libvoxin_$version.$archx.txz in the rfsdir
+# Build libvoxin from github and install the resulting deb and txz
+# into the installer directory
+# 
 getLibvoxin() {
+	[ "$#" != 1 ] && return 1
+	local arch=$1
 	local archive
 	local archivep
 	local dev
 	local version
 	local pwd=$PWD
 	local workdir
-	
+	local installDir=$INSTALLDIR/packages/all
+
+	[ ! -d "$installDir" ] && mkdir -p "$installDir"
+		
 	if [ -n "$LIBVOXIN_VERSION" ]; then
 		unset dev
 		version=$LIBVOXIN_VERSION
@@ -189,8 +191,7 @@ getLibvoxin() {
 			exit 1
 		fi
 		[ ! -d libvoxin-$version ] && tar -zxf "$archivep" || true
-	fi
-	
+	fi	
 	##
 	
 	if [ -n "$dev" ]; then
@@ -200,80 +201,107 @@ getLibvoxin() {
 	fi
 	./build.sh -r
 
-	# libibmeci-fake_1.3.3.all.txz
-	# libvoxin_1.3.3.x86_64.txz
-	# voxin-pkg_1.3.3.all.txz
-
-	local tarball=$(ls $PWD/build/$ARCH/release/libvoxin_*.$ARCH.txz)
+	# install the resulting build/$arch/release/libvoxin_$version.$archx.txz in the rfsdir
+	local tarball=$(ls "$PWD"/build/"$arch"/release/libvoxin_*."$arch".txz)
 	tar -C "$RFSDIR" -xf $tarball
 
-
-	# debian package
+	# build the final rfsdir tarball and install it in the installer tree
+	tarball="$installDir"/rfs_$VOXIN_VER.$arch.txz
+	fakeroot bash -c "tar -C \"$RFSDIR\" -Jcf $tarball ."	
 	
+	# build the libvoxin1 debian package and install it in the installer tree
 	local description="Description: voxin pseudo package\n Voxin is an easily installable add-on which provides yet another\n text-to-speech to blind users of GNU/Linux.\n"
-	tarball=$(ls $PWD/build/$ARCH/release/libvoxin-pkg_*.all.txz)
+	tarball=$(ls "$PWD"/build/"$arch"/release/libvoxin-pkg_*.all.txz)
 	local name=libvoxin1
 	local depends=libc6
 	local arch
-	case "$ARCH" in
-		x86_64) arch=amd64;;
-		*) leave "TODO: arch=$ARCH" 1;;
+	case "$arch" in
+		x86_64) archDeb=amd64;;
+		*) leave "TODO: arch=$arch" 1;;
 	esac
-	buildDebPackage "$tarball" "$name" "$version" "$arch" "$depends" "$description"
+	installDir=$INSTALLDIR/packages/debian
+	buildDebPackage "$tarball" "$installDir" "$name" "$version" "$archDeb" "$depends" "$description" 
 	
 	cd "$pwd"	
 }
 
 # installs the speech-dispatcher-voxin debian package(s)
 getSpeechDispatcherVoxin() {
-	# The old speech-dispatcher-voxin 0.8.x package is extracted from the old voxin 1.15 update tarball
+	# Extracts speech-dispatcher-voxin from the voxin 1.15 update tarball
 	# This package can be rebuild in following for example:
 	# https://github.com/Oralux/speech-dispatcher-voxin-debian
 	#
+	[ "$#" != 1 ] && return 1
+	local arch=$1
 	local basename="$(basename $OLD_VOXIN_URL)"
-	local archivep="$PKGDIR/$basename"
+	local archivep="$DWLDIR/$basename"
+	local installDir=$INSTALLDIR/packages/debian
 
+	[ ! -d "$installDir" ] && mkdir -p "$installDir"
+	
 	if [ ! -e "$archivep" ]; then	
-		if [ ! -e "$DWLDIR/$basename" ]; then	
-			wget -P "$DWLDIR" "$OLD_VOXIN_URL"
-		fi
-		tar --one-top-level="$PKGDIR" --strip-components="$OLD_VOXIN_SD_SUB_DIR" -xf "$DWLDIR/$basename" "$OLD_VOXIN_SD_PATH"
+		wget -P "$DWLDIR" "$OLD_VOXIN_URL"
 	fi
+	tar --one-top-level="$installDir" --strip-components="$OLD_VOXIN_SD_SUB_DIR" -xf "$DWLDIR/$basename" "$OLD_VOXIN_SD_PATH"
 	
 }
 
 buildReleaseTarball() {
-	local dir="voxin-installer_$VOXIN_VER"
-	local workdir="$TMPDIR/$dir"
-	rm -rf "$workdir"
-	mkdir -p "$workdir"	
-	cp -a "$RFSDIR" "$workdir"
-	cp -a "$SRCDIR/tools" "$workdir"
-	fakeroot bash -c "tar -C \"$TMPDIR\" -Jcf \"$PKGDIR/$dir.$ARCH.txz\" $dir"
-	echo "$PKGDIR/$dir.$ARCH.txz"
-}
+	[ "$#" = 0 ] && return 1
+	local arch=$1
+	local files=$2
+	local releaseDir=$PKGDIR/voxin-$VOXIN_VER
+	local installer
 
-addFiles() {
-	local files=$1
+	rm -rf "$releaseDir"
+	mkdir -p "$releaseDir"
+
+	# voxin-update
+	installer="$releaseDir"/voxin-update-$VOXIN_VER
+	mkdir "$installer" || return 1
+	rsync -a "$INSTALLDIR"/ "$installer"
+	
+	fakeroot bash -c "tar -C \"$releaseDir\" -Jcf \"$installer.txz\" $installer"
+	rm -rf "$installer"
+	echo "$installer.txz"
+
 	if [ -f "$files" ]; then
-		for i in $(cat "$files"); do
-			tar -C "$RFSDIR" -xf $i
+		local tarball
+		local all
+		local lang		
+		for tarball in $(cat "$files"); do
+			case "$tarball" in
+				*voxin-viavoice-*txz)
+					lang=$(echo "$tarball" | sed 's/.*-\(.*\)_.*/\1/')
+					if [ "$lang" = "all" ]; then
+						all=$tarball
+					else
+						installer="$releaseDir/voxin-$lang-$VOXIN_VER"
+						mkdir "$installer"
+						rsync -a "$INSTALLDIR"/ "$installer"
+						cp -a "$tarball" "$all" "$installer"/packages/all
+						fakeroot bash -c "tar -C \"$releaseDir\" -Jcf \"$installer.txz\" voxin-$lang-$VOXIN_VER"
+						rm -rf "$installer"
+						echo "$installer.txz"
+					fi
+					;;
+				*) ;;
+			esac
 		done
 	fi
 }
 
-
-buildInstaller() {
+buildInstallerDir() {
 	local pwd=$PWD
 
 	rm -rf "$INSTALLDIR"
 	mkdir -p "$INSTALLDIR"
-	cp -a src/installer/* "$INSTALLDIR"
+	rsync --exclude "*~" -a "$BASE"/src/installer/* "$INSTALLDIR"
 	cd "$INSTALLDIR"
 
 	emacs README.org --batch -f org-ascii-export-to-ascii --kill
-	sed -i -e "s/%VERSION%/$VOXIN_VER/" -e '/^[[:space:]]*[=~_]\+$/d' README.txt 
-	rm README.org
+	sed -e "s/%VERSION%/$VOXIN_VER/" -e '/^[[:space:]]*[=~_]\+$/d' README.txt > README
+	rm README.org README.txt
 
 	cd po
 	for i in de es fr; do
@@ -284,15 +312,16 @@ buildInstaller() {
 }
 
 buildDebPackage() {
-	[ "$#" -lt 6 ] && return 1
+	[ "$#" -lt 7 ] && return 1
 	local tarball=$1
-	local name=$2
-	local version=$3
-	local arch=$4
-	local depends=$5
-	local description=$6
-	local replaces=$7
-	
+	local installDir=$2
+	local name=$3
+	local version=$4
+	local arch=$5
+	local depends=$6
+	local description=$7
+	local replaces=$8
+		
 	which md5sum > /dev/null || leave "install md5sum" 1
 
 	local debdir="$TMPDIR"/deb.d
@@ -321,5 +350,6 @@ EOF
 	echo 2.0 > debian-binary
 	tar -C DEBIAN -Jcf control.tar.xz ./control ./md5sums
 
-	ar -r "$PKGDIR/${name}_${version}_${arch}".deb debian-binary control.tar.xz data.tar.xz 
+	[ ! -d "$installDir" ] && mkdir -p "$installDir"
+	ar -r "$installDir"/${name}_${version}_${arch}.deb debian-binary control.tar.xz data.tar.xz 
 }

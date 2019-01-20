@@ -65,18 +65,18 @@ check_distro()
 	# 	return $?
     # fi
 
-    type pacman &>> "$LOG"
-    if [ "$?" = "0" ]; then
-		source common/install-arch-linux.sh
-		status=$?
+    local a=$(which pacman) || true
+    if [ -n "$a" ]; then
+	source common/install-arch-linux.sh
+	status=$?
     elif [ -e "/etc/fedora-release" ]; then 
 		source common/install-fedora.sh
 		identify_fedora
 		status=$?
     else
 		# Check if this is a debian based distro
-		type dpkg &>> "$LOG"
-		if [ "$?" = "0" ]; then
+		a=$(which dpkg) || true
+		if [ -n "$a" ]; then
 			source common/install-debian.sh
 			identify_debian
 			status=$?
@@ -88,12 +88,11 @@ check_distro()
 # if the speech-dispatcher-voxin package is already installed, check
 # if this installer provides a compatible replacement version
 check_speech_dispatcher_voxin() {
-	local status=0
-	$(isSpeechDispatcherVoxinInstalled)
-	if [ $? = 0 ]; then 
-		local deb=$(getSpeechDispatcherDebPackage)
-		[ -z "$deb" ] && status=1
-	fi	
+    local status=0
+    local deb
+	$(isSpeechDispatcherVoxinInstalled) || return 0
+	deb=$(getSpeechDispatcherDebPackage)
+	[ -z "$deb" ] && status=1
 	return $status
 }
 
@@ -131,7 +130,7 @@ getDebPackageVersion() {
 }
 
 getSpeechDispatcherDebPackage() {
-	local list=$(ls packages/all/$arch/speech-dispatcher-voxin_*.deb 2>/dev/null)
+	local list=$(find packages/debian -name "speech-dispatcher-voxin_*_$DEBIAN_ARCH.deb")
 	local i
 	local availableVersion
 	local deb
@@ -155,19 +154,19 @@ getSpeechDispatcherDebPackage() {
 }
 
 getVoxinDebPackage() {
-	ls packages/all/$arch/voxin-pkg_*.deb 2>/dev/null
+	find packages/debian -name "libvoxin*_$DEBIAN_ARCH.deb"
 }
 
 getLibvoxinTarball() {
-	ls packages/all/$arch/libvoxin_*.txz 2>/dev/null
+	find packages/all -name "rfs*.$ARCH.txz"
 }
 
 getViavoiceAllTarball() {
-	ls packages/all/$arch/voxin-viavoice-all_*.txz 2>/dev/null
+	find packages/all -name "voxin-viavoice-all*.txz"
 }
 
 getViavoiceTarballs() {
-	ls packages/all/$arch/voxin-viavoice_*.txz 2>/dev/null
+	find packages/all -name "voxin-viavoice*.txz" ! -name "voxin-viavoice-all*.txz"
 }
 
 postInstViavoiceTarball() {

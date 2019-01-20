@@ -4,9 +4,11 @@
 #
 
 debianIsPackageInstalled() {
-	[ $# != 1 ] && return
+	[ $# != 1 ] && return 1
 	local deb=$1
-	grep -A1 "Package: $deb$" /var/lib/dpkg/status | grep "Status: install ok installed" &> /dev/null
+	local status=0
+	grep -A1 "Package: $deb$" /var/lib/dpkg/status | grep "Status: install ok installed" &> /dev/null || status=1
+	return $status
 }
 
 identify_debian() 
@@ -59,7 +61,7 @@ installSystem()
 	local voxinDeb=$(getVoxinDebPackage)
 	local libvoxinTarball=$(getLibvoxinTarball)
 
-	if [ ! -d "$rfsdir"]; then
+	if [ ! -d "$rfsdir" ]; then
 		echo "Install directory not found: $rfsdir" >> "$LOG"
 		return 1
 	fi
@@ -82,7 +84,7 @@ installSystem()
 	fi
 
 	for i in libvoxin1 voxind; do
-		apt-get remove --yes --purge $i &>> "$LOG"
+		apt-get remove --yes --purge $i &>> "$LOG" || true
 	done
 	
 	dpkg -i "$voxinDeb" &>> "$LOG"
@@ -135,11 +137,15 @@ orcaConf()
 
 isSpeechDispatcherAvailable()
 {
-	debianIsPackageInstalled speech-dispatcher
+local status=0
+	debianIsPackageInstalled speech-dispatcher || status=1
+return $status
 }
 
 isSpeechDispatcherVoxinInstalled() {
-	debianIsPackageInstalled speech-dispatcher-voxin || debianIsPackageInstalled speech-dispatcher-ibmtts
+local status=0
+	debianIsPackageInstalled speech-dispatcher-voxin || debianIsPackageInstalled speech-dispatcher-ibmtts || status=1
+return $status
 }
 
 sd_install()
@@ -182,28 +188,44 @@ installLang()
 	[ $# != 1 ] && return 1
 	local rfsdir=$1
 	local status
+	local i
 
     askLicense || return 1
 
+	i=$(getViavoiceAllTarball)
+	if [ -z "$i" ]; then
+		echo "Error: no viavoice-all tarball" >> "$LOG"
+		return 1
+	fi
+	tar -C "$rfsdir" --no-overwrite-dir -xf "$i"
+	status=$?
+	if [ "$status" != 0 ]; then
+		echo "Error: untar failure ($i)" >> "$LOG"
+		return $status
+	fi
+	
 	getViavoiceTarballs | while read i; do
 		tar -C "$rfsdir" --no-overwrite-dir -xf "$i"
 		status=$?
 		if [ "$status" != 0 ]; then
-			echo "Error: untar failure ($libvoxinTarball)" >> "$LOG"
+			echo "Error: untar failure ($i)" >> "$LOG"
 			return $status
 		fi
 	done
 
+	postInstViavoiceTarball "$rfsdir" "/"
+	
     return 0
 }
 
 getArch() {
-    case "$(uname -m)" in
+ARCH=$(uname -m)
+    case "$ARCH" in
 		x86_64|ia64)
-			ARCH=amd64
+DEBIAN_ARCH=amd64
     	    ;;
 		*)
-			ARCH=i386
+DEBIAN_ARCH=i386
     	    ;;
     esac
 }

@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 BASE=$(dirname $(realpath "$0"))
 NAME=$(basename "$0")
@@ -62,12 +62,14 @@ if [ -n "$CLEAN" ]; then
 	exit 0
 fi
 
+# TODO
+ARCH=x86_64
+
 mkdir -p "$PKGDIR" "$DWLDIR" "$RFS32"
 [ -n "$BUILDROOT" ] && buildBuildroot
 getMinimalRFS32FromBuildroot
 getOldLibstdc++
-getLibvoxin
-getSpeechDispatcherVoxin
-buildInstaller
-[ -n "$TARBALLS" ] && addFiles "$TARBALLS"
-buildReleaseTarball
+buildInstallerDir
+getLibvoxin "$ARCH"
+getSpeechDispatcherVoxin "$ARCH"
+buildReleaseTarball "$ARCH" "$TARBALLS"

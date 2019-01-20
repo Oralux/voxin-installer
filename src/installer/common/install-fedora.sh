@@ -101,6 +101,16 @@ installLang()
 
 getArch() {
     ARCH="$(uname -m)"
+
+    case "$ARCH" in
+	x86_64|ia64)
+	    DEBIAN_ARCH=amd64
+    	    ;;
+	*)
+	    DEBIAN_ARCH=i386
+    	    ;;
+    esac
+
 }
 
 isSpeechDispatcherVoxinInstalled() {
