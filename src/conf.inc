@@ -32,6 +32,7 @@ DEP_LIST="make gcc wget fakeroot unzip emacs md5sum rsync bsdtar"
 
 PKGDIR=$BASE/build/packages
 TMPDIR=$BASE/build/tmp
+TEMPLATE=voxin-installer.XXXXXXXXXX
 DWLDIR=$BASE/build/download
 SRCDIR=$BASE/src
 BR_PKG="$PKGDIR/buildroot_${BR_VER}.txz"
@@ -39,10 +40,13 @@ RFSDIR=$TMPDIR/rfs
 INSTALLDIR=$TMPDIR/voxin-installer_$VOXIN_VER
 VOXINDIR=$RFSDIR/opt/oralux/voxin
 RFS32=$VOXINDIR/rfs32
+
 #RFS32_PKG="$PKGDIR/${NAME}.txz"
 DOC=$VOXINDIR/usr/share/doc
+OLD_SD_VER=0.8.6-5voxin1
+NEW_SD_VER=0.9
 OLD_VOXIN_URL=https://voxin.oralux.net/update/voxin-update-1.15.tgz
-OLD_VOXIN_SD_PATH=voxin-1.15/voxin-update-1.15/packages/ubuntu.17.04/speech-dispatcher-voxin_0.8.6-5voxin1_amd64.deb
+OLD_VOXIN_SD_PATH=voxin-1.15/voxin-update-1.15/packages/ubuntu.17.04/speech-dispatcher-voxin_${OLD_SD_VER}_amd64.deb
 OLD_VOXIN_SD_SUB_DIR=4
 
 # gnupg key used to sign packages
@@ -137,6 +141,15 @@ getOldLibstdc++() {
 	cd "$pwd"
 }
 
+getDebArch() {
+	local arch=$1
+	case "$arch" in
+		x86_64) arch=amd64;;
+		*) leave "TODO: arch=$arch" 1;;
+	esac
+	echo $arch
+}
+
 # Build libvoxin from github and install the resulting deb and txz
 # into the installer directory
 # 
@@ -214,13 +227,12 @@ getLibvoxin() {
 	tarball=$(ls "$PWD"/build/"$arch"/release/libvoxin-pkg_*.all.txz)
 	local name=libvoxin1
 	local depends=libc6
-	local arch
-	case "$arch" in
-		x86_64) archDeb=amd64;;
-		*) leave "TODO: arch=$arch" 1;;
-	esac
+	debArch=$(getDebArch "$arch")
 	installDir=$INSTALLDIR/packages/debian
-	buildDebPackage "$tarball" "$installDir" "$name" "$version" "$archDeb" "$depends" "$description" 
+	buildDebPackage "$tarball" "$installDir" "$name" "$version" "$debArch" "$depends" "$description" 
+
+	installDir=$INSTALLDIR/packages/archlinux
+	buildPacmanPackage "$tarball" "$installDir" "$name" "$version" "$arch" "$depends" "$description" "LGPL-2.1+" 
 	
 	cd "$pwd"	
 }
@@ -236,7 +248,8 @@ getSpeechDispatcherVoxin() {
 	local basename="$(basename $OLD_VOXIN_URL)"
 	local archivep="$DWLDIR/$basename"
 	local installDir=$INSTALLDIR/packages/debian
-
+	local debArch=$(getDebArch "$arch")
+	
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"
 	
 	if [ ! -e "$archivep" ]; then	
@@ -244,8 +257,23 @@ getSpeechDispatcherVoxin() {
 	fi
 	tar --one-top-level="$installDir" --strip-components="$OLD_VOXIN_SD_SUB_DIR" -xf "$DWLDIR/$basename" "$OLD_VOXIN_SD_PATH"
 
-	# speech-dispatcher-voxin 0.9: symlink to 0.8 (the ibmtts modules are currently the same)	
-	ln -sf "$(basename $OLD_VOXIN_SD_PATH)" "$installDir"/speech-dispatcher-voxin_0.9_amd64.deb 	
+	# speech-dispatcher-voxin 0.9: symlink to 0.8.6 (the ibmtts modules are currently the same)	
+	ln -sf "$(basename $OLD_VOXIN_SD_PATH)" "$installDir"/speech-dispatcher-voxin_${NEW_SD_VER}_${debArch}.deb
+
+	# build the archlinux package from the data archive
+	local pacdir="$TMPDIR"/pac.d
+	[ -e "$pacdir" ] && rm -rf "$pacdir"
+	mkdir -p "$pacdir"
+	
+	pushd "$pacdir" 1>/dev/null
+	ar -x "$installDir"/speech-dispatcher-voxin_${NEW_SD_VER}_${debArch}.deb data.tar.xz
+	
+	installDir=$INSTALLDIR/packages/archlinux
+	buildPacmanPackage "$pacdir"/data.tar.xz "$installDir" speech-dispatcher-voxin "$OLD_SD_VER" "$arch" "libvoxin1" "Speech Dispatcher: voxin output module" "LGPL-2.1+" 
+
+	# speech-dispatcher-voxin 0.9: symlink to 0.8
+	ln -sf "speech-dispatcher-voxin-${OLD_SD_VER}-${arch}.pkg.tar.xz" "$installDir"/speech-dispatcher-voxin-${NEW_SD_VER}-${arch}.pkg.tar.xz
+	popd 1>/dev/null	
 }
 
 buildReleaseTarball() {
@@ -339,7 +367,7 @@ buildDebPackage() {
 Package: $name
 Version: $version
 Architecture: $arch
-Maintainer: <contact@oralux.org>
+Maintainer: voxin-installer <contact@oralux.org>
 Installed-Size: $size
 Depends: $depends
 Section: sound
@@ -354,4 +382,53 @@ EOF
 
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"
 	ar -r "$installDir"/${name}_${version}_${arch}.deb debian-binary control.tar.xz data.tar.xz 
+}
+
+buildPacmanPackage() {
+	[ "$#" -lt 7 ] && return 1
+	local tarball=$1
+	local installDir=$2
+	local name=$3
+	local version=$4
+	local arch=$5
+	local depends=$6
+	local description=$7
+	local license=$8
+	local replaces=$9
+	local date=$(date --utc +%s)
+	
+	[ $# != 8 ] && return
+
+	local pacdir="$TMPDIR"/pac.d
+	[ -e "$pacdir" ] && rm -rf "$pacdir"
+	mkdir -p "$pacdir"
+	cd "$pacdir"
+
+	tar --exclude=share -xf "$tarball"
+	local size=$(du -scb . | head -n1 | cut -f1)
+
+	cat <<EOF>.PKGINFO
+pkgname = $name
+pkgver = $version
+pkgdesc = $description
+url = https://voxin.oralux.net
+builddate = $date
+packager = voxin-installer <contact@oralux.org>
+size = $size
+arch = $arch
+license = $license
+depend = $depends
+EOF
+
+	[ -n "$replaces" ] && echo "replaces = $replaces" >> .PKGINFO
+
+	[ ! -d "$installDir" ] && mkdir -p "$installDir"
+	
+	# Inspired by debtap: https://github.com/helixarch/debtap
+	bsdtar -czf .MTREE --format=mtree --options='!all,use-set,type,uid,gid,mode,time,size,md5,sha256,link' * .PKGINFO .INSTALL 2> /dev/null
+	fakeroot << EOF
+tar -pcf "$installDir/$name-$version-$arch.pkg.tar" * .PKGINFO .INSTALL .MTREE 2> /dev/null
+xz -z -9 "$installDir/$name-$version-$arch.pkg.tar"
+EOF
+	
 }
