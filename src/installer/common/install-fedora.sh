@@ -6,6 +6,13 @@
 
 #####
 
+getPackageVersion() {
+# TODO
+	[ $# != 1 ] && return
+	local deb=$1
+#	dpkg-query --showformat='${Version}' --show "$deb"
+}
+
 identify_fedora() 
 {
     local status=1

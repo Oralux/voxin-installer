@@ -13,6 +13,14 @@ RFS=/opt/voxin
 
 pacman -Syu
 
+getPackageVersion() {
+# TODO
+	[ $# != 1 ] && return 1
+	local deb=$1
+#	dpkg-query --showformat='${Version}' --show "$deb"
+}
+
+
 # remove the multilib section if any
 removeMultilibSection() {
     start="$(grep -n '^\[multilib\]' "$RFS"/pacman.conf | cut -f1 -d: )"

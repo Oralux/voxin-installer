@@ -134,11 +134,9 @@ getSpeechDispatcherDebPackage() {
 	local i
 	local availableVersion
 	local deb
-	local sd=$(which speech-dispatcher 2>/dev/null)
-
-	[ -z "$sd" ] && return
-
-	local installedVersion=$($sd -v | head -n1| cut -f2 -d" ")
+	local installedVersion=$(getPackageVersion speech-dispatcher)
+	[ -z "installedVersion" ] && return
+	
 	if [ -n "$list" ]; then
 		for i in $list; do
 			availableVersion=$(getDebPackageVersion "$i")

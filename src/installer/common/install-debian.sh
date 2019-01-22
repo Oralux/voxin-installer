@@ -11,6 +11,13 @@ debianIsPackageInstalled() {
 	return $status
 }
 
+
+getPackageVersion() {
+	[ $# != 1 ] && return
+	local deb=$1
+	dpkg-query --showformat='${Version}' --show "$deb"
+}
+
 identify_debian() 
 {
     local status=1
@@ -89,6 +96,8 @@ installSystem()
 	
 	dpkg -i "$voxinDeb" &>> "$LOG"
 	status=$?
+	# TODO
+	ls -l /usr/lib/libvoxin*
 	if [ "$status" != 0 ]; then
 		local oldSymlink="/usr/lib/libibmeci.so"
 		if [ -e "$oldSymlink" ]; then
