@@ -1,11 +1,8 @@
-#!/bin/bash
-# This file is under the LGPL license
-# 2007-2019, Gilles Casse <gcasse@oralux.org>
-#
+LOG="$BASE/log/voxin.log"
+TEMPLATE=voxin-installer.XXXXXXXXXX
+TMPDIR=/tmp
 
-LOG="$PWD/log/voxin.log"
 rm -f "$LOG"
-
 
 leave() {
 	echo -e "$1"
@@ -45,8 +42,8 @@ END
 }
 
 uninstall() {
-    uninstallLang || exit 1
     sd_uninstall
+    uninstallLang
     uninstallSystem
     echo; gettext "Operation completed. "    
 }
@@ -56,23 +53,23 @@ check_distro() {
     local ID="$(awk -F= '/ID/{print $2}' /etc/os-release)"
 
     # if [ "$ID" = "gentoo" ]; then
-	# 	source common/install-gentoo.sh
+	# 	source common/install-gentoo.inc
 	# 	return $?
     # fi
 
     local a=$(which pacman) || true
     if [ -n "$a" ]; then
-	source common/install-arch-linux.sh
-	status=$?
+		source common/install-arch-linux.inc
+		status=$?
     elif [ -e "/etc/fedora-release" ]; then 
-		source common/install-fedora.sh
+		source common/install-fedora.inc
 		identify_fedora
 		status=$?
     else
 		# Check if this is a debian based distro
 		a=$(which dpkg) || true
 		if [ -n "$a" ]; then
-			source common/install-debian.sh
+			source common/install-debian.inc
 			status=0
 		fi
     fi

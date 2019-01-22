@@ -26,7 +26,7 @@ LIBVOXIN_VERSION=
 #LIBVOXIN_SHA256=29a211d46f75ee1b8f3922e871554777a64815b1a4a2ff8f3c41e58012af2ea6
 
 # Dependencies
-DEP_LIST="make gcc wget fakeroot unzip emacs md5sum rsync"
+DEP_LIST="make gcc wget fakeroot unzip emacs md5sum rsync bsdtar"
 
 #####
 

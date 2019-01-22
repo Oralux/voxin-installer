@@ -1,8 +1,3 @@
-#!/bin/bash
-# This file is under the LGPL license
-# 2007-2019, Gilles Casse <gcasse@oralux.org>
-#
-
 debianIsPackageInstalled() {
 	[ $# != 1 ] && return 1
 	local deb=$1
@@ -11,15 +6,13 @@ debianIsPackageInstalled() {
 	return $status
 }
 
-
 getPackageVersion() {
 	[ $# != 1 ] && return
 	local deb=$1
 	dpkg-query --showformat='${Version}' --show "$deb"
 }
 
-installSystem()
-{	
+installSystem() {	
 	[ $# != 1 ] && return 1
 	local rfsdir=$1
 	local status=0
@@ -79,18 +72,15 @@ installSystem()
 	return "$status"
 }
 
-uninstallSystem()
-{	
-    apt-get remove --yes --purge voxin-pkg &>> "$LOG"
+uninstallSystem() {	
+    apt-get remove --yes --purge libvoxin1 &>> "$LOG"
 }
 
-installSystem_sd()
-{
+installSystem_sd() {
     return 0
 }
 
-orcaConf()
-{
+orcaConf() {
     ls /home/*/.orca/user-settings.py 2>>"$LOG" | while read i; do
 		sed -i "s/espeak/ibmtts/g" "$i"
     done
@@ -100,8 +90,7 @@ orcaConf()
     done
 }
 
-isSpeechDispatcherAvailable()
-{
+isSpeechDispatcherAvailable() {
 	local status=0
 	debianIsPackageInstalled speech-dispatcher || status=1
 	return $status
@@ -113,8 +102,7 @@ isSpeechDispatcherVoxinInstalled() {
 	return $status
 }
 
-sd_install()
-{
+sd_install() {
 	[ $# != 1 ] && return 1
 	
 	local rfsdir=$1
@@ -127,23 +115,23 @@ sd_install()
     return 0
 }
 
-sd_uninstall()
-{
+sd_uninstall() {
     spd_conf_unset ibmtts
     spd_conf_set espeak
     apt-get remove speech-dispatcher-voxin
     return 0
 }
 
-install_gettext()
-{
+install_gettext() {
     apt-get -q install --yes gettext >> "$LOG"
     . gettext.sh
 }
 
+uninstallLang() {
+    return 0
+}
 
-installLang()
-{
+installLang() {
 	[ $# != 1 ] && return 1
 	local rfsdir=$1
 	local status

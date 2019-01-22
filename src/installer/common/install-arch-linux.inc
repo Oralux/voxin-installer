@@ -3,10 +3,8 @@
 # 2007-2019, Gilles Casse <gcasse@oralux.org>
 #
 
-LIBVOXIN=libvoxin.so.1
 
 #####
-BASE=$PWD
 Distro="archlinux"
 Packages="$BASE/packages/$Distro"
 RFS=/opt/voxin
@@ -14,10 +12,9 @@ RFS=/opt/voxin
 pacman -Syu
 
 getPackageVersion() {
-# TODO
 	[ $# != 1 ] && return 1
 	local deb=$1
-#	dpkg-query --showformat='${Version}' --show "$deb"
+	pacman -Q "$deb" | awk '{print $2}'
 }
 
 

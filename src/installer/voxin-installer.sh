@@ -3,8 +3,11 @@
 # 2007-2019, Gilles Casse <gcasse@oralux.org>
 #
 
-source ./common/init.sh
-source ./common/spdconf.sh
+BASE=$(realpath dirname $0)
+cd $BASE
+
+source ./common/init.inc
+source ./common/spdconf.inc
 
 unset GETTEXT
 which gettext >> "$LOG"
@@ -70,9 +73,9 @@ fi
 getArch
 
 if [ "$with_silent" = "1" ]; then
-    source common/askSilent.sh
+    source common/askSilent.inc
 else
-    source common/ask.sh
+    source common/ask.inc
 fi
 
 if [ -z "$GETTEXT" ]; then
