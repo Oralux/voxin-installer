@@ -12,22 +12,19 @@ leave() {
 	exit $2
 }
 
-init_gettext()
-{
+init_gettext() {
     export TEXTDOMAINDIR="$1"
     export TEXTDOMAIN=voxin
 }
 
-yes()
-{
+yes() {
     local a
     read a
     [ -z "$a" ]
     return $?
 }
 
-ok()
-{
+ok() {
     local status=1
     local a
     read a
@@ -47,16 +44,14 @@ Options:
 END
 }
 
-uninstall()
-{
+uninstall() {
     uninstallLang || exit 1
     sd_uninstall
     uninstallSystem
     echo; gettext "Operation completed. "    
 }
 
-check_distro()
-{
+check_distro() {
     local status=1
     local ID="$(awk -F= '/ID/{print $2}' /etc/os-release)"
 
@@ -78,8 +73,7 @@ check_distro()
 		a=$(which dpkg) || true
 		if [ -n "$a" ]; then
 			source common/install-debian.sh
-			identify_debian
-			status=$?
+			status=0
 		fi
     fi
     return $status
@@ -96,8 +90,7 @@ check_speech_dispatcher_voxin() {
 	return $status
 }
 
-merge_old_archive()
-{
+merge_old_archive() {
     local archive="$1"
 }
 

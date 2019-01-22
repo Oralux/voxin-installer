@@ -1,4 +1,4 @@
-#!/bin/bash -xe
+#!/bin/bash -x
 # This file is under the LGPL license
 # 2007-2019, Gilles Casse <gcasse@oralux.org>
 #
@@ -89,7 +89,7 @@ fi
 echo; gettext "Log file: $LOG"
 echo; gettext "Initialization; please wait... "
 installDir=/
-installSystem "$installDir"
+installSystem "$installDir" || exit 1
 
 installed=0
 askInstallLang && {

@@ -1,4 +1,4 @@
-#!/bin/bash -e
+#!/bin/bash
 # This file is under the LGPL license
 # 2007-2019, Gilles Casse <gcasse@oralux.org>
 #
@@ -16,48 +16,6 @@ getPackageVersion() {
 	[ $# != 1 ] && return
 	local deb=$1
 	dpkg-query --showformat='${Version}' --show "$deb"
-}
-
-identify_debian() 
-{
-    local status=1
-	local Packages
-    
-    DISTRIB_ID="$(awk -F"=" '/^ID=/{print $2}' /etc/os-release)"
-    DISTRIB_RELEASE="$(awk -F'"' '/^VERSION_ID=/{print $2}' /etc/os-release)"
-    
-    case "$DISTRIB_ID" in
-		"ubuntu")
-			status=0
-			case "$DISTRIB_RELEASE" in
-#				"14.04"|"15.10"|"16.04"|"16.10"|"17.04") ;;
-				*) DISTRIB_RELEASE=latest;;
-			esac
-			;;
-		"debian")
-			status=0
-			case "$DISTRIB_RELEASE" in
-#				"8"|"9") ;;
-				*) DISTRIB_RELEASE=latest;;
-			esac
-			;;
-		"kali")
-			status=0
-			case "$DISTRIB_RELEASE" in
-				# 201*)
-				# 	status=0
-				# 	# interactive mode required (ask to restart)
-				# 	LOG=/proc/self/fd/1
-				# 	Packages="packages/$DISTRIB_ID.$DISTRIB_RELEASE"
-				# 	if [ ! -e "$Packages" ]; then
-				# 		DISTRIB_RELEASE=latest
-				# 	fi
-				# 	;;
-				*) DISTRIB_RELEASE=latest;;
-			esac
-			;;
-    esac
-    return $status
 }
 
 installSystem()
@@ -121,12 +79,10 @@ installSystem()
 	return "$status"
 }
 
-
 uninstallSystem()
 {	
     apt-get remove --yes --purge voxin-pkg &>> "$LOG"
 }
-
 
 installSystem_sd()
 {
@@ -146,15 +102,15 @@ orcaConf()
 
 isSpeechDispatcherAvailable()
 {
-local status=0
+	local status=0
 	debianIsPackageInstalled speech-dispatcher || status=1
-return $status
+	return $status
 }
 
 isSpeechDispatcherVoxinInstalled() {
-local status=0
+	local status=0
 	debianIsPackageInstalled speech-dispatcher-voxin || debianIsPackageInstalled speech-dispatcher-ibmtts || status=1
-return $status
+	return $status
 }
 
 sd_install()
@@ -185,12 +141,6 @@ install_gettext()
     . gettext.sh
 }
 
-
-uninstallLang()
-{	
-    rm -rf /opt/IBM/ibmtts
-    rm -rf /var/opt/IBM/ibmtts
-}
 
 installLang()
 {
@@ -228,13 +178,13 @@ installLang()
 }
 
 getArch() {
-ARCH=$(uname -m)
+	ARCH=$(uname -m)
     case "$ARCH" in
 		x86_64|ia64)
-DEBIAN_ARCH=amd64
+			DEBIAN_ARCH=amd64
     	    ;;
 		*)
-DEBIAN_ARCH=i386
+			DEBIAN_ARCH=i386
     	    ;;
     esac
 }
