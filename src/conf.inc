@@ -243,7 +243,9 @@ getSpeechDispatcherVoxin() {
 		wget -P "$DWLDIR" "$OLD_VOXIN_URL"
 	fi
 	tar --one-top-level="$installDir" --strip-components="$OLD_VOXIN_SD_SUB_DIR" -xf "$DWLDIR/$basename" "$OLD_VOXIN_SD_PATH"
-	
+
+	# speech-dispatcher-voxin 0.9: symlink to 0.8 (the ibmtts modules are currently the same)	
+	ln -sf "$(basename $OLD_VOXIN_SD_PATH)" "$installDir"/speech-dispatcher-voxin_0.9_amd64.deb 	
 }
 
 buildReleaseTarball() {
