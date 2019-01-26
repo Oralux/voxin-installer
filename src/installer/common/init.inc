@@ -61,8 +61,7 @@ check_distro() {
 		source common/install-arch-linux.inc
 		status=$?
     elif [ -e "/etc/fedora-release" ]; then 
-		source common/install-fedora.inc
-		identify_fedora
+		source common/install-rpm-dnf.inc
 		status=$?
     else
 		# Check if this is a debian based distro

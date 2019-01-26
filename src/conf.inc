@@ -26,7 +26,7 @@ LIBVOXIN_VERSION=
 #LIBVOXIN_SHA256=29a211d46f75ee1b8f3922e871554777a64815b1a4a2ff8f3c41e58012af2ea6
 
 # Dependencies
-DEP_LIST="make gcc wget fakeroot unzip emacs md5sum rsync bsdtar"
+DEP_LIST="make gcc wget fakeroot unzip emacs md5sum rsync bsdtar alien rpm xz gzip"
 
 #####
 
@@ -228,12 +228,15 @@ getLibvoxin() {
 	local name=libvoxin1
 	local depends=libc6
 	debArch=$(getDebArch "$arch")
-	installDir=$INSTALLDIR/packages/debian
+	installDir=$INSTALLDIR/packages/deb
 	buildDebPackage "$tarball" "$installDir" "$name" "$version" "$debArch" "$depends" "$description" 
 
 	local depends=glibc
 	installDir=$INSTALLDIR/packages/archlinux
 	buildPacmanPackage "$tarball" "$installDir" "$name" "$version" "$arch" "$depends" "$description" "LGPL-2.1+" 
+	
+	installDir=$INSTALLDIR/packages/rpm
+	buildRpmPackage "$tarball" "$installDir" "$name" "$version" "$arch" "$depends" "$description" "LGPL-2.1+" 
 	
 	cd "$pwd"	
 }
@@ -248,11 +251,12 @@ getSpeechDispatcherVoxin() {
 	local arch=$1
 	local basename="$(basename $OLD_VOXIN_URL)"
 	local archivep="$DWLDIR/$basename"
-	local installDir=$INSTALLDIR/packages/debian
+	local installDir=$INSTALLDIR/packages/deb
 	local debArch=$(getDebArch "$arch")
 	
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"
-	
+
+	# -- Deb package
 	if [ ! -e "$archivep" ]; then	
 		wget -P "$DWLDIR" "$OLD_VOXIN_URL"
 	fi
@@ -261,12 +265,13 @@ getSpeechDispatcherVoxin() {
 	# speech-dispatcher-voxin 0.9: symlink to 0.8.6 (the ibmtts modules are currently the same)	
 	ln -sf "$(basename $OLD_VOXIN_SD_PATH)" "$installDir"/speech-dispatcher-voxin_${NEW_SD_VER}_${debArch}.deb
 
-	# build the archlinux package from the data archive
+	# -- Arch Linux package
+	# build the Arch Linux package from the data archive
 	local pacdir="$TMPDIR"/getSpeechDispatcherVoxin.pac.d
 	[ -e "$pacdir" ] && rm -rf "$pacdir"
-	mkdir -p "$pacdir"
-	
+	mkdir -p "$pacdir"	
 	pushd "$pacdir" 1>/dev/null
+
 	ar -x "$installDir"/speech-dispatcher-voxin_${NEW_SD_VER}_${debArch}.deb data.tar.xz
 	
 	installDir=$INSTALLDIR/packages/archlinux
@@ -274,6 +279,20 @@ getSpeechDispatcherVoxin() {
 
 	# speech-dispatcher-voxin 0.9: symlink to 0.8
 	ln -sf "speech-dispatcher-voxin-${OLD_SD_VER}-${arch}.pkg.tar.xz" "$installDir"/speech-dispatcher-voxin-${NEW_SD_VER}-${arch}.pkg.tar.xz
+	popd 1>/dev/null	
+
+	# -- RPM package
+	# build the rpm package from the data archive
+	local rpmdir="$TMPDIR"/getSpeechDispatcherVoxin.rpm.d
+	[ -e "$rpmdir" ] && rm -rf "$rpmdir"
+	mkdir -p "$rpmdir"	
+	pushd "$rpmdir" 1>/dev/null
+
+	installDir=$INSTALLDIR/packages/rpm
+	buildRpmPackage "$pacdir"/data.tar.xz "$installDir" speech-dispatcher-voxin "$OLD_SD_VER" "$arch" "libvoxin1" "Speech Dispatcher: voxin output module" "LGPL-2.1+" 
+
+	# speech-dispatcher-voxin 0.9: symlink to 0.8
+	ln -sf "speech-dispatcher-voxin-${OLD_SD_VER}.${arch}.rpm" "$installDir"/speech-dispatcher-voxin-${NEW_SD_VER}.${arch}.rpm
 	popd 1>/dev/null	
 }
 
@@ -386,7 +405,7 @@ EOF
 }
 
 buildPacmanPackage() {
-	[ "$#" -lt 7 ] && return 1
+	[ "$#" -lt 8 ] && return 1
 	local tarball=$1
 	local installDir=$2
 	local name=$3
@@ -433,3 +452,31 @@ xz -z -9 "$installDir/$name-$version-$arch.pkg.tar"
 EOF
 	
 }
+
+buildRpmPackage() {
+	[ "$#" -lt 8 ] && return 1
+	local tarball=$1
+	local installDir=$2
+	local name=$3
+	local version=$4
+	local arch=$5
+	local depends=$6
+	local description=$7
+	local license=$8
+	local replaces=$9
+	local date=$(date --utc +%s)
+	
+	[ $# != 8 ] && return
+
+	local pacdir="$TMPDIR"/buildRpmPackage.pac.d
+	[ -e "$pacdir" ] && rm -rf "$pacdir"
+	mkdir -p "$pacdir/data"
+	cd "$pacdir/data"
+	tar --exclude=share -xf "$tarball"
+	[ ! -d "$installDir" ] && mkdir -p "$installDir"	
+	tar -zcf "$pacdir/$name.tgz" *
+	cd ..
+	fakeroot alien --target="$arch" --version="$version" --description="$description" --to-rpm "$name.tgz"
+	cp *rpm "$installDir"
+}
+
