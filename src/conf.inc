@@ -231,6 +231,7 @@ getLibvoxin() {
 	installDir=$INSTALLDIR/packages/debian
 	buildDebPackage "$tarball" "$installDir" "$name" "$version" "$debArch" "$depends" "$description" 
 
+	local depends=glibc
 	installDir=$INSTALLDIR/packages/archlinux
 	buildPacmanPackage "$tarball" "$installDir" "$name" "$version" "$arch" "$depends" "$description" "LGPL-2.1+" 
 	
@@ -261,7 +262,7 @@ getSpeechDispatcherVoxin() {
 	ln -sf "$(basename $OLD_VOXIN_SD_PATH)" "$installDir"/speech-dispatcher-voxin_${NEW_SD_VER}_${debArch}.deb
 
 	# build the archlinux package from the data archive
-	local pacdir="$TMPDIR"/pac.d
+	local pacdir="$TMPDIR"/getSpeechDispatcherVoxin.pac.d
 	[ -e "$pacdir" ] && rm -rf "$pacdir"
 	mkdir -p "$pacdir"
 	
@@ -399,7 +400,7 @@ buildPacmanPackage() {
 	
 	[ $# != 8 ] && return
 
-	local pacdir="$TMPDIR"/pac.d
+	local pacdir="$TMPDIR"/buildPacmanPackage.pac.d
 	[ -e "$pacdir" ] && rm -rf "$pacdir"
 	mkdir -p "$pacdir"
 	cd "$pacdir"
