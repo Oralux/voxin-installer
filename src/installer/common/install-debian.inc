@@ -1,6 +1,6 @@
 debianGetVoxinPackage() {
 	[ -z "$DEBIAN_ARCH" ] && return 1
-	find packages/debian -name "libvoxin*_$DEBIAN_ARCH.deb"
+	find packages/deb -name "libvoxin*_$DEBIAN_ARCH.deb"
 }
 
 debianIsPackageInstalled() {
@@ -115,7 +115,7 @@ getArch() {
 }
 
 getSpeechDispatcherPackage() {
-	local list=$(find packages/debian -name "speech-dispatcher-voxin_*_$DEBIAN_ARCH.deb")
+	local list=$(find packages/deb -name "speech-dispatcher-voxin_*_$DEBIAN_ARCH.deb")
 	local i
 	local availableVersion
 	local package
