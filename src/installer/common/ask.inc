@@ -50,7 +50,7 @@ askLicense()
 	local VIAVOICE_ARCHIVE=$(getViavoiceAllTarball)
 	local VIAVOICE_AGREEMENT=opt/oralux/voxin/share/doc/voxin-viavoice-all/AGREEMENT
 	local VIAVOICE_LICENSE=opt/IBM/ibmtts/doc/IBM.txt
-	local LIBVOXIN_ARCHIVE=$(getLibvoxinTarball)
+	local RFS_ARCHIVE=$(getRootfilesystemTarball)
 	local LIBVOXIN_LGPL=opt/oralux/voxin/share/doc/libvoxin/LGPL.txt
 	local LESS
 	local CLEAR
@@ -104,7 +104,7 @@ askLicense()
     echo; gettext "If yes, press the ENTER key."    
     yes && {
 		$CLEAR
-		tar -Oxf "$LIBVOXIN_ARCHIVE" "$LIBVOXIN_LGPL" | $LESS 
+		tar -Oxf "$RFS_ARCHIVE" "$LIBVOXIN_LGPL" | $LESS 
     }	
 
     $CLEAR

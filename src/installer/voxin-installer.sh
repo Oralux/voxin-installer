@@ -3,7 +3,7 @@
 # 2007-2019, Gilles Casse <gcasse@oralux.org>
 #
 
-BASE=$(realpath dirname $0)
+BASE=$(realpath $(dirname $0))
 cd $BASE
 
 source ./common/init.inc

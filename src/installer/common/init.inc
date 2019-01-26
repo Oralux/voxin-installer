@@ -43,7 +43,6 @@ END
 
 uninstall() {
     sd_uninstall
-    uninstallLang
     uninstallSystem
     echo; gettext "Operation completed. "    
 }
@@ -80,10 +79,10 @@ check_distro() {
 # if this installer provides a compatible replacement version
 check_speech_dispatcher_voxin() {
     local status=0
-    local deb
+    local package
 	$(isSpeechDispatcherVoxinInstalled) || return 0
-	deb=$(getSpeechDispatcherDebPackage)
-	[ -z "$deb" ] && status=1
+	package=$(getSpeechDispatcherPackage)
+	[ -z "$package" ] && status=1
 	return $status
 }
 
@@ -109,43 +108,7 @@ getMajMinVersion() {
 	echo "$1" | sed 's/\(.*\..*\)\..*/\1/'
 }
 
-# getDebPackageVersion
-# Example:
-# input: name_1.2.3-5voxin1_amd64.deb
-# output: 1.2.3
-getDebPackageVersion() {
-	[ $# != 1 ] && return
-	local deb=$1
-	echo "$deb" | sed 's+.*_\(.*\)-.*+\1+'
-}
-
-getSpeechDispatcherDebPackage() {
-	local list=$(find packages/debian -name "speech-dispatcher-voxin_*_$DEBIAN_ARCH.deb")
-	local i
-	local availableVersion
-	local deb
-	local installedVersion=$(getPackageVersion speech-dispatcher)
-	[ -z "installedVersion" ] && return
-	
-	if [ -n "$list" ]; then
-		for i in $list; do
-			availableVersion=$(getDebPackageVersion "$i")
-			local ver1=$(getMajMinVersion $availableVersion)
-			local ver2=$(getMajMinVersion $installedVersion)
-			if [ "$ver1" = "$ver2" ]; then
-				deb=$i
-				break
-			fi
-		done
-	fi
-	echo "$deb"
-}
-
-getVoxinDebPackage() {
-	find packages/debian -name "libvoxin*_$DEBIAN_ARCH.deb"
-}
-
-getLibvoxinTarball() {
+getRootfilesystemTarball() {
 	find packages/all -name "rfs*.$ARCH.txz"
 }
 
@@ -209,3 +172,40 @@ postInstViavoiceTarball() {
 	return 0
 }
 
+installLang() {
+	[ $# != 1 ] && return 1
+	local rfsdir=$1
+	local status
+	local i
+
+    askLicense || return 1
+
+	i=$(getViavoiceAllTarball)
+	if [ -z "$i" ]; then
+		echo "Error: no viavoice-all tarball" >> "$LOG"
+		return 1
+	fi
+	tar -C "$rfsdir" --no-overwrite-dir -xf "$i"
+	status=$?
+	if [ "$status" != 0 ]; then
+		echo "Error: untar failure ($i)" >> "$LOG"
+		return $status
+	fi
+	
+	getViavoiceTarballs | while read i; do
+		tar -C "$rfsdir" --no-overwrite-dir -xf "$i"
+		status=$?
+		if [ "$status" != 0 ]; then
+			echo "Error: untar failure ($i)" >> "$LOG"
+			return $status
+		fi
+	done
+
+	postInstViavoiceTarball "$rfsdir" "/"
+	
+    return 0
+}
+
+orcaConf() {
+	return 0
+}
