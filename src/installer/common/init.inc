@@ -68,7 +68,7 @@ check_distro() {
 		# Check if this is a debian based distro
 		a=$(which dpkg) || true
 		if [ -n "$a" ]; then
-			source common/install-debian.inc
+			source common/install-deb.inc
 			status=0
 		fi
     fi
