@@ -469,10 +469,15 @@ buildRpmPackage() {
 	[ $# != 8 ] && return
 
 	local pacdir="$TMPDIR"/buildRpmPackage.pac.d
-	[ -e "$pacdir" ] && rm -rf "$pacdir"
+	if [ -e "$pacdir" ]; then
+		find "$pacdir" -type d -exec chmod a+w {} \;
+		rm -rf "$pacdir"
+	fi
 	mkdir -p "$pacdir/data"
 	cd "$pacdir/data"
 	tar --exclude=share -xf "$tarball"
+	find * -type d -exec chmod a-w {} \;
+	chmod 755 usr/include usr 2>/dev/null
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"	
 	tar -zcf "$pacdir/$name.tgz" *
 	cd ..

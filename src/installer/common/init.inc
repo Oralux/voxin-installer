@@ -100,11 +100,11 @@ getTarballVersion() {
 
 # getMajMinVersion
 # Example:
-# input=1.2.3
+# input=1.2.3-4.fc29
 # output=1.2
 getMajMinVersion() {
 	[ $# != 1 ] && return
-	echo "$1" | sed 's/\(.*\..*\)\..*/\1/'
+	echo "$1" | cut -f1,2 -d.
 }
 
 getRootfilesystemTarball() {
