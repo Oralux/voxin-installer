@@ -78,10 +78,11 @@ check_distro() {
 # if this installer provides a compatible replacement version
 check_speech_dispatcher_voxin() {
     local status=0
-    local package
 	$(isSpeechDispatcherVoxinInstalled) || return 0
-	package=$(getSpeechDispatcherPackage)
-	[ -z "$package" ] && status=1
+	getSpeechDispatcherVoxinPackage
+	if [ -z "$getSpeechDispatcherVoxinPackage1" ] || [ -z "$getSpeechDispatcherVoxinPackage2" ]; then
+			status=1
+	fi
 	return $status
 }
 
@@ -208,3 +209,142 @@ installLang() {
 orcaConf() {
 	return 0
 }
+
+getArch() {
+	ARCH=$(uname -m)
+    case "$ARCH" in
+		x86_64|ia64)
+			DEBIAN_ARCH=amd64
+    	    ;;
+		*)
+			DEBIAN_ARCH=i386
+    	    ;;
+    esac
+}
+
+sd_install() {
+	[ $# != 1 ] && return 1
+	
+	local rfsdir=$1
+	getSpeechDispatcherVoxinPackage
+	if [ -z "$getSpeechDispatcherVoxinPackage1" ] || [ -z "$getSpeechDispatcherVoxinPackage2" ]; then
+			return 1
+	fi
+	
+	installLocalPackage "$getSpeechDispatcherVoxinPackage1" || return 1
+
+	[ ! -e /usr/share/speech-dispatcher/conf/modules/ibmtts.conf ] \
+		&& [ ! -e /etc/speech-dispatcher/modules/ibmtts.conf ] \
+		&& installLocalPackage "$getSpeechDispatcherVoxinPackage2" || return 1
+	
+    spd_conf_set ibmtts
+    return 0
+}
+
+sd_uninstall()
+{
+    spd_conf_unset ibmtts
+    spd_conf_set espeak
+	uninstallPackage speech-dispatcher-voxin
+    return 0
+}
+
+uninstallSystem()
+{	
+	uninstallPackage libvoxin1
+}
+
+installSystem() {	
+	[ $# != 1 ] && return 1
+	local rfsdir=$1
+	local status=0
+	local voxinPackage=$(getVoxinPackage)
+	local rfsTarball=$(getRootfilesystemTarball)
+
+	if [ ! -d "$rfsdir" ]; then
+		echo "Install directory not found: $rfsdir" >> "$LOG"
+		return 1
+	fi
+	
+	if [ -z "$voxinPackage" ]; then
+		echo "voxin package not found!" >> "$LOG"
+		return 1
+	fi
+	
+	if [ -z "$rfsTarball" ]; then
+		echo "rfs tarball not found!" >> "$LOG"
+		return 1
+	fi
+
+	for i in libvoxin1 voxind; do
+		uninstallPackage $i || true
+	done
+	
+	tar -C "$rfsdir" -xf "$rfsTarball" 
+	status=$?
+	if [ "$status" != 0 ]; then
+		echo "Error: untar failure ($rfsTarball)" >> "$LOG"
+		return "$status"
+	fi	
+
+	installLocalPackage "$voxinPackage"
+	status=$?
+	if [ "$status" != 0 ]; then
+		echo "Error: package install failure ($voxinPackage)!" >> "$LOG"
+		return "$status"
+	fi
+	
+	return "$status"
+}
+
+isSpeechDispatcherAvailable() {
+	isPackageInstalled speech-dispatcher
+}
+
+isSpeechDispatcherVoxinInstalled() {
+	isPackageInstalled speech-dispatcher-voxin || isPackageInstalled speech-dispatcher-ibmtts
+}
+
+# getSpeechDispatcherVoxinPackage
+# output: 2 vars
+# getSpeechDispatcherVoxinPackage1: sd_ibmtts package
+# getSpeechDispatcherVoxinPackage2: ibmtts.conf package
+getSpeechDispatcherVoxinPackage() {
+	getListSpeechDispatcherVoxin
+	local list=$getListSpeechDispatcherVoxin1
+	local conf=$getListSpeechDispatcherVoxin2
+	local i
+	local availableVersion
+	local installedVersion=$(getPackageVersion speech-dispatcher)
+	[ -z "installedVersion" ] && return
+	
+	if [ -n "$list" ]; then
+		for i in $list; do
+			availableVersion=$(getPackageFileVersion "$i")
+			local ver1=$(getMajMinVersion $availableVersion)
+			local ver2=$(getMajMinVersion $installedVersion)
+			if [ "$ver1" = "$ver2" ]; then
+				getSpeechDispatcherVoxinPackage1=$i
+				break
+			fi
+		done
+	fi
+
+	if [ -n "$conf" ]; then
+		for i in $conf; do
+			availableVersion=$(getPackageFileVersion "$i")
+			local ver1=$(getMajMinVersion $availableVersion)
+			local ver2=$(getMajMinVersion $installedVersion)
+			if [ "$ver1" = "$ver2" ]; then
+				getSpeechDispatcherVoxinPackage2=$i
+				break
+			fi
+		done
+	fi
+}
+
+install_gettext() {
+    installPackage gettext
+    . gettext.sh
+}
+

@@ -65,6 +65,7 @@ fi
 # TODO
 ARCH=x86_64
 
+checkDep
 mkdir -p "$PKGDIR" "$DWLDIR" "$RFS32"
 [ -n "$BUILDROOT" ] && buildBuildroot
 getMinimalRFS32FromBuildroot

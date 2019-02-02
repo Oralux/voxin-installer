@@ -9,6 +9,8 @@ cd $BASE
 source ./common/init.inc
 source ./common/spdconf.inc
 
+getArch
+
 unset GETTEXT
 which gettext >> "$LOG"
 if [ "$?" = "0" ]; then
@@ -69,8 +71,6 @@ done
 if [ "$with_verbose" = "1" ]; then
     set -x
 fi
-
-getArch
 
 if [ "$with_silent" = "1" ]; then
     source common/askSilent.inc
