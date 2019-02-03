@@ -334,7 +334,7 @@ getSpeechDispatcherVoxin() {
 	head -n $SPEECHD_IBMTTS_COPYRIGHT_NB_LINES src/modules/ibmtts.c > "$docDir"/copyright.$version
 	
 	local v=$(getMajMinVersion $version)
-	ln -s sd_ibmtts.$version "$confDir"/sd_ibmtts.$v
+	ln -s sd_ibmtts.$version "$modulesDir"/sd_ibmtts.$v
 	ln -s ibmtts.conf.$version "$confDir"/ibmtts.conf.$v
 
 	# build two minimal packages (only symlinks):
@@ -344,9 +344,9 @@ getSpeechDispatcherVoxin() {
 	# installed via its speech-dispatcher package
 	#
 	cd $workdir/rfs
-	mkdir -p usr/{lib/speech-dispatcher-modules,share/speech-dispatcher/conf,share/doc/speech-dispatcher-voxin} etc/speech-dispatcher/modules
+	mkdir -p usr/{lib/speech-dispatcher-modules,share/speech-dispatcher/conf/modules,share/doc/speech-dispatcher-voxin} etc/speech-dispatcher/modules
 	ln -s /opt/oralux/voxin/lib/speech-dispatcher-modules/sd_ibmtts.$v usr/lib/speech-dispatcher-modules/sd_ibmtts
-	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$v usr/share/speech-dispatcher/conf/ibmtts.conf
+	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$v usr/share/speech-dispatcher/conf/modules/ibmtts.conf
 	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$v etc/speech-dispatcher/modules/ibmtts.conf
 	
 	local tarball="$workdir/build"/speech-dispatcher-voxin-pkg_$version.all.txz
@@ -382,7 +382,7 @@ tar -C \"$workdir/rfs\" \
 	fakeroot bash -c "\
 tar -C \"$workdir/rfs\" \
 	   -Jcf \"$tarball\" \
-	   usr/share/speech-dispatcher/conf/ibmtts.conf \
+	   usr/share/speech-dispatcher/conf/modules/ibmtts.conf \
 	   etc/speech-dispatcher/modules/ibmtts.conf"
 	
 	# debian package
@@ -544,7 +544,7 @@ buildPacmanPackage() {
 	mkdir -p "$pacdir"
 	cd "$pacdir"
 
-	tar --exclude=share -xf "$tarball"
+	tar --exclude=doc -xf "$tarball"
 	local size=$(du -scb . | head -n1 | cut -f1)
 
 	cat <<EOF>.PKGINFO
@@ -598,9 +598,13 @@ buildRpmPackage() {
 	fi
 	mkdir -p "$pacdir/data"
 	cd "$pacdir/data"
-	tar --exclude=share -xf "$tarball"
+	tar --exclude=doc -xf "$tarball"
 	find * -type d -exec chmod a-w {} \;
-	chmod 755 usr usr/include usr/share usr/share/doc etc etc/speech-dispatcher etc/speech-dispatcher/modules 2>/dev/null
+	chmod 755 usr usr/include usr/share usr/share/doc usr/lib/speech-dispatcher-modules 2>/dev/null
+	for i in usr/share etc; do
+		chmod 755 $i $i/speech-dispatcher $i/speech-dispatcher/modules 2>/dev/null
+	done
+	[ "$arch" = "x86_64" ] && mv usr/lib usr/lib64
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"	
 	tar -zcf "$pacdir/$name.tgz" *
 	cd ..

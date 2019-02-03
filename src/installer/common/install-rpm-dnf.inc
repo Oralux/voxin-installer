@@ -4,15 +4,15 @@ getVoxinPackage() {
 }
 
 getPackageVersion() {
-	[ $# != 1 ] && return
-	local deb=$1
-	dnf list installed "$deb" | awk "/$deb/{print \$2}"	
+	[ $# != 1 ] || [ -z "$1" ] && return
+	local package=$1
+	dnf list installed "$package" 2>/dev/null | awk "/$package/{print \$2}"	
 }
 
 isPackageInstalled() {
-	[ $# != 1 ] && return 1
-	local deb=$1
-	dnf list installed "$deb" &>/dev/null
+	[ $# != 1 ] || [ -z "$1" ] && return 1
+	local package=$1
+	dnf list installed "$package" &>/dev/null
 }
 
 # getPackageFileVersion
@@ -20,33 +20,34 @@ isPackageInstalled() {
 # input: name1-name2-1.2.3-1.x86_64.rpm
 # output: 1.2
 getPackageFileVersion() {
-	[ $# != 1 ] && return
+	unset output
+	[ $# != 1 ] || [ -z "$1" ] && return
 	local package=$1
-	getArch
-	echo "$package" | sed -E -e "s/.$ARCH.pkg.tar.xz//" -e "s/.*-([[:digit:]]+.[[:digit:]]+).*/\1/" 
+	output=$(echo "$package" | sed -E -e "s/.$ARCH.pkg.tar.xz//" -e "s/.*-([[:digit:]]+.[[:digit:]]+).*/\1/")
 }
 
-# getListSpeechDispatcherVoxin
-# output: 2 vars
-# getListSpeechDispatcherVoxin1: list of sd_ibmtts packages
-# getListSpeechDispatcherVoxin2: list of ibmtts.conf packages
 getListSpeechDispatcherVoxin() {
-	getListSpeechDispatcherVoxin1=$(find packages/rpm -name "speech-dispatcher-voxin*.$ARCH.rpm" ! -name "speech-dispatcher-voxin-conf*")
-	getListSpeechDispatcherVoxin2=$(find packages/rpm -name "speech-dispatcher-voxin-conf*.$ARCH.rpm")
+	output=$(echo $(find packages/rpm -name "speech-dispatcher-voxin*.$ARCH.rpm" ! -name "speech-dispatcher-voxin-conf*"))
+}
+
+getListSpeechDispatcherVoxinConf() {
+	output=$(echo $(find packages/rpm -name "speech-dispatcher-voxin-conf*.$ARCH.rpm"))
 }
 
 installLocalPackage() {
-	[ $# != 1 ] && return
+	[ $# != 1 ] || [ -z "$1" ] && return
 	local package=$1
 	dnf install -q -y "$package" &>> "$LOG"
 }
 
 installPackage() {
-	installLocalPackage $1
+	[ $# != 1 ] || [ -z "$1" ] && return
+	local package=$1
+	dnf install -q -y "$package" &>> "$LOG"
 }
 
 uninstallPackage() {
-	[ $# != 1 ] && return
+	[ $# != 1 ] || [ -z "$1" ] && return
 	local package=$1
     dnf remove -y "$package" &>> "$LOG"	
 }

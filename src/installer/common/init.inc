@@ -77,13 +77,11 @@ check_distro() {
 # if the speech-dispatcher-voxin package is already installed, check
 # if this installer provides a compatible replacement version
 check_speech_dispatcher_voxin() {
-    local status=0
+	local installedVersion
 	$(isSpeechDispatcherVoxinInstalled) || return 0
-	getSpeechDispatcherVoxinPackage
-	if [ -z "$getSpeechDispatcherVoxinPackage1" ] || [ -z "$getSpeechDispatcherVoxinPackage2" ]; then
-			status=1
-	fi
-	return $status
+	installedVersion=$(getPackageVersion speech-dispatcher)
+	getListSpeechDispatcherVoxin || return 1
+	getLocalSpeechDispatcherVoxinPackage "$installedVersion" "$output"	
 }
 
 merge_old_archive() {
@@ -95,7 +93,7 @@ merge_old_archive() {
 # input=name_1.2.3.x86_64.txz
 # output=1.2.3
 getTarballVersion() {
-	[ $# != 1 ] && return
+	[ $# != 1 ] || [ -z "$1" ] && return
 	echo "$1" | sed 's+.*_\(.*\)\..*\..*+\1+'
 }
 
@@ -104,7 +102,7 @@ getTarballVersion() {
 # input=1.2.3-4.fc29
 # output=1.2
 getMajMinVersion() {
-	[ $# != 1 ] && return
+	[ $# != 1 ] || [ -z "$1" ] && return
 	echo "$1" | cut -f1,2 -d.
 }
 
@@ -122,6 +120,7 @@ getViavoiceTarballs() {
 
 postInstViavoiceTarball() {
 	[ $# != 2 ] && return 1
+	[ -z "$1" ] || [ -z "$2" ] && return 1
 
 	local rfsdir=$1
 	local destdir=$2
@@ -173,7 +172,7 @@ postInstViavoiceTarball() {
 }
 
 installLang() {
-	[ $# != 1 ] && return 1
+	[ $# != 1 ] || [ -z "$1" ] && return 1
 	local rfsdir=$1
 	local status
 	local i
@@ -223,20 +222,36 @@ getArch() {
 }
 
 sd_install() {
-	[ $# != 1 ] && return 1
+	[ $# != 1 ] || [ -z "$1" ] && return 1
 	
 	local rfsdir=$1
-	getSpeechDispatcherVoxinPackage
-	if [ -z "$getSpeechDispatcherVoxinPackage1" ] || [ -z "$getSpeechDispatcherVoxinPackage2" ]; then
-			return 1
-	fi
+	local binPackage
+	local confPackage
+	local installedVersion=$(getPackageVersion speech-dispatcher)
+	[ -z "$installedVersion" ] && return 1
 	
-	installLocalPackage "$getSpeechDispatcherVoxinPackage1" || return 1
+	getListSpeechDispatcherVoxin || return 1
+	getLocalSpeechDispatcherVoxinPackage "$installedVersion" "$output" || return 1
+	binPackage=$output
+	
+	getListSpeechDispatcherVoxinConf || return 1
+	getLocalSpeechDispatcherVoxinPackage "$installedVersion" "$output" || return 1
+	confPackage=$output
+		
+	installLocalPackage "$binPackage" || return 1
 
-	[ ! -e /usr/share/speech-dispatcher/conf/modules/ibmtts.conf ] \
-		&& [ ! -e /etc/speech-dispatcher/modules/ibmtts.conf ] \
-		&& installLocalPackage "$getSpeechDispatcherVoxinPackage2" || return 1
-	
+	# if the original system does not already provide ibmtts.conf,
+	# then install our local package
+	local installConf=0
+	isPackageInstalled speech-dispatcher-voxin-conf
+	if [ "$?" = 1 ]; then
+		if [ -e /usr/share/speech-dispatcher/conf/modules/ibmtts.conf ] || [ -e /etc/speech-dispatcher/modules/ibmtts.conf ]; then
+			installConf=1
+		fi
+	fi
+	if [ "$installConf" = 0 ]; then
+		installLocalPackage "$confPackage" || return 1
+	fi
     spd_conf_set ibmtts
     return 0
 }
@@ -255,7 +270,7 @@ uninstallSystem()
 }
 
 installSystem() {	
-	[ $# != 1 ] && return 1
+	[ $# != 1 ] || [ -z "$1" ] && return 1
 	local rfsdir=$1
 	local status=0
 	local voxinPackage=$(getVoxinPackage)
@@ -305,42 +320,27 @@ isSpeechDispatcherVoxinInstalled() {
 	isPackageInstalled speech-dispatcher-voxin || isPackageInstalled speech-dispatcher-ibmtts
 }
 
-# getSpeechDispatcherVoxinPackage
-# output: 2 vars
-# getSpeechDispatcherVoxinPackage1: sd_ibmtts package
-# getSpeechDispatcherVoxinPackage2: ibmtts.conf package
-getSpeechDispatcherVoxinPackage() {
-	getListSpeechDispatcherVoxin
-	local list=$getListSpeechDispatcherVoxin1
-	local conf=$getListSpeechDispatcherVoxin2
+# output: pathname of the local speech-dispatcher-voxin(-conf) package
+# compatible with the installed speech-dispatcher
+getLocalSpeechDispatcherVoxinPackage() {	
+	unset output
+	[ $# != 2 ] && return 1
+	[ -z "$1" ] || [ -z "$2" ] && return 1
+	local installedVersion=$1	
+	local localPackages=$2
 	local i
-	local availableVersion
-	local installedVersion=$(getPackageVersion speech-dispatcher)
-	[ -z "installedVersion" ] && return
 	
-	if [ -n "$list" ]; then
-		for i in $list; do
-			availableVersion=$(getPackageFileVersion "$i")
-			local ver1=$(getMajMinVersion $availableVersion)
-			local ver2=$(getMajMinVersion $installedVersion)
-			if [ "$ver1" = "$ver2" ]; then
-				getSpeechDispatcherVoxinPackage1=$i
-				break
-			fi
-		done
-	fi
-
-	if [ -n "$conf" ]; then
-		for i in $conf; do
-			availableVersion=$(getPackageFileVersion "$i")
-			local ver1=$(getMajMinVersion $availableVersion)
-			local ver2=$(getMajMinVersion $installedVersion)
-			if [ "$ver1" = "$ver2" ]; then
-				getSpeechDispatcherVoxinPackage2=$i
-				break
-			fi
-		done
-	fi
+	for i in $localPackages; do
+		getPackageFileVersion "$i"
+		local ver1=$(getMajMinVersion "$output")
+		local ver2=$(getMajMinVersion "$installedVersion")
+		if [ "$ver1" = "$ver2" ]; then
+			output=$i
+			break
+		fi
+		unset output
+	done
+	[ -n "$output" ]
 }
 
 install_gettext() {
