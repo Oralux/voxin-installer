@@ -27,11 +27,11 @@ getPackageFileVersion() {
 }
 
 getListSpeechDispatcherVoxin() {
-	output=$(echo $(find packages/deb -name "speech-dispatcher-voxin_*_$DEBIAN_ARCH.deb"))
+	output=$(find packages/deb -name "speech-dispatcher-voxin_*_$DEBIAN_ARCH.deb")
 }
 
 getListSpeechDispatcherVoxinConf() {
-	output=$(echo $(find packages/deb -name "speech-dispatcher-voxin-conf_*_$DEBIAN_ARCH.deb"))
+	output=$(find packages/deb -name "speech-dispatcher-voxin-conf_*_$DEBIAN_ARCH.deb")
 }
 
 installLocalPackage() {

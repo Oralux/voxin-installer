@@ -27,11 +27,11 @@ getPackageFileVersion() {
 }
 
 getListSpeechDispatcherVoxin() {
-	output=$(echo $(find packages/rpm -name "speech-dispatcher-voxin*.$ARCH.rpm" ! -name "speech-dispatcher-voxin-conf*"))
+	output=$(find packages/rpm -name "speech-dispatcher-voxin*.$ARCH.rpm" ! -name "speech-dispatcher-voxin-conf*")
 }
 
 getListSpeechDispatcherVoxinConf() {
-	output=$(echo $(find packages/rpm -name "speech-dispatcher-voxin-conf*.$ARCH.rpm"))
+	output=$(find packages/rpm -name "speech-dispatcher-voxin-conf*.$ARCH.rpm")
 }
 
 installLocalPackage() {

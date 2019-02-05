@@ -63,6 +63,9 @@ check_distro() {
     elif [ -e "/etc/fedora-release" ]; then 
 		source common/install-rpm-dnf.inc
 		status=$?
+	elif [ -e "/etc/slackware-version" ]; then 
+		source common/install-slackware.inc
+		status=$?
     else
 		# Check if this is a debian based distro
 		a=$(which dpkg) || true

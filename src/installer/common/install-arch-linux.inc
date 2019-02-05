@@ -27,11 +27,11 @@ getPackageFileVersion() {
 }
 
 getListSpeechDispatcherVoxin() {
-	output=$(echo $(find packages/archlinux -name "speech-dispatcher-voxin*$ARCH.pkg.tar.xz" ! -name "speech-dispatcher-voxin-conf*"))
+	output=$(find packages/archlinux -name "speech-dispatcher-voxin*$ARCH.pkg.tar.xz" ! -name "speech-dispatcher-voxin-conf*")
 }
 
 getListSpeechDispatcherVoxinConf() {
-	output=$(echo $(find packages/archlinux -name "speech-dispatcher-voxin-conf*$ARCH.pkg.tar.xz"))
+	output=$(find packages/archlinux -name "speech-dispatcher-voxin-conf*$ARCH.pkg.tar.xz")
 }
 
 installLocalPackage() {
