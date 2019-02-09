@@ -261,7 +261,6 @@ sd_install() {
 
 sd_uninstall()
 {
-    spd_conf_unset ibmtts
     spd_conf_set espeak
 	uninstallPackage speech-dispatcher-voxin
     return 0
