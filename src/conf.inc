@@ -243,26 +243,27 @@ getLibvoxin() {
 	tar -C "$RFSDIR" -xf $tarball
 
 	# build the debian package and install it into the installer tree
-	local description="Description: voxin pseudo package.\n Voxin is an easily installable add-on which provides yet another\n text-to-speech to blind users of GNU/Linux.\n"
+	local title="Voxin pseudo package"
+	local description="Voxin is an easily installable add-on which provides yet another text-to-speech to blind users of GNU/Linux. This package provides symbolic links to voxin."
 	tarball=$(ls "$PWD"/build/"$arch"/release/libvoxin-pkg_*.all.txz)
 	local name=libvoxin1
 	local depends=libc6
 	local debArch=$(getDebArch "$arch")
 	installDir=$INSTALLDIR/packages/deb
-	local debName=$(buildDebPackage "$tarball" "$installDir" "$name" "$version" "$debArch" "$depends" "$description")
+	local debName=$(buildDebPackage "$tarball" "$installDir" "$name" "$version" "$debArch" "$depends" "$title" "$description")
 
 	# pacman package
 	local depends=glibc
 	installDir=$INSTALLDIR/packages/archlinux
-	buildPacmanPackage "$tarball" "$installDir" "$name" "$version" "$arch" "$depends" "$description" "LGPL-2.1+" 
+	buildPacmanPackage "$tarball" "$installDir" "$name" "$version" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" 
 	
 	# rpm package
 	installDir=$INSTALLDIR/packages/rpm
-	buildRpmPackage "$tarball" "$installDir" "$name" "$version" "$arch" "$depends" "$description" "LGPL-2.1+" 
+	buildRpmPackage "$tarball" "$installDir" "$name" "$version" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" 
 	
 	# slackware package
 	installDir=$INSTALLDIR/packages/slackware
-	buildSlackwarePackage "$tarball" "$installDir" "$name" "$version" "$arch" "$depends" "$description" "LGPL-2.1+" 
+	buildSlackwarePackage "$tarball" "$installDir" "$name" "$version" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" 
 	
 	cd "$pwd"	
 }
@@ -361,29 +362,30 @@ tar -C \"$workdir/rfs\" \
 
 	# speech-dispatcher-voxin package
 	# build the debian package and install it into the installer tree
-	local description="Description: Speech Dispatcher pseudo package: voxin output module.\n This package contains a symbolic link to the voxin output module.\n"
+	local title="Speech Dispatcher: voxin output module"
+	local description="This package contains a symbolic link to the voxin output module."
 	local name=speech-dispatcher-voxin
 	local depends=libvoxin1
 	local debArch=$(getDebArch "$arch")
 	installDir=$INSTALLDIR/packages/deb
-	buildDebPackage "$tarball" "$installDir" "$name" "$version" "$debArch" "$depends" "$description"
+	buildDebPackage "$tarball" "$installDir" "$name" "$version" "$debArch" "$depends" "$title" "$description"
 
  	# speech-dispatcher-voxin 0.8: symlink to 0.9.x (the ibmtts modules are currently the same)	
  	ln -sf "$(basename $buildDebPackageRes)" "$installDir"/speech-dispatcher-voxin_0.8_${debArch}.deb
 
 	# pacman package
 	installDir=$INSTALLDIR/packages/archlinux
-	buildPacmanPackage "$tarball" "$installDir" "$name" "$version" "$arch" "$depends" "$description" "LGPL-2.1+"
+	buildPacmanPackage "$tarball" "$installDir" "$name" "$version" "$arch" "$depends" "$title" "$description" "LGPL-2.1+"
  	ln -sf "$(basename $buildPacmanPackageRes)" "$installDir"/speech-dispatcher-voxin-0.8-${ARCH}.pkg.tar.xz
 	
 	# rpm package
 	installDir=$INSTALLDIR/packages/rpm
-	buildRpmPackage "$tarball" "$installDir" "$name" "$version" "$arch" "$depends" "$description" "LGPL-2.1+"
+	buildRpmPackage "$tarball" "$installDir" "$name" "$version" "$arch" "$depends" "$title" "$description" "LGPL-2.1+"
  	ln -sf "$(basename $buildRpmPackageRes)" "$installDir"/speech-dispatcher-voxin-0.8-1.${ARCH}.rpm	
 
 	# slackware package
 	installDir=$INSTALLDIR/packages/slackware
-	buildSlackwarePackage "$tarball" "$installDir" "$name" "$version" "$arch" "$depends" "$description" "LGPL-2.1+" 
+	buildSlackwarePackage "$tarball" "$installDir" "$name" "$version" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" 
  	ln -sf "$(basename $buildSlackwarePackageRes)" "$installDir"/speech-dispatcher-voxin-0.8-${ARCH}-1.txz
 	
 	# speech-dispatcher-voxin-conf package
@@ -395,26 +397,27 @@ tar -C \"$workdir/rfs\" \
 	   etc/speech-dispatcher/modules/ibmtts.conf"
 	
 	# debian package
-	description="Description: Speech Dispatcher pseudo package: conf of the voxin output module.\n Symbolic links to the configuration of the voxin output module.\n"
+	title="Speech-dispatcher: voxin conf"
+	description="Symbolic links to the configuration of the voxin output module."
 	name=speech-dispatcher-voxin-conf
 	depends=speech-dispatcher-voxin
 	installDir=$INSTALLDIR/packages/deb
-	buildDebPackage "$tarball" "$installDir" "$name" "$version" "$debArch" "$depends" "$description"
+	buildDebPackage "$tarball" "$installDir" "$name" "$version" "$debArch" "$depends" "$title" "$description"
  	ln -sf "$(basename $buildDebPackageRes)" "$installDir"/speech-dispatcher-voxin-conf_0.8_${debArch}.deb
 
 	# pacman package
 	installDir=$INSTALLDIR/packages/archlinux
-	buildPacmanPackage "$tarball" "$installDir" "$name" "$version" "$arch" "$depends" "$description" "LGPL-2.1+"
+	buildPacmanPackage "$tarball" "$installDir" "$name" "$version" "$arch" "$depends" "$title" "$description" "LGPL-2.1+"
  	ln -sf "$(basename $buildPacmanPackageRes)" "$installDir"/speech-dispatcher-voxin-conf-0.8-${ARCH}.pkg.tar.xz
 	
 	# rpm package
 	installDir=$INSTALLDIR/packages/rpm
-	buildRpmPackage "$tarball" "$installDir" "$name" "$version" "$arch" "$depends" "$description" "LGPL-2.1+"
+	buildRpmPackage "$tarball" "$installDir" "$name" "$version" "$arch" "$depends" "$title" "$description" "LGPL-2.1+"
  	ln -sf "$(basename $buildRpmPackageRes)" "$installDir"/speech-dispatcher-voxin-conf-0.8-1.${ARCH}.rpm	
 
 	# slackware package
 	installDir=$INSTALLDIR/packages/slackware
-	buildSlackwarePackage "$tarball" "$installDir" "$name" "$version" "$arch" "$depends" "$description" "LGPL-2.1+" 
+	buildSlackwarePackage "$tarball" "$installDir" "$name" "$version" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" 
  	ln -sf "$(basename $buildSlackwarePackageRes)" "$installDir"/speech-dispatcher-voxin-conf-0.8-${ARCH}-1.txz
 	
 	cd "$pwd"	
@@ -493,15 +496,16 @@ buildInstallerDir() {
 
 # output buildDebPackageRes 
 buildDebPackage() {
-	[ "$#" -lt 7 ] && return 1
+	[ "$#" -lt 8 ] && return 1
 	local tarball=$1
 	local installDir=$2
 	local name=$3
 	local version=$4
 	local arch=$5
 	local depends=$6
-	local description=$7
-	local replaces=$8
+	local title=$7
+	local description=$8
+	local replaces=$9
 
 	unset buildDebPackageRes 
 	which md5sum > /dev/null || leave "install md5sum" 1
@@ -526,7 +530,9 @@ Section: sound
 EOF
 
 	[ -n "$replaces" ] && echo "Replaces: $replaces" >> DEBIAN/control
-	echo -e "$description" >> DEBIAN/control
+	echo -e "Description: $title" >> DEBIAN/control
+	local prefix=" "
+	echo "$description" | fold -w 80 -s | sed "s/^/$prefix/" >> DEBIAN/control
 
 	cp "$tarball" data.tar.xz
 	echo 2.0 > debian-binary
@@ -539,20 +545,19 @@ EOF
 
 # output buildPacmanPackageRes
 buildPacmanPackage() {
-	[ "$#" -lt 8 ] && return 1
+	[ "$#" -lt 9 ] && return 1
 	local tarball=$1
 	local installDir=$2
 	local name=$3
 	local version=$4
 	local arch=$5
 	local depends=$6
-	local description=$7
-	local license=$8
-	local replaces=$9
+	local title=$7
+	local description=$8
+	local license=$9
+	local replaces=$10
 	local date=$(date --utc +%s)
 	
-	[ $# != 8 ] && return
-
 	local pacdir="$TMPDIR"/buildPacmanPackage.pac.d
 	[ -e "$pacdir" ] && rm -rf "$pacdir"
 	mkdir -p "$pacdir"
@@ -564,7 +569,7 @@ buildPacmanPackage() {
 	cat <<EOF>.PKGINFO
 pkgname = $name
 pkgver = $version
-pkgdesc = $description
+pkgdesc = $title
 url = https://voxin.oralux.net
 builddate = $date
 packager = voxin-installer <contact@oralux.org>
@@ -589,22 +594,21 @@ EOF
 
 // output buildRpmPackageRes
 buildRpmPackage() {	
-	[ "$#" -lt 8 ] && return 1
+	[ "$#" -lt 9 ] && return 1
 	local tarball=$1
 	local installDir=$2
 	local name=$3
 	local version=$4
 	local arch=$5
 	local depends=$6
-	local description=$7
-	local license=$8
-	local replaces=$9
+	local title=$7
+	local description=$8
+	local license=$9
+	local replaces=$10
 	local date=$(date --utc +%s)
 
 	unset buildRpmPackageRes
 	
-	[ $# != 8 ] && return
-
 	local pacdir="$TMPDIR"/buildRpmPackage.pac.d
 	if [ -e "$pacdir" ]; then
 		find "$pacdir" -type d -exec chmod a+w {} \;
@@ -622,7 +626,7 @@ buildRpmPackage() {
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"	
 	tar -zcf "$pacdir/$name.tgz" *
 	cd ..
-	fakeroot alien --target="$arch" --version="$version" --description="$description" --to-rpm "$name.tgz"
+	fakeroot alien --target="$arch" --version="$version" --description="$title. $description" --to-rpm "$name.tgz"
 	local rpm=$(ls *rpm)
 	cp "$rpm" "$installDir"
 	buildRpmPackageRes="$installDir/$rpm"
@@ -630,22 +634,21 @@ buildRpmPackage() {
 
 // output buildSlackwarePackageRes
 buildSlackwarePackage() {	
-	[ "$#" -lt 8 ] && return 1
+	[ "$#" -lt 9 ] && return 1
 	local tarball=$1
 	local installDir=$2
 	local name=$3
 	local version=$4
 	local arch=$5
 	local depends=$6
-	local description=$7
-	local license=$8
-	local replaces=$9
+	local title=$7
+	local description=$8
+	local license=$9
+	local replaces=$10
 	local date=$(date --utc +%s)
 
 	unset buildSlackwarePackageRes
 	
-	[ $# != 8 ] && return
-
 	local pacdir="$TMPDIR"/buildSlackwarePackage.pac.d
 	if [ -e "$pacdir" ]; then
 		find "$pacdir" -type d -exec chmod a+w {} \;
@@ -662,7 +665,9 @@ buildSlackwarePackage() {
 	[ "$arch" = "x86_64" ] && [ -d usr/lib ] && mv usr/lib usr/lib64
 	find . -type d -exec chmod 755 {} \;
 	[ ! -d install ] && mkdir install
-	echo "$description" | sed 's/\\n//g' | fold -w 70 -s | sed "s/^/$prefix/" > $descFile
+	echo "$prefix$name ($title)" > $descFile
+	echo "$prefix" >> $descFile
+	echo "$description" | fold -w 69 -s | sed "s/^/$prefix/" >> $descFile
 	local n=$(wc -l "$descFile" | cut -f1 -d" ")
 	local i
 	for ((i=0; i<$((11-n)); i++)); do echo "$prefix"; done >> $descFile

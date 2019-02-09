@@ -70,13 +70,23 @@ Voxin %VERSION% can be uninstalled with this command line as root:
 
 * Compatible GNU/Linux Distributions
 ** Voxin %VERSION%
-|--------|
-| Debian |
-|--------|
+From version 2.0, voxin is compatible with much more distributions (and their family: derivatives, parent distro).
+The tested distributions are displayed below. Much more should be compatible.
 
-** Voxin 1.15
+The included speech dispatcher module works with with speech-dispatcher 0.8.x and 0.9.
+
+Only 64 bits distributions 
+
+|----------------------------|
+| Arch Linux                 |
+| Debian 9                   |
+| Fedora 29                  |
+| Slint64-14.2.1.1, 14.2.1.2 |
+|----------------------------|
+
+** voxin 1.15
 |-----------------+------------------------|
-| Archlinux       | 2017-01-14             |
+| Arch Linux      | 2017-01-14             |
 | Debian          | 8, 9                   |
 | Fedora          | 25, 26                 |
 | Kali            | 2016.2, 2017.2, 2017.3 |
