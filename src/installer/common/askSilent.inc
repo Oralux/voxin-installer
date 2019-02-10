@@ -1,11 +1,10 @@
+askContinue() {
+    return 1
+}
+
 askInstallLang()
 {
     return $((! with_lang))
-}
-
-askInstallSpeechDriver()
-{
-    return $((! with_sd))
 }
 
 askUninstall()

@@ -1,8 +1,12 @@
 LOG="$BASE/log/voxin.log"
 TEMPLATE=voxin-installer.XXXXXXXXXX
 TMPDIR=/tmp
+SPEECHD_MIN_VERSION=0.8.5
 
 rm -f "$LOG"
+
+unset outputArray
+declare -a outputArray
 
 leave() {
 	echo -e "$1"
@@ -35,14 +39,13 @@ Usage: voxin-installer.sh [options]
 Options:
      -h, --help       print this message
      -l, --lang       install the language
-     -s, --sd         install the speech dispatcher driver
      -u, --uninstall  uninstall the TTS
      -v, --verbose    verbose
 END
 }
 
 uninstall() {
-    sd_uninstall
+    spd_conf_unset
     uninstallSystem
     echo; gettext "Operation completed. "    
 }
@@ -77,14 +80,11 @@ check_distro() {
     return $status
 }
 
-# if the speech-dispatcher-voxin package is already installed, check
-# if this installer provides a compatible replacement version
+# if speech-dispatcher is already installed, check if this installer
+# provides the compatible voxin output module
 check_speech_dispatcher_voxin() {
-	local installedVersion
-	$(isSpeechDispatcherVoxinInstalled) || return 0
-	installedVersion=$(getPackageVersion speech-dispatcher)
-	getListSpeechDispatcherVoxin || return 1
-	getLocalSpeechDispatcherVoxinPackage "$installedVersion" "$output"	
+	local installedVersion=$(getPackageVersion speech-dispatcher)
+	isVersionGreater "$installedVersion" "$SPEECHD_MIN_VERSION"
 }
 
 merge_old_archive() {
@@ -208,10 +208,6 @@ installLang() {
     return 0
 }
 
-orcaConf() {
-	return 0
-}
-
 getArch() {
 	ARCH=$(uname -m)
     case "$ARCH" in
@@ -224,51 +220,9 @@ getArch() {
     esac
 }
 
-sd_install() {
-	[ $# != 1 ] || [ -z "$1" ] && return 1
-	
-	local rfsdir=$1
-	local binPackage
-	local confPackage
-	local installedVersion=$(getPackageVersion speech-dispatcher)
-	[ -z "$installedVersion" ] && return 1
-	
-	getListSpeechDispatcherVoxin || return 1
-	getLocalSpeechDispatcherVoxinPackage "$installedVersion" "$output" || return 1
-	binPackage=$output
-	
-	getListSpeechDispatcherVoxinConf || return 1
-	getLocalSpeechDispatcherVoxinPackage "$installedVersion" "$output" || return 1
-	confPackage=$output
-		
-	installLocalPackage "$binPackage" || return 1
-
-	# if the original system does not already provide ibmtts.conf,
-	# then install our local package
-	local installConf=0
-	isPackageInstalled speech-dispatcher-voxin-conf
-	if [ "$?" = 1 ]; then
-		if [ -e /usr/share/speech-dispatcher/conf/modules/ibmtts.conf ] || [ -e /etc/speech-dispatcher/modules/ibmtts.conf ]; then
-			installConf=1
-		fi
-	fi
-	if [ "$installConf" = 0 ]; then
-		installLocalPackage "$confPackage" || return 1
-	fi
-    spd_conf_set ibmtts
-    return 0
-}
-
-sd_uninstall()
-{
-	spd_conf_unset ibmtts
-	uninstallPackage speech-dispatcher-voxin
-    return 0
-}
-
 uninstallSystem()
 {	
-	uninstallPackage libvoxin1
+	uninstallPackage voxin
 }
 
 installSystem() {	
@@ -293,9 +247,7 @@ installSystem() {
 		return 1
 	fi
 
-	for i in libvoxin1 voxind; do
-		uninstallPackage $i || true
-	done
+	uninstallPackage voxin || true
 	
 	tar -C "$rfsdir" -xf "$rfsTarball" 
 	status=$?
@@ -314,39 +266,51 @@ installSystem() {
 	return "$status"
 }
 
-isSpeechDispatcherAvailable() {
-	isPackageInstalled speech-dispatcher
-}
-
-isSpeechDispatcherVoxinInstalled() {
-	isPackageInstalled speech-dispatcher-voxin || isPackageInstalled speech-dispatcher-ibmtts
-}
-
-# output: pathname of the local speech-dispatcher-voxin(-conf) package
-# compatible with the installed speech-dispatcher
-getLocalSpeechDispatcherVoxinPackage() {	
-	unset output
-	[ $# != 2 ] && return 1
-	[ -z "$1" ] || [ -z "$2" ] && return 1
-	local installedVersion=$1	
-	local localPackages=$2
-	local i
-	
-	for i in $localPackages; do
-		getPackageFileVersion "$i"
-		local ver1=$(getMajMinVersion "$output")
-		local ver2=$(getMajMinVersion "$installedVersion")
-		if [ "$ver1" = "$ver2" ]; then
-			output=$i
-			break
-		fi
-		unset output
-	done
-	[ -n "$output" ]
-}
-
 install_gettext() {
     installPackage gettext
     . gettext.sh
+}
+
+getMajorMinorMicro() {
+	[ $# != 1 ] && return 1
+	local version=$1
+	local major
+	local minor
+	local micro
+	
+	major=$(echo "$version" | sed -r "s/([0-9]+)\.[0-9]+.*/\1/")	
+	[ "$major" = "$version" ] && return 1
+
+	minor=$(echo "$version" | sed -r "s/[0-9]+\.([0-9]+).*/\1/")	
+	[ "$minor" = "$version" ] && return 1
+	
+	micro=$(echo "$version" | sed -r "s/[0-9]+\.[0-9]+\.([0-9]+).*/\1/")
+	[ "$micro" = "$version" ] && micro=0
+
+	outputArray[0]=$major
+	outputArray[1]=$minor
+	outputArray[2]=$micro
+	
+	return 0
+}
+
+isVersionGreater() {
+	[ $# != 2 ] && return 1
+	local ver1=$1
+	local ver2=$2
+
+	getMajorMinorMicro "$ver1" || return 1
+	ver1=("${outputArray[@]}") 
+
+	getMajorMinorMicro "$ver2"
+	ver2=("${outputArray[@]}")
+
+	i=0
+	while [ "$i" -le 2 ]; do
+		[ "${ver1[$i]}" -gt "${ver2[$i]}" ] && return 0
+		[ "${ver1[$i]}" -lt "${ver2[$i]}" ] && return 1
+	i=$((i+1))	
+	done
+	return 0
 }
 

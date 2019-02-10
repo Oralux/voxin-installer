@@ -1,6 +1,6 @@
 getVoxinPackage() {
 	[ -z "$ARCH" ] && return 1
-	find packages/rpm -name "libvoxin*.$ARCH.rpm"
+	find packages/rpm -name "voxin*.$ARCH.rpm"
 }
 
 getPackageVersion() {
@@ -24,14 +24,6 @@ getPackageFileVersion() {
 	[ $# != 1 ] || [ -z "$1" ] && return
 	local package=$1
 	output=$(echo "$package" | sed -E -e "s/.$ARCH.pkg.tar.xz//" -e "s/.*-([[:digit:]]+.[[:digit:]]+).*/\1/")
-}
-
-getListSpeechDispatcherVoxin() {
-	output=$(find packages/rpm -name "speech-dispatcher-voxin*.$ARCH.rpm" ! -name "speech-dispatcher-voxin-conf*")
-}
-
-getListSpeechDispatcherVoxinConf() {
-	output=$(find packages/rpm -name "speech-dispatcher-voxin-conf*.$ARCH.rpm")
 }
 
 installLocalPackage() {

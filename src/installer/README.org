@@ -73,9 +73,7 @@ Voxin %VERSION% can be uninstalled with this command line as root:
 From version 2.0, voxin is compatible with much more distributions (and their family: derivatives, parent distro).
 The tested distributions are displayed below. Much more should be compatible.
 
-The included speech dispatcher module works with with speech-dispatcher 0.8.x and 0.9.
-
-Only 64 bits distributions 
+The included speech dispatcher module works with speech-dispatcher version >= 0.8.5 .
 
 |----------------------------|
 | Arch Linux                 |

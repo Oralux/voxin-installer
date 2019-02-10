@@ -1,3 +1,15 @@
+
+askContinue() {
+    local status
+	echo; gettext "Your version of speech-dispatcher is too old (required version >= $SPEECHD_MIN_VERSION)"
+	echo; gettext "If the installation continues, orca will not be able to use voxin, but emacspeak will"
+	echo; gettext "Do you really want to continue?"
+	echo; gettext "If yes, press the ENTER key."
+	yes
+	status=$?
+    return $status
+}
+
 askInstallLang()
 {
     local status
@@ -13,28 +25,6 @@ askInstallLang()
 		status=$?
     fi
     return $status
-}
-
-askInstallSpeechDriver()
-{
-    # select a speech driver
-    #    echo; gettext "Please, select below the softwares you are interested in:"
-
-
-    # Emacspeak package not yet available.
-    # #     soft="Emacspeak"
-    # #     echo; gettext "Do you want to use the TTS with: \$soft."
-    # #     echo; gettext "If yes, press the ENTER key."
-
-    # #     yes
-    # #     [ "$?" = "1" ] && outloud_build
-
-    local soft="Orca via Speech-Dispatcher"
-    echo; gettext "Do you want to use the TTS with:"
-    echo -n " $soft."
-    echo; gettext "If yes, press the ENTER key."
-    yes
-    return $?
 }
 
 askUninstall()

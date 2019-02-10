@@ -1,6 +1,6 @@
 getVoxinPackage() {
 	[ -z "$ARCH" ] && return 1
-	find packages/slackware -name "libvoxin*-$ARCH*"
+	find packages/slackware -name "voxin*-$ARCH*"
 }
 
 getPackageVersion() {
@@ -39,14 +39,6 @@ getPackageFileVersion() {
 	local a	
 	a=${package%-*}; a=${a%-*}; a=${a##*-}
 	output=$(echo $a | cut -f1-2 -d.)	
-}
-
-getListSpeechDispatcherVoxin() {
-	output=$(find packages/slackware -name "speech-dispatcher-voxin*$ARCH*txz" ! -name "speech-dispatcher-voxin-conf*$ARCH*txz")
-}
-
-getListSpeechDispatcherVoxinConf() {
-	output=$(find packages/slackware -name "speech-dispatcher-voxin-conf*$ARCH*txz")
 }
 
 installLocalPackage() {

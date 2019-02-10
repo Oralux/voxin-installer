@@ -37,10 +37,15 @@ if [ "$?" != "0" ]; then
     exit 0
 fi
 
+with_sd=1
 check_speech_dispatcher_voxin
 if [ "$?" != "0" ]; then
-	echo; gettext "Sorry, this installer does not provide a compatible replacement version for speech-dispatcher-voxin."
-    exit 0
+	askContinue
+	if [ $? = 1 ]; then
+		echo; gettext "Good Bye. "
+		exit 0
+	fi
+	with_sd=0
 fi
 			
 TEMP=`getopt -o hlsuv --long help,lang,sd,uninstall,verbose -- "$@"`
@@ -53,14 +58,12 @@ eval set -- "$TEMP"
 
 with_silent=0
 with_lang=0
-with_sd=0
 with_uninstall=0
 with_verbose=0
 
 while true ; do
     case "$1" in
 		-l|--lang) with_silent=1; with_lang=1; shift;;
-		-s|--sd) with_silent=1; with_sd=1; shift;;
 		-u|--uninstall) with_uninstall=1; shift;;
 		-v|--verbose) with_verbose=1; shift;;
 		--) shift ; break;;
@@ -110,11 +113,7 @@ askInstallLang && {
 	fi
 }
 
-isSpeechDispatcherAvailable && askInstallSpeechDriver && {
-		sd_install "$installDir" || exit 1
-		installed=1
-		orcaConf
-    }
+[ "$with_sd" = 1 ] && spd_conf_set voxin
 
 if [ "$installed" = "0" ]; then
     askUninstall && {
@@ -122,7 +121,7 @@ if [ "$installed" = "0" ]; then
 		exit 0
     }
 
-    echo; gettext "The changes will be taken into account on next boot. "
 fi
 
+echo; gettext "The changes will be taken into account on next boot. "
 echo; gettext "Good Bye. "

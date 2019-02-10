@@ -66,11 +66,12 @@ fi
 ARCH=x86_64
 
 checkDep
-mkdir -p "$PKGDIR" "$DWLDIR" "$RFS32"
+init
 [ -n "$BUILDROOT" ] && buildBuildroot
 getMinimalRFS32FromBuildroot
 getOldLibstdc++
 buildInstallerDir
 getLibvoxin "$ARCH"
 getSpeechDispatcherVoxin "$ARCH"
+buildPackage "$ARCH"
 buildReleaseTarball "$ARCH" "$TARBALLS"

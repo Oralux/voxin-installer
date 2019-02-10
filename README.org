@@ -1,8 +1,8 @@
 The voxin installer installs voxin and its dependencies on various GNU/Linux distributions (e.g. Arch Linux, Debian, Fedora, Slackware, Slint, Ubuntu,...). 
 
 The current goal is to provide:
-- distribution-independent tarballs (in /opt directory), 
-- a few minimal and stable debian packages, easily converted to other package format (/usr, ...), 
+- distribution-independent tarballs (installed under /opt), 
+- a minimal package providing symlinks to /opt for various package managers, 
 - no dependencies on foreign architectures (the x86_64 binaries won't require multi-arch support from the distribution for x86 binaries).
 
 This git repository has been initially copied from libvoxin-debian and replaces it.

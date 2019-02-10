@@ -1,6 +1,6 @@
 getVoxinPackage() {
 	[ -z "$DEBIAN_ARCH" ] && return 1
-	find packages/deb -name "libvoxin*_$DEBIAN_ARCH.deb"
+	find packages/deb -name "voxin*_$DEBIAN_ARCH.deb"
 }
 
 getPackageVersion() {
@@ -24,14 +24,6 @@ getPackageFileVersion() {
 	[ $# != 1 ] || [ -z "$1" ] && return
 	local package=$1
 	output=$(echo "$package" | sed -E -e "s/_$DEBIAN_ARCH.deb//" -e "s/.*_([[:digit:]]+.[[:digit:]]+).*/\1/")
-}
-
-getListSpeechDispatcherVoxin() {
-	output=$(find packages/deb -name "speech-dispatcher-voxin_*_$DEBIAN_ARCH.deb")
-}
-
-getListSpeechDispatcherVoxinConf() {
-	output=$(find packages/deb -name "speech-dispatcher-voxin-conf_*_$DEBIAN_ARCH.deb")
 }
 
 installLocalPackage() {
