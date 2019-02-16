@@ -62,16 +62,19 @@ if [ -n "$CLEAN" ]; then
 	exit 0
 fi
 
-# TODO
-ARCH=x86_64
-
 checkDep
 init
 [ -n "$BUILDROOT" ] && buildBuildroot
 getMinimalRFS32FromBuildroot
 getOldLibstdc++
 buildInstallerDir
-getLibvoxin "$ARCH"
-getSpeechDispatcherVoxin "$ARCH"
-buildPackage "$ARCH"
-buildReleaseTarball "$ARCH" "$TARBALLS"
+
+unset keepDownloadedSources
+for ARCH in x86_64 i686; do
+	getLibvoxin "$ARCH" "$keepDownloadedSources" || leave "Error: can't build libvoxin" 1
+	getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
+	buildPackage "$ARCH" || leave "Error: can't build packages" 1
+	keepDownloadedSources=1
+done
+
+buildReleaseTarball "$TARBALLS"

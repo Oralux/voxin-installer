@@ -174,16 +174,19 @@ getDebArch() {
 	local arch=$1
 	case "$arch" in
 		x86_64) arch=amd64;;
-		*) leave "TODO: arch=$arch" 1;;
+		*) arch=i386;;
 	esac
 	echo $arch
 }
 
 # Build libvoxin, install the resulting tarball into the local rfs,
 # create the symlinks for the voxin package
+# Build a fake libibmeci.so for test
+# getLibvoxinRes: directory of the fake lib
 getLibvoxin() {
-	[ "$#" != 1 ] && return 1
+	[ "$#" = 0 ] && return 1
 	local arch=$1
+	local keepDownloadedSources=$2
 	local archive
 	local archivep
 	local dev
@@ -191,7 +194,8 @@ getLibvoxin() {
 	local pwd=$PWD
 	local workdir=$TMPDIR/libvoxin
 	local installDir=$INSTALLDIR/packages/all
-
+	unset getLibvoxinRes
+	
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"
 		
 	if [ -n "$LIBVOXIN_VERSION" ]; then
@@ -202,7 +206,7 @@ getLibvoxin() {
 		version=1.x.x
 		dev=1
 		archive=master.zip
-		[ -e "$DWLDIR"/$archive ] && mv "$DWLDIR"/$archive "$DWLDIR"/$archive.old
+		[ -e "$DWLDIR"/$archive ] && [ -z "$keepDownloadedSources" ] && mv "$DWLDIR"/$archive "$DWLDIR"/$archive.old
 	fi
 	archivep="$DWLDIR/$archive"
 	
@@ -235,7 +239,7 @@ getLibvoxin() {
 	else
 		cd libvoxin-$version || leave "Can't cd to libvoxin-$version" 1
 	fi
-	./build.sh -r
+	./build.sh -m "$arch" -r
 
 	# install the resulting build/$arch/release/libvoxin_$version.$archx.txz in the rfsdir
 	local tarball=$(ls "$PWD"/build/"$arch"/release/libvoxin_*."$arch".txz)
@@ -245,6 +249,8 @@ getLibvoxin() {
 	tarball=$(ls "$PWD"/build/"$arch"/release/libvoxin-pkg_*.all.txz)
 	tar -C "$BUILDPKG/rfs" -xf "$tarball" || leave "Can't uncompress libvoxin-pkg tarball ($tarball)" 1
 
+	getLibvoxinRes=$PWD/build/$arch/rfs/usr/lib
+	
 	cd "$pwd"
 	return 0
 }
@@ -252,8 +258,10 @@ getLibvoxin() {
 # Build speech-dispatcher from github, build and install the resulting
 # into the local rfs, create the symlinks for the voxin package
 getSpeechDispatcherVoxin() {
-	[ "$#" != 1 ] && return 1
+	[ "$#" -lt 2 ] && return 1
 	local arch=$1
+	local libvoxinDir=$2
+	local keepDownloadedSources=$3
 	local archive
 	local archivep
 	local dev
@@ -261,6 +269,7 @@ getSpeechDispatcherVoxin() {
 	local pwd=$PWD
 	local workdir=$TMPDIR/speechd_voxin
 	local installDir=$INSTALLDIR/packages/all
+	local suffixdir
 	
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"
 		
@@ -272,7 +281,7 @@ getSpeechDispatcherVoxin() {
 		version=0.9.x
 		dev=1
 		archive=$SPEECHD_VOXIN_BRANCH.zip
-		[ -e "$DWLDIR"/$archive ] && mv "$DWLDIR"/$archive "$DWLDIR"/$archive.old
+		[ -e "$DWLDIR"/$archive ] && [ -z "$keepDownloadedSources" ] && mv "$DWLDIR"/$archive "$DWLDIR"/$archive.old
 	fi
 	archivep="$DWLDIR/$archive"
 	
@@ -306,16 +315,18 @@ getSpeechDispatcherVoxin() {
 		cd speechd-$version || leave "Can't cd to speechd-$version" 1
 	fi
 	./build.sh
-	./configure --with-ibmtts
-	make
+	local mach
+	[ "$arch" = i686 ] && mach=-m32
+	CFLAGS="$mach" LDFLAGS="$mach -L$libvoxinDir" ./configure --with-ibmtts
+	make || return 1
 	
 	# install
-	local modulesDir="$VOXINDIR"/lib/speech-dispatcher-modules
+	local modulesDir="$VOXINDIR"/lib$suffixdir/speech-dispatcher-modules
 	local confDir="$VOXINDIR"/share/speech-dispatcher/conf
 	local docDir="$VOXINDIR"/share/doc/speech-dispatcher-voxin
 	mkdir -p "$modulesDir" "$confDir" "$docDir"
-	cp src/modules/sd_ibmtts "$modulesDir"/sd_ibmtts.$version
-	cp ./config/modules/ibmtts.conf "$confDir"/ibmtts.conf.$version
+	cp src/modules/sd_ibmtts "$modulesDir"/sd_ibmtts.$version || return 1
+	cp ./config/modules/ibmtts.conf "$confDir"/ibmtts.conf.$version || return 1
 	head -n $SPEECHD_IBMTTS_COPYRIGHT_NB_LINES src/modules/ibmtts.c > "$docDir"/copyright.$version
 	
 	local v=$(getMajMinVersion $version)
@@ -325,7 +336,7 @@ getSpeechDispatcherVoxin() {
 	# create symlinks
 	cd "$BUILDPKG/rfs"
 	mkdir -p usr/{lib/speech-dispatcher-modules,share/speech-dispatcher/conf/modules} etc/speech-dispatcher/modules
-	ln -s /opt/oralux/voxin/lib/speech-dispatcher-modules/sd_ibmtts.$v usr/lib/speech-dispatcher-modules/sd_voxin
+	ln -s /opt/oralux/voxin/lib$suffixdir/speech-dispatcher-modules/sd_ibmtts.$v usr/lib/speech-dispatcher-modules/sd_voxin
 	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$v usr/share/speech-dispatcher/conf/modules/voxin.conf
 	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$v etc/speech-dispatcher/modules/voxin.conf
 	
@@ -370,13 +381,12 @@ tar -C \"$rfsdir\" \
 }
 
 buildReleaseTarball() {
-	[ "$#" = 0 ] && return 1
-	local arch=$1
-	local files=$2
+	[ $# != 1 ] && return 1
+	local files=$1
 	local releaseDir=$PKGDIR/voxin-$VOXIN_VER
 	local installer
 	local installDir=$INSTALLDIR/packages/all
-	local tarball="$installDir"/rfs_$VOXIN_VER.$arch.txz
+	local tarball="$installDir"/rfs_$VOXIN_VER.all.txz
 	
 	# build the final rfsdir tarball and install it in the installer tree
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"
@@ -542,7 +552,7 @@ EOF
 	cd "$pwd"		
 }
 
-// output buildRpmPackageRes
+# output buildRpmPackageRes
 buildRpmPackage() {	
 	[ "$#" -lt 9 ] && return 1
 	local tarball=$1
@@ -584,7 +594,7 @@ buildRpmPackage() {
 	cd "$pwd"
 }
 
-// output buildSlackwarePackageRes
+# output buildSlackwarePackageRes
 buildSlackwarePackage() {	
 	[ "$#" -lt 9 ] && return 1
 	local tarball=$1
