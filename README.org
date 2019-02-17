@@ -27,7 +27,6 @@ Sequence followed:
 ** Minimal 32 bits rootfilesystem
 The buildroot tarball is expected to be found in build/packages/buildroot_2017.02.9.txz .
 This tarball can be (re)built if needed; it is a relatively intensive process (more than one hour, 3.5 GB of storage space).
-An archive should be available from Oralux and 
 
 *** Command
 #+BEGIN_SRC shell
