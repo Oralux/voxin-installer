@@ -39,8 +39,17 @@ SPEECHD_VOXIN_BRANCH=ibmtts_dynamic_loading
 SPEECHD_IBMTTS_COPYRIGHT_NB_LINES=23
 
 # Dependencies
-DEP_LIST="make gcc wget fakeroot unzip emacs md5sum rsync bsdtar alien rpm xz gzip"
-
+DEP_PACKAGES="build-essential fakeroot bsdtar alien rpm"
+# Debian9: speech-dispatcher dependencies
+# obtain with apt-get build-dep speech-dispatcher
+DEP_PACKAGES_SPEECHD="espeak-data flite1-dev intltool libao-dev libasound2-dev libaudio-dev \
+  libdotconf-dev libespeak-dev libespeak-ng-dev libespeak1 libflac-dev \
+  libglib2.0-dev libogg-dev libpcre16-3 libpcre3-dev libpcre32-3 libpcrecpp0v5 \
+  libportaudio2 libpulse-dev libsndfile1-dev libtext-unidecode-perl \
+  libvorbis-dev libxau-dev libxml-libxml-perl libxml-namespacesupport-perl \
+  libxml-sax-base-perl libxml-sax-perl pkg-config tex-common texinfo \
+  x11proto-core-dev xorg-sgml-doctools zlib1g-dev \
+"
 #####
 
 PKGDIR=$BASE/build/packages
@@ -65,15 +74,21 @@ leave() {
 	echo -e "$1" && exit $2
 }
 
+isPackageInstalled() {
+	[ $# != 1 ] || [ -z "$1" ] && return 1
+	local deb=$1
+	grep -A1 "Package: $deb$" /var/lib/dpkg/status | grep "Status: install ok installed" &> /dev/null
+}
+
 checkDep() {
 	local missing
 	local i
-	local a
-	for i in $DEP_LIST; do
-		a=$(which $i) || missing="$missing $i"
+
+	for i in $DEP_PACKAGES $DEP_PACKAGES_SPEECHD; do
+	    isPackageInstalled $i || missing="$missing $i"
 	done
-	
-	[ -n "$missing" ] && leave "\nInstall please these binaries:\n$missing\n" 0
+
+	[ -n "$missing" ] && leave "install these required dependencies:\n$missing" 1
 }
 
 init() {
@@ -269,7 +284,6 @@ getSpeechDispatcherVoxin() {
 	local pwd=$PWD
 	local workdir=$TMPDIR/speechd_voxin
 	local installDir=$INSTALLDIR/packages/all
-	local suffixdir
 	
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"
 		
@@ -315,13 +329,11 @@ getSpeechDispatcherVoxin() {
 		cd speechd-$version || leave "Can't cd to speechd-$version" 1
 	fi
 	./build.sh
-	local mach
-	[ "$arch" = i686 ] && mach=-m32
-	CFLAGS="$mach" LDFLAGS="$mach -L$libvoxinDir" ./configure --with-ibmtts
+	CFLAGS="-I$libvoxinDir/../include/voxin" LDFLAGS="-L$libvoxinDir" ./configure --with-ibmtts
 	make || return 1
 	
 	# install
-	local modulesDir="$VOXINDIR"/lib$suffixdir/speech-dispatcher-modules
+	local modulesDir="$VOXINDIR"/lib/speech-dispatcher-modules
 	local confDir="$VOXINDIR"/share/speech-dispatcher/conf
 	local docDir="$VOXINDIR"/share/doc/speech-dispatcher-voxin
 	mkdir -p "$modulesDir" "$confDir" "$docDir"
@@ -336,7 +348,7 @@ getSpeechDispatcherVoxin() {
 	# create symlinks
 	cd "$BUILDPKG/rfs"
 	mkdir -p usr/{lib/speech-dispatcher-modules,share/speech-dispatcher/conf/modules} etc/speech-dispatcher/modules
-	ln -s /opt/oralux/voxin/lib$suffixdir/speech-dispatcher-modules/sd_ibmtts.$v usr/lib/speech-dispatcher-modules/sd_voxin
+	ln -s /opt/oralux/voxin/lib/speech-dispatcher-modules/sd_ibmtts.$v usr/lib/speech-dispatcher-modules/sd_voxin
 	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$v usr/share/speech-dispatcher/conf/modules/voxin.conf
 	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$v etc/speech-dispatcher/modules/voxin.conf
 	
@@ -381,17 +393,24 @@ tar -C \"$rfsdir\" \
 }
 
 buildReleaseTarball() {
-	[ $# != 1 ] && return 1
+	[ $# != 2 ] && return 1
 	local files=$1
+	local arch=$2
 	local releaseDir=$PKGDIR/voxin-$VOXIN_VER
 	local installer
-	local installDir=$INSTALLDIR/packages/all
-	local tarball="$installDir"/rfs_$VOXIN_VER.all.txz
+	local installDir
+	local tarball
 	
 	# build the final rfsdir tarball and install it in the installer tree
+	installDir=$INSTALLDIR/packages/all
+	tarball=$installDir/rfs_$VOXIN_VER.all.txz
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"
-	fakeroot bash -c "tar -C \"$RFSDIR\" -Jcf $tarball ."	
+	fakeroot bash -c "tar -C \"$RFSDIR\" --exclude ./opt/oralux/voxin/bin --exclude ./opt/oralux/voxin/lib -Jcf $tarball ."	
 	
+	installDir=$INSTALLDIR/packages/all
+	tarball=$installDir/rfs_$VOXIN_VER.$arch.txz
+	[ ! -d "$installDir" ] && mkdir -p "$installDir"
+	fakeroot bash -c "tar -C \"$RFSDIR\" --exclude ./opt/oralux/voxin/share --exclude ./opt/oralux/voxin/rfs32 --exclude ./opt/oralux/voxin/include -Jcf $tarball ."		
 	rm -rf "$releaseDir"
 	mkdir -p "$releaseDir"
 
@@ -406,9 +425,11 @@ buildReleaseTarball() {
 
 	if [ -f "$files" ]; then
 		local all
-		local lang		
-		for tarball in $(cat "$files"); do
-			case "$tarball" in
+		local lang
+		local t
+		for t in $(cat "$files"); do
+		    tarball=$(eval echo $t)
+		    case "$tarball" in
 				*voxin-viavoice-*txz)
 					lang=$(echo "$tarball" | sed 's/.*-\(.*\)_.*/\1/')
 					if [ "$lang" = "all" ]; then

@@ -4,6 +4,8 @@ BASE=$(dirname $(realpath "$0"))
 NAME=$(basename "$0")
 . $BASE/src/conf.inc
 
+[ "$UID" = 0 ] && leave "Run this script as non superuser" 1
+
 usage() {
 	echo "
 Usage: 
@@ -30,7 +32,7 @@ Example:
  $0
 
 # build all, extract and merge the tarballs in list.txt
- $0 -t list.txt
+ $0 -t src/list.vv
 
 " 
 
@@ -70,11 +72,10 @@ getOldLibstdc++
 buildInstallerDir
 
 unset keepDownloadedSources
-for ARCH in x86_64 i686; do
-	getLibvoxin "$ARCH" "$keepDownloadedSources" || leave "Error: can't build libvoxin" 1
-	getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
-	buildPackage "$ARCH" || leave "Error: can't build packages" 1
-	keepDownloadedSources=1
-done
+ARCH=$(uname -m)
+getLibvoxin "$ARCH" "$keepDownloadedSources" || leave "Error: can't build libvoxin" 1
+getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
+buildPackage "$ARCH" || leave "Error: can't build packages" 1
+keepDownloadedSources=1
 
-buildReleaseTarball "$TARBALLS"
+buildReleaseTarball "$TARBALLS" "$ARCH" || leave "Error: can't build release tarball" 1

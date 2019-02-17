@@ -109,8 +109,25 @@ getMajMinVersion() {
 	echo "$1" | cut -f1,2 -d.
 }
 
-getRootfilesystemTarball() {
-	find packages/all -name "rfs*.$ARCH.txz"
+getRootfilesystemAllTarball() {
+    local tarball=$(find packages/all -name "rfs*.all.txz")
+
+    if [ -z "$tarball" ]; then
+	echo "rfs all tarball not found!" >> "$LOG"
+	return 1
+    fi
+    echo "$tarball"
+}
+
+getRootfilesystemArchTarball() {
+    local arch=$(uname -m)
+    local tarball=$(find packages/all -name "rfs*.$arch.txz")
+
+    if [ -z "$tarball" ]; then
+	echo "rfs all tarball not found!" >> "$LOG"
+	return 1
+    fi
+    echo "$tarball"
 }
 
 getViavoiceAllTarball() {
@@ -230,8 +247,9 @@ installSystem() {
 	local rfsdir=$1
 	local status=0
 	local voxinPackage=$(getVoxinPackage)
-	local rfsTarball=$(getRootfilesystemTarball)
-
+	local rfsAllTarball=$(getRootfilesystemAllTarball) || return 1
+	local rfsArchTarball=$(getRootfilesystemArchTarball) || return 1
+	
 	if [ ! -d "$rfsdir" ]; then
 		echo "Install directory not found: $rfsdir" >> "$LOG"
 		return 1
@@ -242,20 +260,18 @@ installSystem() {
 		return 1
 	fi
 	
-	if [ -z "$rfsTarball" ]; then
-		echo "rfs tarball not found!" >> "$LOG"
-		return 1
-	fi
-
 	uninstallPackage voxin || true
-	
-	tar -C "$rfsdir" -xf "$rfsTarball" 
-	status=$?
-	if [ "$status" != 0 ]; then
-		echo "Error: untar failure ($rfsTarball)" >> "$LOG"
-		return "$status"
-	fi	
 
+	local i
+	for i in "$rfsAllTarball" "$rfsArchTarball"; do
+	    tar -C "$rfsdir" -xf "$i" 
+	    status=$?
+	    if [ "$status" != 0 ]; then
+		echo "Error: untar failure ($i)" >> "$LOG"
+		return "$status"
+	    fi	
+	done
+	
 	installLocalPackage "$voxinPackage"
 	status=$?
 	if [ "$status" != 0 ]; then
