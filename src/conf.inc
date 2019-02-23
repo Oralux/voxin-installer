@@ -38,10 +38,15 @@ SPEECHD_VOXIN_BRANCH=ibmtts_dynamic_loading
 
 SPEECHD_IBMTTS_COPYRIGHT_NB_LINES=23
 
+# VMX86: VM where voxin-installer is built for x86 architecture
+# The VM is currently used to build on a 64 bits machine the speech-dispatcher module for x86
+# 
+VMX86=user1@192.168.122.94
+
 # Dependencies
-DEP_PACKAGES="build-essential fakeroot bsdtar alien rpm"
+DEP_PACKAGES="alien bsdtar build-essential fakeroot rpm rsync"
 # Debian9: speech-dispatcher dependencies
-# obtain with apt-get build-dep speech-dispatcher
+# obtained with apt-get build-dep speech-dispatcher
 DEP_PACKAGES_SPEECHD="espeak-data flite1-dev intltool libao-dev libasound2-dev libaudio-dev \
   libdotconf-dev libespeak-dev libespeak-ng-dev libespeak1 libflac-dev \
   libglib2.0-dev libogg-dev libpcre16-3 libpcre3-dev libpcre32-3 libpcrecpp0v5 \
@@ -63,6 +68,7 @@ INSTALLDIR=$TMPDIR/voxin-installer_$VOXIN_VER
 VOXINDIR=$RFSDIR/opt/oralux/voxin
 RFS32=$VOXINDIR/rfs32
 BUILDPKG=$TMPDIR/buildPackage
+DWLX86=$DWLDIR/x86
 
 #RFS32_PKG="$PKGDIR/${NAME}.txz"
 DOC=$VOXINDIR/usr/share/doc
@@ -84,6 +90,8 @@ checkDep() {
 	local missing
 	local i
 
+	if [ ! -e /var/lib/dpkg/status ] && leave "this script expects a Debian based distro (to check dependencies)" 1
+	
 	for i in $DEP_PACKAGES $DEP_PACKAGES_SPEECHD; do
 	    isPackageInstalled $i || missing="$missing $i"
 	done
@@ -92,7 +100,10 @@ checkDep() {
 }
 
 init() {
-	rm -rf "$BUILDPKG" "$PKGDIR/voxin*" "$RFS32"
+	local i
+	for i in "$BUILDPKG" "$PKGDIR"/voxin* "$RFS32"; do
+		rm -rf "$i"
+	done
 	mkdir -p "$PKGDIR" "$DWLDIR" "$BUILDPKG"/{rfs,build}
 }
 
@@ -329,8 +340,13 @@ getSpeechDispatcherVoxin() {
 		cd speechd-$version || leave "Can't cd to speechd-$version" 1
 	fi
 	./build.sh
-	CFLAGS="-I$libvoxinDir/../include/voxin" LDFLAGS="-L$libvoxinDir" ./configure --with-ibmtts
-	make || return 1
+	PLUGIN_DIR="/usr/lib/speech-dispatcher"
+	case "$arch" in
+		x86_64) PLUGIN_DIR="$PLUGIN_DIR:/usr/lib/x86_64-linux-gnu/speech-dispatcher:/usr/lib64/speech-dispatcher";;
+		*86) PLUGIN_DIR="$PLUGIN_DIR:/usr/lib/i386-linux-gnu/speech-dispatcher";;
+	esac
+	CFLAGS="-I$libvoxinDir/../include/voxin" LDFLAGS="-L$libvoxinDir" ./configure --prefix="/usr" --with-ibmtts 
+	PLUGIN_DIR=$PLUGIN_DIR make || return 1
 	
 	# install
 	local modulesDir="$VOXINDIR"/lib/speech-dispatcher-modules
@@ -419,7 +435,7 @@ buildReleaseTarball() {
 	mkdir "$installer" || return 1
 	rsync -a "$INSTALLDIR"/ "$installer"
 	
-	fakeroot bash -c "tar -C \"$releaseDir\" -Jcf \"$installer.txz\" $installer"
+	fakeroot bash -c "tar -C \"$releaseDir\" -Jcf \"$installer.txz\" voxin-update-$VOXIN_VER"
 	rm -rf "$installer"
 	echo "$installer.txz"
 
@@ -688,4 +704,34 @@ EOF
 getMajMinVersion() {
 	[ $# != 1 ] && return
 	echo "$1" | cut -f1,2 -d.
+}
+
+downloadVoxinUpdateFromX86VM() {
+	local TARBALL="voxin-installer/build/packages/voxin-$VOXIN_VER/voxin-update-$VOXIN_VER.txz"
+	mkdir -p "$DWLX86"
+	scp "$VMX86:$TARBALL" "$DWLX86"	
+}
+
+uploadToX86VM() {
+	local pwd=$PWD
+	cd $BASE/..
+
+	local SRC="voxin-installer voxin-installer/build/packages/buildroot_2017.02.9.txz voxin-installer/build/.gitignore"
+	rsync --exclude build --exclude tmp -aRvz $SRC $VMX86:
+
+	local VVDIR=VOXIN/voxin-viavoice/build/packages
+	if [ -e "$HOME/$VVDIR" ]; then
+		cd $HOME
+		rsync -aRvz $VVDIR/voxin-viavoice-* $VMX86:
+	fi
+
+	cd "$pwd"
+}
+
+
+getOtherArch() {
+	local TARBALL="$DWLX86/voxin-update-$VOXIN_VER.txz"
+	if [ -e "$TARBALL" ]; then
+		tar -C "$INSTALLDIR" --exclude rfs_$VOXIN_VER.all.txz --strip-components=1 -xf "$TARBALL" voxin-update-$VOXIN_VER/packages
+	fi
 }

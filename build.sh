@@ -26,7 +26,16 @@ Options:
 -t, --tarballs <file>  extracts the list of supplied tarballs 
                        (voxin-viavoice-all.txz,...) into the root filesystem.
                        <file> contains one tarball per line (full pathname) 
-
+-d, --download <arch>  download voxin-installer from a remote machine.
+                       <arch> = x86
+                       useful to download the 32 bits voxin-installer built on 
+                       a remote x86 VM.
+                       remote address = variable VMX86 in src/conf.inc
+-u, --upload <arch>    upload voxin-installer to a remote machine.
+                       <arch> = x86
+                       useful to build thereafter the 32 bits voxin-installer 
+                       on an x86 VM.                       
+                       remote address = VMX86 in src/conf.inc
 Example:
 # build all
  $0
@@ -34,13 +43,20 @@ Example:
 # build all, extract and merge the tarballs in list.txt
  $0 -t src/list.vv
 
+# upload voxin-installer to the X86 VM
+ $0 -u x86
+
+# download the 32 bits voxin-installer from the X86 VM
+# and build the resulting installer (x86_64 + x86)
+ $0 -d x86 -t src/list.vv
+
 " 
 
 }
 
-unset CLEAN HELP BUILDROOT TARBALLS
+unset CLEAN DOWNLOAD HELP BUILDROOT TARBALLS UPLOAD
 
-OPTIONS=`getopt -o chbt: --long clean,help,buildroot,tarballs: \
+OPTIONS=`getopt -o cd:hbt:u: --long clean,download:,help,buildroot,tarballs:,upload: \
              -n "$NAME" -- "$@"`
 [ $? != 0 ] && usage && exit 1
 eval set -- "$OPTIONS"
@@ -49,8 +65,10 @@ while true; do
   case "$1" in
     -b|--buildroot) BUILDROOT=1; shift;;
     -c|--clean) CLEAN=1; shift;;
+    -d|--download) DOWNLOAD=$2; shift 2;;
     -h|--help) HELP=1; shift;;
     -t|--tarballs) TARBALLS=$2; shift 2;;
+    -u|--upload) UPLOAD=$2; shift 2;;
     --) shift; break;;
     *) break;;
   esac
@@ -64,9 +82,30 @@ if [ -n "$CLEAN" ]; then
 	exit 0
 fi
 
+if [ -n "$UPLOAD" ]; then
+	unset STATUS
+	case $UPLOAD in
+		x86) uploadToX86VM && STATUS=0;;
+		*) ;;
+	esac
+	[ -z "$STATUS" ] && leave "Error: can't upload voxin-installer to $VMX86" 1
+	exit 0
+fi
+
+if [ -n "$DOWNLOAD" ]; then
+	unset STATUS
+	case $DOWNLOAD in
+		x86) downloadVoxinUpdateFromX86VM && STATUS=0;;
+		*) ;;
+	esac
+	[ -z "$STATUS" ] && leave "Error: can't download voxin-installer from $VMX86" 1
+fi
+
 checkDep
 init
 [ -n "$BUILDROOT" ] && buildBuildroot
+
+getVoxinUpdateX86
 getMinimalRFS32FromBuildroot
 getOldLibstdc++
 buildInstallerDir
@@ -78,4 +117,7 @@ getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$keepDownloadedSources" || l
 buildPackage "$ARCH" || leave "Error: can't build packages" 1
 keepDownloadedSources=1
 
+[ "$ARCH" = x86_64 ] && getOtherArch
+
 buildReleaseTarball "$TARBALLS" "$ARCH" || leave "Error: can't build release tarball" 1
+

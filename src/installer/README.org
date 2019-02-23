@@ -79,10 +79,10 @@ The tested distributions are displayed below. Much more should be compatible.
 | Tested distribution        | Architecture |
 |----------------------------+--------------|
 | Arch Linux                 | x86_64       |
-| Debian 9                   | x86_64       |
+| Debian 9                   | x86_64, x86  |
 | Fedora 29                  | x86_64       |
 | Slint64-14.2.1.1, 14.2.1.2 | x86_64       |
-|                            |              |
+| Ubuntu 18.04               | x86_64       |
 |----------------------------+--------------|
 
 ** voxin 1.15
