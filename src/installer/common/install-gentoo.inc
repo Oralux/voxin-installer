@@ -40,7 +40,7 @@ installLocalPackage() {
 installPackage() {
 	[ $# != 1 ] || [ -z "$1" ] && return
 	local package=$1
-    emerge "$package" &>> "$LOG"
+	emerge "$package" &>> "$LOG"
 }
 
 uninstallPackage() {
@@ -58,12 +58,11 @@ uninstallPackage() {
 	pwd=$PWD
 	cd /
 	tar $gentooTarExclude -tf "$tarball" | while read i; do
-		[ ! -h "$i" ] && continue
-		target=$(readlink -m $i)
-		echo "target=$target"
-		case "$target" in
-			/opt/oralux/*) echo unlink "$i";;
-		esac
+	    [ ! -h "$i" ] && continue
+	    target=$(readlink -m $i)
+	    case "$target" in
+			/opt/oralux/*) unlink "$i";;
+	    esac
 	done	
 	cd $pwd
 }
