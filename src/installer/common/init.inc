@@ -66,6 +66,12 @@ check_distro() {
     elif [ -e "/etc/fedora-release" ]; then 
 		source common/install-rpm-dnf.inc
 		status=$?
+    elif [ -e "/etc/gentoo-release" ]; then 
+		source common/install-gentoo.inc
+		status=$?
+    # elif [ -e "/etc/redhat-release" ]; then 
+	# 	source common/install-rpm-yum.inc
+	# 	status=$?
 	elif [ -e "/etc/slackware-version" ]; then 
 		source common/install-slackware.inc
 		status=$?

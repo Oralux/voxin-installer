@@ -90,7 +90,7 @@ checkDep() {
 	local missing
 	local i
 
-	if [ ! -e /var/lib/dpkg/status ] && leave "this script expects a Debian based distro (to check dependencies)" 1
+	[ ! -e /var/lib/dpkg/status ] && leave "this script expects a Debian based distro (to check dependencies)" 1
 	
 	for i in $DEP_PACKAGES $DEP_PACKAGES_SPEECHD; do
 	    isPackageInstalled $i || missing="$missing $i"
