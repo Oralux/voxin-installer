@@ -45,7 +45,7 @@ END
 }
 
 uninstall() {
-    spd_conf_unset
+    spd_conf_unset voxin
     uninstallSystem
     echo; gettext "Operation completed. "    
 }
@@ -62,7 +62,8 @@ check_distro() {
 		debian*) source common/install-deb.inc;;
 		fedora*) source common/install-rpm-dnf.inc;;
 		gentoo*) source source common/install-gentoo.inc;;
-#		rhel*) source common/install-rpm-yum.inc;; # require speech-dispatcher 0.7.x support
+		suse*) source common/install-rpm-zypper.inc;;
+		# rhel*) source common/install-rpm-yum.inc;; # require support of speech-dispatcher 0.7.x
 		slackware*|slint*) source common/install-slackware.inc;;
 		*) status=1;;
 	esac

@@ -1,4 +1,4 @@
-The voxin installer installs voxin and its dependencies on various GNU/Linux distributions (e.g. Arch Linux, Debian, Fedora, Gentoo, Slackware, Slint, Ubuntu,...). 
+The voxin installer installs voxin and its dependencies on various GNU/Linux distributions (e.g. Arch Linux, Debian, Fedora, Gentoo, openSUSE, Slackware, Slint, Ubuntu,...). 
 
 The current goal is to provide:
 - distribution-independent tarballs (installed under /opt), 

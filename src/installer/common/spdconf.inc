@@ -2,6 +2,30 @@
 
 LIST="/home/*/.config/speech-dispatcher/speechd.conf /etc/speech-dispatcher/speechd.conf /usr/share/speech-dispatcher/conf/speechd.conf"
 
+isAdded() {
+    local filename="$1"
+    local module="$2"
+    grep -Eq '^[[:space:]]*AddModule[[:space:]]+"'"$module"'"[[:space:]]+"sd_'"$module"'"[[:space:]]+"'"$module"'.conf"[[:space:]]*' "$filename"
+}
+
+isAnyAdded() {
+    local filename="$1"
+    grep -Eq '^[[:space:]]*AddModule[[:space:]]+' "$filename"
+}
+
+addModule() {
+    local filename="$1"
+    local module="$2"
+    sed -i -e '/^[[:space:]]*AddModule[[:space:]]/b ins' -e b -e ':ins' -e 'a\'$'\n''AddModule "'$module'"        "sd_'$module'"     "'$module'.conf"' -e ': done' -e 'n;b done' "$filename"
+}
+
+removeModule() {
+    local filename="$1"
+    local module="$2"
+    sed -i -r '/^.*AddModule[[:space:]]+"'$module'"[[:space:]]+.*/d' "$filename"
+}
+
+
 isDefaultModule() {
     local filename="$1"
     local module="$2"
@@ -21,9 +45,12 @@ setDefaultModule() {
 }
 
 function spd_conf_unset() {
+    local module="$1"
     ls -t $LIST 2>>"$LOG" | while read file; do		
 		local newModule=$(grep "^[[:space:]]*#[[:space:]]*voxinadded \(.*\)" "$file" | awk '{print $2}')
 
+		isAdded "$file" "$module" && removeModule "$file" "$module"
+		
 		if [ -n "$newModule" ]; then
 			sed -i -e "/^[[:space:]]*#[[:space:]]*voxinadded/d" -e 's/^[[:space:]]*DefaultModule.*/DefaultModule '"$newModule"'/' "$file"
 			return
@@ -53,10 +80,14 @@ function spd_conf_set() {
     local file
     
     ls -t $LIST 2>>"$LOG" | while read file; do
-		isDefaultModule "$file" "$module"
-		if [ "$?" = "1" ]; then
-			setDefaultModule "$file" "$module"
-		fi
-	done
+	isAnyAdded "$file"
+	if [ "$?" = 0 ]; then
+	    isAdded "$file" "$module" || addModule "$file" "$module"
+	fi
+	isDefaultModule "$file" "$module"
+	if [ "$?" = "1" ]; then
+	    setDefaultModule "$file" "$module"
+	fi
+    done
 }
 

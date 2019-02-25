@@ -76,16 +76,17 @@ The included speech dispatcher module works with speech-dispatcher version >= 0.
 The tested distributions are displayed below. Much more should be compatible.
 Again, for support or feedback, please send a mail to contact@oralux.org
 
-|----------------------------+--------------|
-| Tested distribution        | Architecture |
-|----------------------------+--------------|
-| Arch Linux                 | x86_64       |
-| Debian 9                   | x86_64, x86  |
-| Fedora 29                  | x86_64       |
-| Gentoo                     | x86_64       |
-| Slint64-14.2.1.1, 14.2.1.2 | x86_64       |
-| Ubuntu 18.04               | x86_64       |
-|----------------------------+--------------|
+|-----------------------------+--------------|
+| Tested distribution         | Architecture |
+|-----------------------------+--------------|
+| Arch Linux                  | x86_64       |
+| Debian 9                    | x86_64, x86  |
+| Fedora 29                   | x86_64       |
+| Gentoo                      | x86_64       |
+| openSUSE Leap 15.0          | x86_64       |
+| Slint64-14.2.1.1, 14.2.1.2  | x86_64       |
+| Ubuntu 18.04                | x86_64       |
+|-----------------------------+--------------|
 
 ** voxin 1.15
 |-----------------+------------------------|
