@@ -31,8 +31,10 @@ check_distro
 if [ "$?" != "0" ]; then
     if [ -n "$GETTEXT" ]; then
 		echo; gettext "Sorry, this distribution is not yet supported. "
+		echo; gettext "For support, email to contact at oralux.org "
     else
 		echo -n "Sorry, this distribution is not yet supported. "
+		echo -n "For support, email to contact at oralux.org "
     fi
     exit 0
 fi

@@ -51,38 +51,22 @@ uninstall() {
 }
 
 check_distro() {
-    local status=1
-    local ID="$(awk -F= '/ID/{print $2}' /etc/os-release)"
+    local status=0
+	local ID=$(awk -F= '/^ID_LIKE=/{print $2}' /etc/os-release | tr -d '"')
+	[ -z "$ID" ] && ID=$(awk -F= '/^ID=/{print $2}' /etc/os-release | tr -d '"')
+	[ -z "$ID" ] && return 1
 
-    # if [ "$ID" = "gentoo" ]; then
-	# 	source common/install-gentoo.inc
-	# 	return $?
-    # fi
-
-    local a=$(which pacman) || true
-    if [ -n "$a" ]; then
-		source common/install-arch-linux.inc
-		status=$?
-    elif [ -e "/etc/fedora-release" ]; then 
-		source common/install-rpm-dnf.inc
-		status=$?
-    elif [ -e "/etc/gentoo-release" ]; then 
-		source common/install-gentoo.inc
-		status=$?
-    # elif [ -e "/etc/redhat-release" ]; then 
-	# 	source common/install-rpm-yum.inc
-	# 	status=$?
-	elif [ -e "/etc/slackware-version" ]; then 
-		source common/install-slackware.inc
-		status=$?
-    else
-		# Check if this is a debian based distro
-		a=$(which dpkg) || true
-		if [ -n "$a" ]; then
-			source common/install-deb.inc
-			status=0
-		fi
-    fi
+	status=0
+	case "$ID" in
+		arch*) source common/install-arch-linux.inc;;
+		debian*) source common/install-deb.inc;;
+		fedora*) source common/install-rpm-dnf.inc;;
+		gentoo*) source source common/install-gentoo.inc;;
+#		rhel*) source common/install-rpm-yum.inc;; # require speech-dispatcher 0.7.x support
+		slackware*|slint*) source common/install-slackware.inc;;
+		*) status=1;;
+	esac
+	
     return $status
 }
 
