@@ -345,7 +345,8 @@ getSpeechDispatcherVoxin() {
 		x86_64) PLUGIN_DIR="$PLUGIN_DIR:/usr/lib/x86_64-linux-gnu/speech-dispatcher:/usr/lib64/speech-dispatcher";;
 		*86) PLUGIN_DIR="$PLUGIN_DIR:/usr/lib/i386-linux-gnu/speech-dispatcher";;
 	esac
-	CFLAGS="-I$libvoxinDir/../include/voxin" LDFLAGS="-L$libvoxinDir" ./configure --prefix="/usr" --with-ibmtts 
+	# pthread instead of gthread which is not always installed by default (seen in openSUSE Tumbleweed-i586 20190220)
+	GTHREAD_LIBS=-lpthread CFLAGS="-I$libvoxinDir/../include/voxin" LDFLAGS="-L$libvoxinDir" ./configure --prefix="/usr" --with-ibmtts 
 	PLUGIN_DIR=$PLUGIN_DIR make || return 1
 	
 	# install
