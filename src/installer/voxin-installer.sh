@@ -3,40 +3,59 @@
 # 2007-2019, Gilles Casse <gcasse@oralux.org>
 #
 
-BASE=$(realpath $(dirname $0))
+BASE=$(dirname $(readlink -f $0))
 cd $BASE
 
 source ./common/init.inc
 source ./common/spdconf.inc
+
+_gettext() {
+    if [ -n "$GETTEXT" ]; then
+		echo; gettext "$1"
+    else
+		echo "$1"
+    fi
+}
 
 getArch
 
 unset GETTEXT
 which gettext >> "$LOG"
 if [ "$?" = "0" ]; then
-    init_gettext "$(pwd)/locale"
+    init_gettext "$BASE"/locale
     GETTEXT=0
 fi
 
-if [ "$UID" != "0" ]; then
-    if [ -n "$GETTEXT" ]; then
-		echo; gettext "Please run voxin-installer as root. "
-    else
-		echo -n "Please run voxin-installer as root. "
-    fi	
-    exit 0
-fi  
+[ "$UID" != "0" ] && _gettext "Please run voxin-installer as root. " && exit 0
 
 check_distro
 if [ "$?" != "0" ]; then
-    if [ -n "$GETTEXT" ]; then
-		echo; gettext "Sorry, this distribution is not yet supported. "
-		echo; gettext "For support, email to contact at oralux.org "
-    else
-		echo -n "Sorry, this distribution is not yet supported. "
-		echo -n "For support, email to contact at oralux.org "
-    fi
-    exit 0
+	_gettext "Sorry, this distribution is not yet supported. "
+	_gettext "For support, email to contact at oralux.org "
+    exit 1
+fi
+
+
+# beta1
+if [ -h /opt ]; then
+	_gettext "Sorry, this installer does not expect a symbolic link /opt"
+	_gettext "For support, email to contact at oralux.org "
+    exit 1
+fi
+unset status
+for i in libvoxin libvoxin1 voxind speech-dispatcher-voxin speech-dispatcher-ibmtts; do
+	isPackageInstalled $i 
+	if [ $? = 0 ]; then
+		status="$status $i"
+		break
+	fi
+done
+
+if [ -n "$status" ]; then
+	_gettext "Voxin Packages: $status"
+	_gettext "Sorry, this beta version can't update a previous voxin installation"
+	_gettext "For support, email to contact at oralux.org "
+    exit 1
 fi
 
 with_sd=1
@@ -44,7 +63,7 @@ check_speech_dispatcher_voxin
 if [ "$?" != "0" ]; then
 	askContinue
 	if [ $? = 1 ]; then
-		echo; gettext "Good Bye. "
+		_gettext "Good Bye. "
 		exit 0
 	fi
 	with_sd=0
@@ -94,8 +113,8 @@ if [ "$with_uninstall" = "1" ]; then
     exit 0
 fi
 
-echo; gettext "Log file: $LOG"
-echo; gettext "Initialization; please wait... "
+_gettext "Log file: $LOG"
+_gettext "Initialization; please wait... "
 installDir=/
 installSystem "$installDir" || exit 1
 
@@ -132,5 +151,5 @@ if [ "$installed" = "0" ]; then
 
 fi
 
-echo; gettext "The changes will be taken into account on next boot. "
-echo; gettext "Good Bye. "
+_gettext "The changes will be taken into account on next boot. "
+_gettext "Good Bye. "

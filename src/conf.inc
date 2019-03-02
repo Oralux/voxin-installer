@@ -1,6 +1,6 @@
 # The BASE variable should be set before including this file
 #
-VOXIN_VER=2.0
+VOXIN_VER=2.0beta1
 
 #-- voxin-rfs32
 # Buildroot
