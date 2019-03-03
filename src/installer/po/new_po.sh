@@ -1,6 +1,6 @@
-#!/bin/sh
+#!/bin/bash -x
 # This file is under LGPL license
-# March 2007, Gilles Casse <gcasse@oralux.org>
+# 2007-2019, Gilles Casse <gcasse@oralux.org>
 #
 # new_po.sh : create or update xx.new.po, (xx = fr,...) the file which 
 # includes the translation for the xx language.
@@ -8,37 +8,29 @@
 
 VOXIN=".."
 
+lang="$1"
+default=${LANG:0:2}
+[ -z "$lang" ] && read -p "Please, enter your language code (default = $default): " lang
+[ -z "$lang" ] && lang=$default
+[ "$lang" = en ] && exit 0
 
-if [ "$#" != "1" ]; then
-    echo "Please, enter your language code (default = $LANG)"
-    read lg
-else
-    lg="$1"
-fi
-
-# if lg is empty, $LANG is used 
-
-case v$lg in
-  v) lg=$LANG;;
-esac
-
-if test -s $lg.new.po
-then
-  echo "The $lg.new.po file already exists.";
-  echo "Do you really want to remove it ? (y/n)";
-  read q
+if [ -s "$lang.new.po" ]; then
+  echo "The $lang.new.po file already exists.";
+  read -p "Do you really want to remove it ? (y/N): " q
   case $q in
     y|Y) ;;
     *) echo "ok, we stop here.";exit 1;;
   esac
 fi
 
-touch $lg.def.po $lg.new.po voxin.pot
-chmod +w $lg.def.po $lg.new.po voxin.pot
+touch $lang.def.po $lang.new.po voxin.pot
+chmod +w $lang.def.po $lang.new.po voxin.pot
 
-echo "Building the new $lg.new.po..."   
+echo "Building the new $lang.new.po..."   
 
-xgettext --add-location -s `find  $VOXIN -maxdepth 2 -name "*sh"` -o voxin.pot
-msgmerge $lg.def.po voxin.pot -o $lg.new.po
+#xgettext --add-location -s `find  $VOXIN -maxdepth 2 -name "*sh" -name "*inc"` -o voxin.pot
+xgettext --language=Shell --keyword --keyword=_gettext --add-location -s `find  $VOXIN -maxdepth 2 -name '*sh' ! -path '*/po/*' -o -name '*.inc' ` -o voxin.pot
 
-echo "...the file $lg.new.po is ready"   
+msgmerge $lang.def.po voxin.pot -o $lang.new.po
+
+echo "...the file $lang.new.po is ready"   

@@ -47,7 +47,7 @@ END
 uninstall() {
     spd_conf_unset voxin
     uninstallSystem
-    echo; gettext "Operation completed. "    
+    _gettext "Operation completed. "    
 }
 
 check_distro() {
@@ -104,7 +104,7 @@ getRootfilesystemAllTarball() {
     local tarball=$(find packages/all -name "rfs*.all.txz")
 
     if [ -z "$tarball" ]; then
-	echo "rfs all tarball not found!" >> "$LOG"
+	_gettext "rfs all tarball not found!" >> "$LOG"
 	return 1
     fi
     echo "$tarball"
@@ -115,7 +115,7 @@ getRootfilesystemArchTarball() {
     local tarball=$(find packages/all -name "rfs*.$arch.txz")
 
     if [ -z "$tarball" ]; then
-	echo "rfs all tarball not found!" >> "$LOG"
+	_gettext "rfs all tarball not found!" >> "$LOG"
 	return 1
     fi
     echo "$tarball"
@@ -142,7 +142,7 @@ postInstViavoiceTarball() {
 	local i
 
 	if [ ! -f "$inidir/all.ini" ]; then
-		echo "Notice: no $inidir/all.ini"
+		_gettext "Notice: no $inidir/all.ini"
 		return 0
 	fi
 
@@ -150,13 +150,13 @@ postInstViavoiceTarball() {
 	LANG=$(find "$inidir/../lib" -regex ".*/...50.so" | sed "s+.*/\(.*\)50.so+\1+")
 
 	if [ -z "$LANG" ]; then
-		echo "No language found in $inidir/../lib"
+		_gettext "No language found in $inidir/../lib"
 		return 1
 	fi
 
 	cp "$inidir/all.ini" "$newconf" 
 	if [ $? != 0 ]; then
-		echo "Write error: $inidir/all.ini"
+		_gettext "Write error: $inidir/all.ini"
 		return 1
 	fi
 
@@ -164,18 +164,18 @@ postInstViavoiceTarball() {
 		if [ -e "$inidir/$i.ini" ]; then
 			cat "$inidir/$i.ini" >> "$newconf"
 			if [ $? != 0 ]; then
-				echo "Write error: $inidir/all.ini"
+				_gettext "Write error: $inidir/all.ini"
 				return 1
 			fi
 		else
-			echo "Notice: no $inidir/$i.ini"		
+			_gettext "Notice: no $inidir/$i.ini"		
 			return 1
 		fi
 	done
 
 	sed -i "s#=/opt/#=$destdir/opt/#" "$newconf"
 	if [ $? != 0 ]; then
-		echo "Write error: $newconf"
+		_gettext "Write error: $newconf"
 		return 1
 	fi
 
@@ -192,13 +192,13 @@ installLang() {
 
 	i=$(getViavoiceAllTarball)
 	if [ -z "$i" ]; then
-		echo "Error: no viavoice-all tarball" >> "$LOG"
+		_gettext "Error: no viavoice-all tarball" >> "$LOG"
 		return 1
 	fi
 	tar -C "$rfsdir" --no-overwrite-dir -xf "$i"
 	status=$?
 	if [ "$status" != 0 ]; then
-		echo "Error: untar failure ($i)" >> "$LOG"
+		_gettext "Error: untar failure ($i)" >> "$LOG"
 		return $status
 	fi
 	
@@ -206,7 +206,7 @@ installLang() {
 		tar -C "$rfsdir" --no-overwrite-dir -xf "$i"
 		status=$?
 		if [ "$status" != 0 ]; then
-			echo "Error: untar failure ($i)" >> "$LOG"
+			_gettext "Error: untar failure ($i)" >> "$LOG"
 			return $status
 		fi
 	done
@@ -242,12 +242,12 @@ installSystem() {
 	local rfsArchTarball=$(getRootfilesystemArchTarball) || return 1
 	
 	if [ ! -d "$rfsdir" ]; then
-		echo "Install directory not found: $rfsdir" >> "$LOG"
+		_gettext "Install directory not found: $rfsdir" >> "$LOG"
 		return 1
 	fi
 	
 	if [ -z "$voxinPackage" ]; then
-		echo "voxin package not found!" >> "$LOG"
+		_gettext "voxin package not found!" >> "$LOG"
 		return 1
 	fi
 	
@@ -258,7 +258,7 @@ installSystem() {
 	    tar -C "$rfsdir" -xf "$i" 
 	    status=$?
 	    if [ "$status" != 0 ]; then
-		echo "Error: untar failure ($i)" >> "$LOG"
+		_gettext "Error: untar failure ($i)" >> "$LOG"
 		return "$status"
 	    fi	
 	done
@@ -266,7 +266,7 @@ installSystem() {
 	installLocalPackage "$voxinPackage"
 	status=$?
 	if [ "$status" != 0 ]; then
-		echo "Error: package install failure ($voxinPackage)!" >> "$LOG"
+		_gettext "Error: package install failure ($voxinPackage)!" >> "$LOG"
 		return "$status"
 	fi
 	
