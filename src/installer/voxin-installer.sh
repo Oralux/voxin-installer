@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 # This file is under the LGPL license
 # 2007-2019, Gilles Casse <gcasse@oralux.org>
 #

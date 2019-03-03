@@ -388,25 +388,28 @@ tar -C \"$rfsdir\" \
 
 	local name=voxin
 	local depends=libc6
-	local replaces="libvoxin1, voxind, speech-dispatcher-voxin, speech-dispatcher-ibmtts"
+	local replaces
 
 	# debian
 	local debArch=$(getDebArch "$arch")
+	replaces="libvoxin1, libvoxin1-dev, voxind, speech-dispatcher-voxin, speech-dispatcher-ibmtts"
 	installDir=$INSTALLDIR/packages/deb
 	buildDebPackage "$tarball" "$installDir" "$name" "$VOXIN_VER" "$debArch" "$depends" "$title" "$description" "$replaces"
 
 	# pacman
 	local depends=glibc
+	replaces="libvoxin, voxind, speech-dispatcher-voxin, speech-dispatcher-ibmtts"
 	installDir=$INSTALLDIR/packages/archlinux
 	buildPacmanPackage "$tarball" "$installDir" "$name" "$VOXIN_VER" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" "$replaces" 
 	
 	# rpm
+	replaces="libvoxin, libvoxin-debuginfo, libvoxin-devel, voxind, voxind-debuginfo, speech-dispatcher-voxin, speech-dispatcher-ibmtts"
 	installDir=$INSTALLDIR/packages/rpm
 	buildRpmPackage "$tarball" "$installDir" "$name" "$VOXIN_VER" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" "$replaces"
 	
 	# slackware
 	installDir=$INSTALLDIR/packages/slackware
-	buildSlackwarePackage "$tarball" "$installDir" "$name" "$VOXIN_VER" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" "$replaces"
+	buildSlackwarePackage "$tarball" "$installDir" "$name" "$VOXIN_VER" "$arch" "$depends" "$title" "$description" "LGPL-2.1+"
 }
 
 buildReleaseTarball() {
@@ -414,7 +417,8 @@ buildReleaseTarball() {
 	local files=$1
 	local arch=$2
 	local releaseDir=$PKGDIR/voxin-$VOXIN_VER
-	local installer
+	local installerDir
+	local installerTar
 	local installDir
 	local tarball
 	local pwd=$PWD
@@ -432,14 +436,23 @@ buildReleaseTarball() {
 	rm -rf "$releaseDir"
 	mkdir -p "$releaseDir"
 
+	# released tarballs:
+	# voxin-$VOXIN_VER.tgz: voxin-$VOXIN_VER/voxin-$LANG-$VOXIN_VER.tgz
+	# voxin-$LANG-$VOXIN_VER.tgz: voxin-$VOXIN_VER/voxin-$LANG-$VOXIN_VER/
+	#
+	# release dir:
+	# $PKGDIR/voxin-$VOXIN_VER/
+	#                          voxin-$VOXIN_VER/voxin-$LANG-$VOXIN_VER
+	#
 	# voxin-update
-	installer="$releaseDir"/voxin-update-$VOXIN_VER
-	mkdir "$installer" || return 1
-	rsync -a "$INSTALLDIR"/ "$installer"
+	installerDir="$releaseDir"/voxin-$VOXIN_VER/voxin-update-$VOXIN_VER
+	installerTar="$releaseDir"/voxin-update-$VOXIN_VER.tgz
+	mkdir -p "$installerDir" || return 1
+	rsync -a "$INSTALLDIR"/ "$installerDir"
 	
-	fakeroot bash -c "tar -C \"$releaseDir\" -zcf \"$installer.tgz\" voxin-update-$VOXIN_VER"
-	rm -rf "$installer"
-	echo "$installer.tgz"
+	fakeroot bash -c "tar -C \"$releaseDir\" -zcf \"$installerTar\" voxin-$VOXIN_VER" || return 1
+	rm -rf "$releaseDir/voxin-$VOXIN_VER"
+	echo "$installerTar"
 
 	if [ -f "$files" ]; then
 		local all
@@ -453,13 +466,14 @@ buildReleaseTarball() {
 					if [ "$lang" = "all" ]; then
 						all=$tarball
 					else
-						installer="$releaseDir/voxin-$VOXIN_VER/voxin-$lang-$VOXIN_VER"
-						mkdir -p "$installer"
-						rsync -a "$INSTALLDIR"/ "$installer"
-						cp -a "$tarball" "$all" "$installer"/packages/all
-						fakeroot bash -c "tar -C \"$releaseDir\" -zcf \"$installer.tgz\" voxin-$lang-$VOXIN_VER"
-						rm -rf "$installer"
-						echo "$installer.tgz"
+						installerDir="$releaseDir/voxin-$VOXIN_VER/voxin-$lang-$VOXIN_VER"
+						installerTar="$releaseDir/voxin-$lang-$VOXIN_VER.tgz"
+						mkdir -p "$installerDir" || return 1
+						rsync -a "$INSTALLDIR"/ "$installerDir"
+						cp -a "$tarball" "$all" "$installerDir"/packages/all
+						fakeroot bash -c "tar -C \"$releaseDir\" -zcf \"$installerTar\" voxin-$VOXIN_VER" || return 1
+						rm -rf "$releaseDir/voxin-$VOXIN_VER"
+						echo "$installerTar"
 					fi
 					;;
 				*) ;;
@@ -564,7 +578,7 @@ buildPacmanPackage() {
 	local title=$7
 	local description=$8
 	local license=$9
-	local replaces=$10
+	local replaces=${10}
 	local date=$(date --utc +%s)
 	local pwd=$PWD
 	
@@ -615,7 +629,7 @@ buildRpmPackage() {
 	local title=$7
 	local description=$8
 	local license=$9
-	local replaces=$10
+	local replaces=${10}
 	local date=$(date --utc +%s)
 	local pwd=$PWD
 
@@ -657,7 +671,6 @@ buildSlackwarePackage() {
 	local title=$7
 	local description=$8
 	local license=$9
-	local replaces=$10
 	local date=$(date --utc +%s)
 	local pwd=$PWD
 

@@ -3,6 +3,25 @@
 
 For support or feedback, please send a mail to contact@oralux.org with possibly the log file (log/voxin.log). 
 
+* Check the tarball
+
+Before any install, check that your tarball has a correct checksum.
+The checksum file can be downloaded at GitHub under the Oralux account:
+
+https://github.com/Oralux/voxin-installer/check/%VERSION%/voxin-%VERSION%.sha512 
+
+Copy this file into the directory of your voxin tarball.
+Then run the sha512sum command which must return OK.
+
+# # the two files are in the same directory ;
+# ls
+voxin-%VERSION%.sha512 voxin-update-%VERSION%.tgz
+
+# # run sha512sum like this:
+# sha512sum --ignore-missing --check voxin-%VERSION%.sha512 
+voxin-update-%VERSION%.tgz: OK
+
+
 * General Install
 
 Just run ./voxin-installer.sh as root and answer to the questions.
