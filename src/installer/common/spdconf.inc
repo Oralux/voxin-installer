@@ -62,9 +62,9 @@ function spd_conf_unset() {
 			echo "$a" | grep libespeak-ng.so &> /dev/null
 			if [ $? = 0 ]; then
 				newModule=espeak-ng
-				else
-					echo "$a" | grep libespeak.so &> /dev/null
-					[ $? = 0 ] && newModule=espeak
+			else
+				echo "$a" | grep libespeak.so &> /dev/null
+				[ $? = 0 ] && newModule=espeak
 			fi
 		fi
 
@@ -80,14 +80,14 @@ function spd_conf_set() {
     local file
     
     ls -t $LIST 2>>"$LOG" | while read file; do
-	isAnyAdded "$file"
-	if [ "$?" = 0 ]; then
-	    isAdded "$file" "$module" || addModule "$file" "$module"
-	fi
-	isDefaultModule "$file" "$module"
-	if [ "$?" = "1" ]; then
-	    setDefaultModule "$file" "$module"
-	fi
+		isAnyAdded "$file"
+		if [ "$?" = 0 ]; then
+			isAdded "$file" "$module" || addModule "$file" "$module"
+		fi
+		isDefaultModule "$file" "$module"
+		if [ "$?" = "1" ]; then
+			setDefaultModule "$file" "$module"
+		fi
     done
 }
 

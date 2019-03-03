@@ -231,6 +231,12 @@ getArch() {
 uninstallSystem()
 {	
 	uninstallPackage voxin
+	for i in /opt/oralux/voxin /opt/IBM/ibmtts /var/opt/IBM/ibmtts; do
+		rm -rf $i
+	done
+	for i in /opt/oralux /opt/IBM /var/opt/IBM; do
+		[ -z "$(ls -A $i)" ] && rm -rf $i
+	done
 }
 
 installSystem() {	

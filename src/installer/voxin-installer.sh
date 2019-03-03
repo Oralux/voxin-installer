@@ -141,7 +141,7 @@ askInstallLang && {
     fi
 }
 
-[ "$with_sd" = 1 ] && spd_conf_set voxin
+[ "$with_sd" = 1 ] && askUpdateConfAuthorization && spd_conf_set voxin
 
 if [ "$installed" = "0" ]; then
     askUninstall && {

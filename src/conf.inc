@@ -20,20 +20,20 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 
 # select the libvoxin sources (development or tag)
 # - development (master branch)
-LIBVOXIN_VERSION=
+#LIBVOXIN_VERSION=
 # - from the 1.3.3 tag instead (+sha256)
-#LIBVOXIN_VERSION=1.3.3
-#LIBVOXIN_SHA256=29a211d46f75ee1b8f3922e871554777a64815b1a4a2ff8f3c41e58012af2ea6
+LIBVOXIN_VERSION=1.3.3
+LIBVOXIN_SHA256=c3bf0daa2012ff2a83be97cef3b7ca364cc2c48ac3c995739a3f8e4144cccf4c
 
 #-- speech-dispatcher-voxin
 SPEECHD_VOXIN_URL=https://github.com/Oralux/speechd/archive
 
 # select the speech-dispatcher sources (development or tag)
 # - development (SPEECHD_BRANCH)
-SPEECHD_VOXIN_VERSION=
+#SPEECHD_VOXIN_VERSION=
 # - from the 0.9voxin1 tag instead (+sha256)
-#SPEECHD_VOXIN_VERSION=0.9voxin1
-#SPEECHD_VOXIN_SHA256=29a211d46f75ee1b8f3922e871554777a64815b1a4a2ff8f3c41e58012af2ea6
+SPEECHD_VOXIN_VERSION=0.9voxin1
+SPEECHD_VOXIN_SHA256=e1c49aa45a7ca08fd2984cc583ad1509af46409018e07b6603d824416a480d09
 SPEECHD_VOXIN_BRANCH=ibmtts_dynamic_loading
 
 SPEECHD_IBMTTS_COPYRIGHT_NB_LINES=23
@@ -417,6 +417,7 @@ buildReleaseTarball() {
 	local installer
 	local installDir
 	local tarball
+	local pwd=$PWD
 	
 	# build the final rfsdir tarball and install it in the installer tree
 	installDir=$INSTALLDIR/packages/all
@@ -436,9 +437,9 @@ buildReleaseTarball() {
 	mkdir "$installer" || return 1
 	rsync -a "$INSTALLDIR"/ "$installer"
 	
-	fakeroot bash -c "tar -C \"$releaseDir\" -Jcf \"$installer.txz\" voxin-update-$VOXIN_VER"
+	fakeroot bash -c "tar -C \"$releaseDir\" -zcf \"$installer.tgz\" voxin-update-$VOXIN_VER"
 	rm -rf "$installer"
-	echo "$installer.txz"
+	echo "$installer.tgz"
 
 	if [ -f "$files" ]; then
 		local all
@@ -452,18 +453,30 @@ buildReleaseTarball() {
 					if [ "$lang" = "all" ]; then
 						all=$tarball
 					else
-						installer="$releaseDir/voxin-$lang-$VOXIN_VER"
-						mkdir "$installer"
+						installer="$releaseDir/voxin-$VOXIN_VER/voxin-$lang-$VOXIN_VER"
+						mkdir -p "$installer"
 						rsync -a "$INSTALLDIR"/ "$installer"
 						cp -a "$tarball" "$all" "$installer"/packages/all
-						fakeroot bash -c "tar -C \"$releaseDir\" -Jcf \"$installer.txz\" voxin-$lang-$VOXIN_VER"
+						fakeroot bash -c "tar -C \"$releaseDir\" -zcf \"$installer.tgz\" voxin-$lang-$VOXIN_VER"
 						rm -rf "$installer"
-						echo "$installer.txz"
+						echo "$installer.tgz"
 					fi
 					;;
 				*) ;;
 			esac
 		done
+
+		local sha512=$BASE/check/$VOXIN_VER/voxin-$VOXIN_VER.sha512
+		if [ -e "$sha512" ]; then
+			rm "$sha512"
+		else
+			mkdir -p ${sha512%/*}
+		fi
+		cd "$releaseDir"
+		for i in *.tgz; do
+			sha512sum "$i" >> "$sha512"
+		done
+		cd "$pwd"
 	fi
 }
 
@@ -708,7 +721,7 @@ getMajMinVersion() {
 }
 
 downloadVoxinUpdateFromX86VM() {
-	local TARBALL="voxin-installer/build/packages/voxin-$VOXIN_VER/voxin-update-$VOXIN_VER.txz"
+	local TARBALL="voxin-installer/build/packages/voxin-$VOXIN_VER/voxin-update-$VOXIN_VER.tgz"
 	mkdir -p "$DWLX86"
 	scp "$VMX86:$TARBALL" "$DWLX86"	
 }
@@ -731,7 +744,7 @@ uploadToX86VM() {
 
 
 getOtherArch() {
-	local TARBALL="$DWLX86/voxin-update-$VOXIN_VER.txz"
+	local TARBALL="$DWLX86/voxin-update-$VOXIN_VER.tgz"
 	if [ -e "$TARBALL" ]; then
 		tar -C "$INSTALLDIR" --exclude rfs_$VOXIN_VER.all.txz --strip-components=1 -xf "$TARBALL" voxin-update-$VOXIN_VER/packages
 	fi

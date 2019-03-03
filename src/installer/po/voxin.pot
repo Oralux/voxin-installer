@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-03 00:48+0100\n"
+"POT-Creation-Date: 2019-03-03 20:51+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,20 +17,24 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../common/ask.inc:60
+#: ../common/ask.inc:70
 msgid "1. Do you want to read again the End-User Agreement?"
 msgstr ""
 
-#: ../common/ask.inc:81
+#: ../common/ask.inc:91
 msgid "2. Do you want to read again the IBM License Agreement?"
 msgstr ""
 
-#: ../common/ask.inc:93
+#: ../common/ask.inc:103
 msgid "3. Do you want to read again the LGPL License?"
 msgstr ""
 
-#: ../common/ask.inc:56
+#: ../common/ask.inc:66
 msgid "Do you agree the licenses?"
+msgstr ""
+
+#: ../common/ask.inc:33
+msgid "Do you authorize the update of the configuration files (speechd.conf)?"
 msgstr ""
 
 #: ../common/ask.inc:6
@@ -41,7 +45,7 @@ msgstr ""
 msgid "Do you want to install a new language?"
 msgstr ""
 
-#: ../common/ask.inc:32
+#: ../common/ask.inc:42
 msgid "Do you want to uninstall the TTS?"
 msgstr ""
 
@@ -63,24 +67,25 @@ msgid ""
 "emacspeak will"
 msgstr ""
 
-#: ../common/ask.inc:7 ../common/ask.inc:23 ../common/ask.inc:57
-#: ../common/ask.inc:61 ../common/ask.inc:82 ../common/ask.inc:94
+#: ../common/ask.inc:7 ../common/ask.inc:23 ../common/ask.inc:34
+#: ../common/ask.inc:67 ../common/ask.inc:71 ../common/ask.inc:92
+#: ../common/ask.inc:104
 msgid "If yes, press the ENTER key."
 msgstr ""
 
-#: ../common/ask.inc:33
+#: ../common/ask.inc:43
 msgid "If you agree please type OK "
 msgstr ""
 
-#: ../common/ask.inc:77
+#: ../common/ask.inc:87
 msgid "If you agree to the End-User Agreement, press the ENTER key"
 msgstr ""
 
-#: ../common/ask.inc:89
+#: ../common/ask.inc:99
 msgid "If you agree to the IBM license agreement, press the ENTER key"
 msgstr ""
 
-#: ../common/ask.inc:101
+#: ../common/ask.inc:111
 msgid "If you agree to the LGPL license, press the ENTER key"
 msgstr ""
 
@@ -96,7 +101,7 @@ msgstr ""
 msgid "Please run voxin-installer as root. "
 msgstr ""
 
-#: ../common/ask.inc:64
+#: ../common/ask.inc:74
 msgid "Please use the space bar to scroll through the document."
 msgstr ""
 
@@ -116,10 +121,14 @@ msgstr ""
 msgid "The changes will be taken into account on next boot. "
 msgstr ""
 
+#: ../common/ask.inc:32
+msgid "Voxin can be set as default text-to-speech."
+msgstr ""
+
 #: ../common/init.inc:107 ../common/init.inc:118
 msgid "rfs all tarball not found!"
 msgstr ""
 
-#: ../common/init.inc:250
+#: ../common/init.inc:256
 msgid "voxin package not found!"
 msgstr ""

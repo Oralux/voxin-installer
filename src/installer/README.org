@@ -1,7 +1,7 @@
 #+TITLE:     Voxin %VERSION% README
 #+AUTHOR:
 
-For support or feedback, please send a mail to contact@oralux.org
+For support or feedback, please send a mail to contact@oralux.org with possibly the log file (log/voxin.log). 
 
 * General Install
 
@@ -50,7 +50,7 @@ Please note that the Speech Dispatcher server will take in account the new confi
 
 ** Emacspeak
 
-The [[http://soft.oralux.net/emacspeak/][emacspeak installer]] helps to install Emacspeak with eSpeak and Voxin.
+The [[https://github.com/Oralux/emacspeak_voxin_install/releases][emacspeak installer]] helps to install Emacspeak with eSpeak and Voxin.
 
 If the sound is choppy under Alsa, please copy the asoundrc file from emacspeak to your home directory as ~/.asoundrc
 For example:
@@ -60,7 +60,7 @@ cp emacspeak-45.0/share/emacs/site-lisp/emacspeak/servers/linux-outloud/asoundrc
 You may want to install speechd-up (interface between Speakup and Speech Dispatcher).
 
 We proposed voxinup, the Speakup connector for Voxin; but incompatibilities with the graphical desktop appeared for example in Vinux 5.1.
-The [[https://soft.oralux.net/speakup][voxinup_install]] helped to install "voxinup" in Arch Linux or Debian based distros.
+The [[https://github.com/Oralux/voxinup_install/releases][voxinup_install]] helped to install "voxinup" in Arch Linux or Debian based distros.
 The original Speakup connector, "spk-connect-ttsynth", was renamed to "voxinup" to ease at least the typing.
 
 ** How to uninstall Voxin?
@@ -74,17 +74,17 @@ From version 2.0, voxin is compatible with much more distributions (and their fa
 The included speech dispatcher module works with speech-dispatcher version >= 0.8.5 .
 
 The tested distributions are displayed below. Much more should be compatible.
-Again, for support or feedback, please send a mail to contact@oralux.org
+For support or feedback, please send a mail to contact@oralux.org with possibly the log file (log/voxin.log).
 
 |----------------------------+---------------|
 | Tested distributions       | Architectures |
 |----------------------------+---------------|
 | Arch Linux                 | x86_64        |
-| Debian 9                   | x86_64, x86   |
+| Debian 9                   | x86_64, i686  |
 | Fedora 29                  | x86_64        |
 | Gentoo                     | x86_64        |
 | openSUSE Leap 15.0         | x86_64        |
-| openSUSE Tumbleweed-i586   | x86           |
+| openSUSE Tumbleweed-i586   | i686          |
 | Slint64-14.2.1.1, 14.2.1.2 | x86_64        |
 | Ubuntu 18.04               | x86_64        |
 |----------------------------+---------------|
