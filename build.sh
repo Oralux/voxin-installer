@@ -114,6 +114,7 @@ unset keepDownloadedSources
 ARCH=$(uname -m)
 getLibvoxin "$ARCH" "$keepDownloadedSources" || leave "Error: can't build libvoxin" 1
 getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
+getVoxinDoc
 buildPackage "$ARCH" || leave "Error: can't build packages" 1
 keepDownloadedSources=1
 

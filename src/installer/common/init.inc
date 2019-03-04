@@ -2,6 +2,7 @@ LOG="$BASE/log/voxin.log"
 TEMPLATE=voxin-installer.XXXXXXXXXX
 TMPDIR=/tmp
 SPEECHD_MIN_VERSION=0.8.5
+VOXIN_VERSION=%VERSION%
 
 rm -f "$LOG"
 

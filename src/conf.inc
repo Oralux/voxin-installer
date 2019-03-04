@@ -21,9 +21,9 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 # select the libvoxin sources (development or tag)
 # - development (master branch)
 #LIBVOXIN_VERSION=
-# - from the 1.3.3 tag instead (+sha256)
+# - from the 1.3.3 tag instead (+sha512)
 LIBVOXIN_VERSION=1.3.3
-LIBVOXIN_SHA256=c3bf0daa2012ff2a83be97cef3b7ca364cc2c48ac3c995739a3f8e4144cccf4c
+LIBVOXIN_SHA512=c4bf052de16778c56b2ca4fb4bb50ba14254fd5999c2532e3533232a0cd04a7244fb157df184459643144fe5ccf45f2143029eeac3db17f8d45df7ce6671678f
 
 #-- speech-dispatcher-voxin
 SPEECHD_VOXIN_URL=https://github.com/Oralux/speechd/archive
@@ -31,9 +31,9 @@ SPEECHD_VOXIN_URL=https://github.com/Oralux/speechd/archive
 # select the speech-dispatcher sources (development or tag)
 # - development (SPEECHD_BRANCH)
 #SPEECHD_VOXIN_VERSION=
-# - from the 0.9voxin1 tag instead (+sha256)
+# - from the 0.9voxin1 tag instead (+sha512)
 SPEECHD_VOXIN_VERSION=0.9voxin1
-SPEECHD_VOXIN_SHA256=e1c49aa45a7ca08fd2984cc583ad1509af46409018e07b6603d824416a480d09
+SPEECHD_VOXIN_SHA512=8fcd24797525fa59fa775761d7e108e93e8ebe29ace20ddd72e2b6cbe6b668b8a40998cb0d9b4c21ad69d9e1304d6864c18b3914a30c0044986e96301dece6dd
 SPEECHD_VOXIN_BRANCH=ibmtts_dynamic_loading
 
 SPEECHD_IBMTTS_COPYRIGHT_NB_LINES=23
@@ -101,7 +101,7 @@ checkDep() {
 
 init() {
 	local i
-	for i in "$BUILDPKG" "$PKGDIR"/voxin* "$RFS32"; do
+	for i in "$TMPDIR" "$BUILDPKG" "$PKGDIR"/voxin* "$RFS32"; do
 		rm -rf "$i"
 	done
 	mkdir -p "$PKGDIR" "$DWLDIR" "$BUILDPKG"/{rfs,build}
@@ -251,9 +251,9 @@ getLibvoxin() {
 	if [ -n "$dev" ]; then
 		[ ! -d libvoxin-master ] && unzip "$archivep" || true
 	else
-		local a=$(sha256sum "$archivep" | cut -f1 -d" ")
-		if [ "$a" != "$LIBVOXIN_SHA256" ]; then
-			echo "$archivep: sha256 mismatch !"
+		local a=$(sha512sum "$archivep" | cut -f1 -d" ")
+		if [ "$a" != "$LIBVOXIN_SHA512" ]; then
+			echo "$archivep: sha512 mismatch !"
 			exit 1
 		fi
 		[ ! -d libvoxin-$version ] && tar -zxf "$archivep" || true
@@ -303,7 +303,7 @@ getSpeechDispatcherVoxin() {
 		version=$SPEECHD_VOXIN_VERSION
 		archive=$version.tar.gz		
 	else
-		version=0.9.x
+		version=0.9voxinx
 		dev=1
 		archive=$SPEECHD_VOXIN_BRANCH.zip
 		[ -e "$DWLDIR"/$archive ] && [ -z "$keepDownloadedSources" ] && mv "$DWLDIR"/$archive "$DWLDIR"/$archive.old
@@ -325,9 +325,9 @@ getSpeechDispatcherVoxin() {
 	if [ -n "$dev" ]; then
 		[ ! -d speechd_voxin-$SPEECHD_VOXIN_BRANCH ] && unzip "$archivep" || true
 	else
-		local a=$(sha256sum "$archivep" | cut -f1 -d" ")
-		if [ "$a" != "$SPEECHD_VOXIN_SHA256" ]; then
-			echo "$archivep: sha256 mismatch !"
+		local a=$(sha512sum "$archivep" | cut -f1 -d" ")
+		if [ "$a" != "$SPEECHD_VOXIN_SHA512" ]; then
+			echo "$archivep: sha512 mismatch !"
 			exit 1
 		fi
 		[ ! -d speechd_voxin-$version ] && tar -zxf "$archivep" || true
@@ -358,7 +358,7 @@ getSpeechDispatcherVoxin() {
 	cp ./config/modules/ibmtts.conf "$confDir"/ibmtts.conf.$version || return 1
 	head -n $SPEECHD_IBMTTS_COPYRIGHT_NB_LINES src/modules/ibmtts.c > "$docDir"/copyright.$version
 	
-	local v=$(getMajMinVersion $version)
+	local v=$(getMajMinVersion ${version%voxin*})
 	ln -s sd_ibmtts.$version "$modulesDir"/sd_ibmtts.$v
 	ln -s ibmtts.conf.$version "$confDir"/ibmtts.conf.$v
 
@@ -368,6 +368,22 @@ getSpeechDispatcherVoxin() {
 	ln -s /opt/oralux/voxin/lib/speech-dispatcher-modules/sd_ibmtts.$v usr/lib/speech-dispatcher-modules/sd_voxin
 	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$v usr/share/speech-dispatcher/conf/modules/voxin.conf
 	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$v etc/speech-dispatcher/modules/voxin.conf
+	
+	cd "$pwd"
+	return 0
+}
+
+# install the README and LICENSE files
+# create the symlinks for the voxin package
+getVoxinDoc() {
+	local pwd=$PWD
+
+	cp $INSTALLDIR/README $INSTALLDIR/LICENSE "$VOXINDIR"
+
+	cd "$BUILDPKG/rfs"
+	mkdir -p usr/share/doc/voxin
+	ln -s /opt/oralux/voxin/LICENSE usr/share/doc/voxin/
+	ln -s /opt/oralux/voxin/README usr/share/doc/voxin/
 	
 	cd "$pwd"
 	return 0
@@ -396,6 +412,12 @@ tar -C \"$rfsdir\" \
 	installDir=$INSTALLDIR/packages/deb
 	buildDebPackage "$tarball" "$installDir" "$name" "$VOXIN_VER" "$debArch" "$depends" "$title" "$description" "$replaces"
 
+	# gentoo
+	local depends=glibc
+	replaces="libvoxin, voxind, speech-dispatcher-voxin, speech-dispatcher-ibmtts"
+	installDir=$INSTALLDIR/packages/gentoo
+	buildGentooPackage "$tarball" "$installDir" "$name" "$VOXIN_VER" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" "$replaces" 
+	
 	# pacman
 	local depends=glibc
 	replaces="libvoxin, voxind, speech-dispatcher-voxin, speech-dispatcher-ibmtts"
@@ -422,6 +444,7 @@ buildReleaseTarball() {
 	local installDir
 	local tarball
 	local pwd=$PWD
+	local exclude
 	
 	# build the final rfsdir tarball and install it in the installer tree
 	installDir=$INSTALLDIR/packages/all
@@ -494,18 +517,21 @@ buildReleaseTarball() {
 	fi
 }
 
+# populate $INSTALLDIR
 buildInstallerDir() {
 	local pwd=$PWD
 
 	rm -rf "$INSTALLDIR"
 	mkdir -p "$INSTALLDIR"
-	rsync --exclude "*~" --exclude .gitignore -a "$BASE"/src/installer/* "$INSTALLDIR"
+	rsync --exclude .gitignore --exclude *~ --exclude *bak -a "$BASE"/src/installer/* "$INSTALLDIR"
 	cd "$INSTALLDIR"
 
 	emacs README.org --batch -f org-ascii-export-to-ascii --kill
-	sed -e "s/%VERSION%/$VOXIN_VER/" -e '/^[[:space:]]*[=~_]\+$/d' README.txt > README
-	rm README.org README.txt
+	sed -e "s/%VERSION%/$VOXIN_VER/g" -e '/^[[:space:]]*[=~_]\+$/d' README.txt > README
+	rm README.org README.txt README.txt~
 
+	sed -i "s/%VERSION%/$VOXIN_VER/g" common/init.inc
+	
 	cd po
 	for i in de es fr; do
 		./install_po.sh $i
@@ -538,6 +564,8 @@ buildDebPackage() {
 	cd "$pacdir"/data
 
 	tar -xf "$tarball"
+	mv usr/share/doc/"$name"/LICENSE usr/share/doc/"$name"/copyright
+	tar -Jcf ../data.tar.xz .
 	find . -type f | xargs md5sum >> ../DEBIAN/md5sums
 	local size=$(du -scb . | head -n1 | cut -f1)
 	cd ..
@@ -556,7 +584,6 @@ EOF
 	local prefix=" "
 	echo "$description" | fold -w 80 -s | sed "s/^/$prefix/" >> DEBIAN/control
 
-	cp "$tarball" data.tar.xz
 	echo 2.0 > debian-binary
 	tar -C DEBIAN -Jcf control.tar.xz ./control ./md5sums
 
@@ -581,13 +608,72 @@ buildPacmanPackage() {
 	local replaces=${10}
 	local date=$(date --utc +%s)
 	local pwd=$PWD
+
+	version=$version-1
 	
 	local pacdir="$TMPDIR"/buildPacmanPackage
 	[ -e "$pacdir" ] && rm -rf "$pacdir"
 	mkdir -p "$pacdir"
 	cd "$pacdir"
 
-	tar --exclude=doc -xf "$tarball"
+	tar -xf "$tarball"
+	mkdir -p usr/share/licenses/"$name"
+	mv usr/share/doc/"$name"/LICENSE usr/share/licenses/"$name"/
+	
+	local size=$(du -scb . | head -n1 | cut -f1)
+
+	cat <<EOF>.PKGINFO
+pkgname = $name
+pkgver = $version
+pkgdesc = $title
+url = https://voxin.oralux.net
+builddate = $date
+packager = voxin-installer <contact@oralux.org>
+size = $size
+arch = $arch
+license = $license
+depend = $depends
+EOF
+
+	[ -n "$replaces" ] && echo "replaces = $replaces" >> .PKGINFO
+
+	[ ! -d "$installDir" ] && mkdir -p "$installDir"
+	
+	# Inspired by debtap: https://github.com/helixarch/debtap
+	bsdtar -czf .MTREE --format=mtree --options='!all,use-set,type,uid,gid,mode,time,size,md5,sha256,link' * .PKGINFO .INSTALL 2> /dev/null
+	fakeroot << EOF
+tar -pcf "$installDir/$name-$version-$arch.pkg.tar" * .PKGINFO .MTREE 2> /dev/null
+xz -z -9 "$installDir/$name-$version-$arch.pkg.tar"
+EOF
+	buildPacmanPackageRes="$installDir/$name-$version-$arch.pkg.tar.xz"
+	cd "$pwd"		
+}
+
+# output buildGentooPackageRes
+buildGentooPackage() {
+	[ "$#" -lt 9 ] && return 1
+	local tarball=$1
+	local installDir=$2
+	local name=$3
+	local version=$4
+	local arch=$5
+	local depends=$6
+	local title=$7
+	local description=$8
+	local license=$9
+	local replaces=${10}
+	local date=$(date --utc +%s)
+	local pwd=$PWD
+	
+	local pacdir="$TMPDIR"/buildGentooPackage
+	[ -e "$pacdir" ] && rm -rf "$pacdir"
+	mkdir -p "$pacdir"
+	cd "$pacdir"
+
+	tar -xf "$tarball"
+	mkdir -p usr/share/doc/"$name-$version"
+	mv usr/share/doc/"$name"/{LICENSE,README} usr/share/doc/"$name-$version"/
+	rm -rf usr/share/doc/"$name"
 	local size=$(du -scb . | head -n1 | cut -f1)
 
 	cat <<EOF>.PKGINFO
@@ -613,7 +699,7 @@ EOF
 tar -pcf "$installDir/$name-$version-$arch.pkg.tar" * .PKGINFO .INSTALL .MTREE 2> /dev/null
 xz -z -9 "$installDir/$name-$version-$arch.pkg.tar"
 EOF
-	buildPacmanPackageRes="$installDir/$name-$version-$arch.pkg.tar.xz"
+	buildGentooPackageRes="$installDir/$name-$version-$arch.pkg.tar.xz"
 	cd "$pwd"		
 }
 
@@ -642,7 +728,7 @@ buildRpmPackage() {
 	fi
 	mkdir -p "$pacdir/data"
 	cd "$pacdir/data"
-	tar --exclude=doc -xf "$tarball"
+	tar -xf "$tarball"
 	find * -type d -exec chmod a-w {} \;
 	chmod 755 usr usr/include usr/share usr/share/doc usr/lib/speech-dispatcher-modules 2>/dev/null
 	for i in usr/share etc; do
@@ -683,8 +769,11 @@ buildSlackwarePackage() {
 	fi
 	mkdir -p "$pacdir/data"
 	cd "$pacdir/data"
-	tar --exclude=doc -xf "$tarball"
-
+	tar -xf "$tarball"
+	mkdir -p usr/doc/"$name"-$VOXIN_VER
+	mv usr/share/doc/"$name"/LICENSE usr/share/doc/"$name"/README usr/doc/"$name"-$VOXIN_VER
+	rm -rf usr/share/doc/"$name"
+	
 	# inspired by xz2txz.sh
 	# https://forum.porteus.org/viewtopic.php?f=39&t=4577#p36115
 	local prefix="$name: "

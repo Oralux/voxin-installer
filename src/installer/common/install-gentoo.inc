@@ -2,7 +2,7 @@ gentooTarExclude="--exclude .MTREE --exclude .PKGINFO"
 
 getVoxinPackage() {
 	[ -z "$ARCH" ] && return 1
-	find packages/archlinux -name "voxin*$ARCH.pkg.tar.xz"
+	find packages/gentoo -name "voxin*$ARCH.pkg.tar.xz"
 }
 
 getPackageVersion() {
@@ -50,7 +50,7 @@ uninstallPackage() {
 	local i
 
 	[ "$package" != voxin ] && return 1
-	tarball=$(find packages/archlinux -name "voxin*$ARCH.pkg.tar.xz" 2>/dev/null)
+	tarball=$(find packages/gentoo -name "voxin*$ARCH.pkg.tar.xz" 2>/dev/null)
 	[ -z "$tarball" ] && return 1
 	tarball=$(readlink -e "$tarball")
 	[ -z "$tarball" ] && return 1

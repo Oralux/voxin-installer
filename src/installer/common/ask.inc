@@ -50,7 +50,7 @@ askLicense()
 	local VIAVOICE_ARCHIVE=$(getViavoiceAllTarball)
 	local VIAVOICE_AGREEMENT=opt/oralux/voxin/share/doc/voxin-viavoice-all/AGREEMENT
 	local VIAVOICE_LICENSE=opt/IBM/ibmtts/doc/IBM.txt
-	local RFS_ARCHIVE=$(getRootfilesystemTarball)
+	local RFS_ARCHIVE=$(getRootfilesystemAllTarball)
 	local LIBVOXIN_LGPL=opt/oralux/voxin/share/doc/libvoxin/LGPL.txt
 	local LESS
 	local CLEAR
