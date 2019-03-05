@@ -565,7 +565,7 @@ buildDebPackage() {
 
 	tar -xf "$tarball"
 	mv usr/share/doc/"$name"/LICENSE usr/share/doc/"$name"/copyright
-	tar -Jcf ../data.tar.xz .
+	fakeroot bash -c "tar -Jcf ../data.tar.xz ."
 	find . -type f | xargs md5sum >> ../DEBIAN/md5sums
 	local size=$(du -scb . | head -n1 | cut -f1)
 	cd ..
@@ -585,7 +585,7 @@ EOF
 	echo "$description" | fold -w 80 -s | sed "s/^/$prefix/" >> DEBIAN/control
 
 	echo 2.0 > debian-binary
-	tar -C DEBIAN -Jcf control.tar.xz ./control ./md5sums
+	fakeroot bash -c "tar -C DEBIAN -Jcf control.tar.xz ./control ./md5sums"
 
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"
 	ar -r "$installDir"/${name}_${version}_${arch}.deb debian-binary control.tar.xz data.tar.xz 
@@ -839,7 +839,7 @@ uploadToX86VM() {
 		cd $HOME
 		rsync -aRvz $VVDIR/voxin-viavoice-* $VMX86:
 	fi
-
+	ssh $VMX86 'cd voxin-installer && ./build.sh -t src/list.vv'
 	cd "$pwd"
 }
 
@@ -847,6 +847,6 @@ uploadToX86VM() {
 getOtherArch() {
 	local TARBALL="$DWLX86/voxin-update-$VOXIN_VER.tgz"
 	if [ -e "$TARBALL" ]; then
-		tar -C "$INSTALLDIR" --exclude rfs_$VOXIN_VER.all.txz --strip-components=1 -xf "$TARBALL" voxin-update-$VOXIN_VER/packages
+		tar -C "$INSTALLDIR" --exclude rfs_$VOXIN_VER.all.txz --strip-components=2 -xf "$TARBALL" voxin-$VOXIN_VER/voxin-update-$VOXIN_VER/packages		
 	fi
 }

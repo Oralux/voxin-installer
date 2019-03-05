@@ -6,7 +6,8 @@ getVoxinPackage() {
 getPackageVersion() {
 	[ $# != 1 ] || [ -z "$1" ] && return
 	local package=$1
-	local a=$(zypper -q search -xis "$package")
+	local a
+	a=$(zypper -q search -xis "$package")
 	# e.g. speech-dispatcher on Leap 15.0:
 	# echo $a
 	# S | Name | Type | Version | Arch | Repository ---+-------------------+---------+-----------------+--------+----------------------- i+ | speech-dispatcher | package | 0.8.8-lp150.1.2 | x86_64 | openSUSE-Leap-15.0-Oss
@@ -20,7 +21,8 @@ getPackageVersion() {
 isPackageInstalled() {
 	[ $# != 1 ] || [ -z "$1" ] && return 1
 	local package=$1
-	local a=$(zypper -q search -xi "$package")
+	local a
+	a=$(zypper -q search -xi "$package")
 }
 
 # getPackageFileVersion

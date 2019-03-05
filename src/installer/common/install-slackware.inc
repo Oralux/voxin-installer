@@ -50,7 +50,8 @@ installLocalPackage() {
 installPackage() {
 	[ $# != 1 ] || [ -z "$1" ] && return
 	local package=$1
-	local cmd=$(which slackpkg) || return 1
+	local cmd
+	cmd=$(which slackpkg) || return 1
 	slackpkg -batch=on -default_answer=y install "$package" &>>"$LOG"
 }
 

@@ -31,19 +31,21 @@ Options:
                        useful to download the 32 bits voxin-installer built on 
                        a remote x86 VM.
                        remote address = variable VMX86 in src/conf.inc
--u, --upload <arch>    upload voxin-installer to a remote machine.
+                       (current value = $VMX86)
+-u, --upload <arch>    upload voxin-installer to a remote machine and build it.
+                       Useful to build the 32 bits voxin-installer on an x86 VM.
                        <arch> = x86
-                       useful to build thereafter the 32 bits voxin-installer 
-                       on an x86 VM.                       
-                       remote address = VMX86 in src/conf.inc
-Example:
+                       remote address = variable VMX86 in src/conf.inc
+                       (current value = $VMX86)
+
+Examples:
 # build all
  $0
 
 # build all, extract and merge the tarballs in list.txt
  $0 -t src/list.vv
 
-# upload voxin-installer to the X86 VM
+# upload voxin-installer to the X86 VM ($VMX86) and build it
  $0 -u x86
 
 # download the 32 bits voxin-installer from the X86 VM
@@ -82,6 +84,11 @@ if [ -n "$CLEAN" ]; then
 	exit 0
 fi
 
+if [ -n "$TARBALLS" ]; then
+	t=$(readlink -e "$TARBALLS") || leave "Error: the tarballs file does not exist (-t $TARBALLS)" 1
+	TARBALLS=$t
+fi
+
 if [ -n "$UPLOAD" ]; then
 	unset STATUS
 	case $UPLOAD in
@@ -105,7 +112,6 @@ checkDep
 init
 [ -n "$BUILDROOT" ] && buildBuildroot
 
-getVoxinUpdateX86
 getMinimalRFS32FromBuildroot
 getOldLibstdc++
 buildInstallerDir

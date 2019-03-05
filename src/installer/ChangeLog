@@ -1,3 +1,18 @@
+2019-03-05 Gilles Casse <gcasse@oralux.org>
+	release 2.0beta1:
+	- compatibility with much more GNU/Linux distributions (and their family: derivatives, parent distro). List below.
+	- include voxin-say to convert text to wav files (e.g. basic audio books).
+
+	Known restrictions of this beta-release:
+	- if you have installed several voxin languages, it is not yet possible to switch languages via speech-dispatcher.
+
+	Tested distributions (much more should be compatible):
+	- x86_64: Arch Linux, Debian 9, Fedora 29, Gentoo, openSUSE Leap 15.0, Slint64-14.2.1.1, 14.2.1.2, Ubuntu 18.04
+	- i686: Debian 9, openSUSE Tumbleweed-i586
+
+	To download this beta-release, append to your download url these 8 characters:
+	&v=beta1 
+
 2018-07-22 Gilles Casse <gcasse@oralux.org>
 	release 1.15:
 	- libvoxin 1.1.10 (debian package): don't replace xml entities with white spaces (case of "I'd ")

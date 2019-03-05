@@ -35,25 +35,8 @@ if [ "$?" != "0" ]; then
     exit 1
 fi
 
-
-# beta1
 if [ -h /opt ]; then
 	_gettext "Sorry, this installer does not expect a symbolic link /opt"
-	_gettext "For support, email to contact at oralux.org "
-    exit 1
-fi
-unset status
-for i in libvoxin libvoxin1 voxind speech-dispatcher-voxin speech-dispatcher-ibmtts; do
-	isPackageInstalled $i 
-	if [ $? = 0 ]; then
-		status="$status $i"
-		break
-	fi
-done
-
-if [ -n "$status" ]; then
-	_gettext "Voxin Packages: $status"
-	_gettext "Sorry, this beta version can't update a previous voxin installation"
 	_gettext "For support, email to contact at oralux.org "
     exit 1
 fi
@@ -68,7 +51,7 @@ if [ "$?" != "0" ]; then
 	fi
 	with_sd=0
 fi
-			
+
 TEMP=`getopt -o hlsuv --long help,lang,sd,uninstall,verbose -- "$@"`
 if [ $? != 0 ] ; then
     usage
@@ -113,8 +96,14 @@ if [ "$with_uninstall" = "1" ]; then
     exit 0
 fi
 
-_gettext "Log file: $LOG"
+_gettext "Logs written in log/voxin.log"
 _gettext "Initialization; please wait... "
+
+# remove packages from voxin < 2.0
+for i in speech-dispatcher-ibmtts speech-dispatcher-voxin voxind libvoxin libvoxin1; do
+	isPackageInstalled $i && uninstallPackage $i
+done
+
 installDir=/
 installSystem "$installDir" || exit 1
 
@@ -126,18 +115,18 @@ askInstallLang && {
     unset PLAY OPT 
     PLAY=$(which paplay 2>/dev/null)
     if [ -n "$PLAY" ]; then
-	OPT="--rate=11025 --channels=1 --format=s16le" 
+		OPT="--rate=11025 --channels=1 --format=s16le" 
     else
-	PLAY=$(which aplay 2>/dev/null)
-	if [ -n "$PLAY" ]; then
-	    OPT="-r 11025 -c 1 -f S16_LE"
-	fi
+		PLAY=$(which aplay 2>/dev/null)
+		if [ -n "$PLAY" ]; then
+			OPT="-r 11025 -c 1 -f S16_LE"
+		fi
     fi
 
     export LD_LIBRARY_PATH="$installDir"/opt/oralux/voxin/lib
     if [ -n "$PLAY" ]; then
-	# $OPT can usually be omitted (needed during the test on Gentoo)
-	"$installDir"/opt/oralux/voxin/bin/voxin-say "Voxin: OK" | "$PLAY" $OPT &>> "$LOG"
+		# $OPT can usually be omitted (needed during the test on Gentoo)
+		"$installDir"/opt/oralux/voxin/bin/voxin-say "Voxin: OK" | "$PLAY" $OPT &>> "$LOG"
     fi
 }
 

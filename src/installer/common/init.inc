@@ -79,10 +79,6 @@ check_speech_dispatcher_voxin() {
 	isVersionGreater "$installedVersion" "$SPEECHD_MIN_VERSION"
 }
 
-merge_old_archive() {
-    local archive="$1"
-}
-
 # getTarballVersion
 # Example:
 # input=name_1.2.3.x86_64.txz

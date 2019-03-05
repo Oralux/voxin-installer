@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: voxin-installer 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-03 20:51+0100\n"
+"POT-Creation-Date: 2019-03-05 16:21+0100\n"
 "PO-Revision-Date: 2019-03-03 20:54+0100\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
@@ -46,15 +46,15 @@ msgstr "Möchten Sie eine neue Sprache installieren?"
 msgid "Do you want to uninstall the TTS?"
 msgstr "Möchten Sie die TTS deinstallieren?"
 
-#: ../common/init.inc:195
+#: ../common/init.inc:192
 msgid "Error: no viavoice-all tarball"
 msgstr ""
 
-#: ../voxin-installer.sh:34 ../voxin-installer.sh:42 ../voxin-installer.sh:57
+#: ../voxin-installer.sh:34 ../voxin-installer.sh:40
 msgid "For support, email to contact at oralux.org "
 msgstr ""
 
-#: ../voxin-installer.sh:66 ../voxin-installer.sh:155
+#: ../voxin-installer.sh:57 ../voxin-installer.sh:146
 msgid "Good Bye. "
 msgstr "Auf wiedersehen. "
 
@@ -89,11 +89,15 @@ msgstr ""
 msgid "If you agree to the LGPL license, press the ENTER key"
 msgstr "Wenn Sie der LGPL-Lizenz zustimmen, drücken Sie die Eingabetaste."
 
-#: ../voxin-installer.sh:117
+#: ../voxin-installer.sh:108
 msgid "Initialization; please wait... "
 msgstr "Initialisierung; Warten Sie mal... "
 
-#: ../common/init.inc:50
+#: ../voxin-installer.sh:107
+msgid "Logs written in log/voxin.log"
+msgstr ""
+
+#: ../common/init.inc:51
 msgid "Operation completed. "
 msgstr "Die Operation wurde abgeschlossen. "
 
@@ -105,19 +109,15 @@ msgstr "Bitte starten Sie voxin-installer als root. "
 msgid "Please use the space bar to scroll through the document."
 msgstr "Bitte benutzen sie die Leertaste, um durch das Dokument zu scrollen."
 
-#: ../voxin-installer.sh:56
-msgid "Sorry, this beta version can't update a previous voxin installation"
-msgstr ""
-
 #: ../voxin-installer.sh:33
 msgid "Sorry, this distribution is not yet supported. "
 msgstr "Das Linux-Distribution noch nicht unterstützt wird. "
 
-#: ../voxin-installer.sh:41
+#: ../voxin-installer.sh:39
 msgid "Sorry, this installer does not expect a symbolic link /opt"
 msgstr ""
 
-#: ../voxin-installer.sh:154
+#: ../voxin-installer.sh:145
 msgid "The changes will be taken into account on next boot. "
 msgstr "Die Änderungen werden beim nächsten Start berücksichtigt werden. "
 
@@ -125,11 +125,11 @@ msgstr "Die Änderungen werden beim nächsten Start berücksichtigt werden. "
 msgid "Voxin can be set as default text-to-speech."
 msgstr ""
 
-#: ../common/init.inc:107 ../common/init.inc:118
+#: ../common/init.inc:104 ../common/init.inc:115
 msgid "rfs all tarball not found!"
 msgstr ""
 
-#: ../common/init.inc:256
+#: ../common/init.inc:253
 msgid "voxin package not found!"
 msgstr ""
 
