@@ -7,9 +7,7 @@ For support or feedback, please send a mail to contact@oralux.org with possibly 
 
 Before any install, check that your voxin archive (the .tgz file) has a correct checksum.
 
-The checksum file can be downloaded from GitHub under the Oralux account:
-
-https://github.com/Oralux/voxin-installer/check/%VERSION%/voxin-%VERSION%.sha512 
+The checksum file can be downloaded from [[https://raw.githubusercontent.com/Oralux/voxin-installer/master/check/%VERSION%/voxin-%VERSION%.sha512][GitHub under the Oralux account]] .
 
 In the following example, our voxin archive (voxin-update-%VERSION%.tgz) is checked against the checksum file (voxin-%VERSION%.sha512).
 
