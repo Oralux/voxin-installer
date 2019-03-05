@@ -731,9 +731,8 @@ buildRpmPackage() {
 	tar -xf "$tarball"
 	find * -type d -exec chmod a-w {} \;
 	chmod 755 usr usr/include usr/share usr/share/doc usr/lib/speech-dispatcher-modules 2>/dev/null
-	for i in usr/share etc; do
-		chmod 755 $i $i/speech-dispatcher $i/speech-dispatcher/modules 2>/dev/null
-	done
+	chmod 755 usr/share/speech-dispatcher usr/share/speech-dispatcher/conf usr/share/speech-dispatcher/conf/modules 2>/dev/null
+	chmod 755 etc etc/speech-dispatcher etc/speech-dispatcher/modules 2>/dev/null
 	[ "$arch" = "x86_64" ] && mv usr/lib usr/lib64
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"	
 	tar -zcf "$pacdir/$name.tgz" *
