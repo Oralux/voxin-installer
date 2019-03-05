@@ -62,7 +62,7 @@ check_distro() {
 		arch*) source common/install-arch-linux.inc;;
 		debian*) source common/install-deb.inc;;
 		fedora*) source common/install-rpm-dnf.inc;;
-		gentoo*) source source common/install-gentoo.inc;;
+		gentoo*) source common/install-gentoo.inc;;
 		opensuse*|suse*) source common/install-rpm-zypper.inc;;
 		# rhel*) source common/install-rpm-yum.inc;; # require support of speech-dispatcher 0.7.x
 		slackware*|slint*) source common/install-slackware.inc;;
