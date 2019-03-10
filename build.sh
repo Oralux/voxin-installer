@@ -119,7 +119,10 @@ buildInstallerDir
 unset keepDownloadedSources
 ARCH=$(uname -m)
 getLibvoxin "$ARCH" "$keepDownloadedSources" || leave "Error: can't build libvoxin" 1
-getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
+getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION" "$SPEECHD_VOXIN_SHA512" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
+getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION_0_8" "$SPEECHD_VOXIN_SHA512_0_8" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
+#getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION_0_7" "$SPEECHD_VOXIN_SHA512_0_7" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
+buildVoxinModule
 getVoxinDoc
 buildPackage "$ARCH" || leave "Error: can't build packages" 1
 keepDownloadedSources=1

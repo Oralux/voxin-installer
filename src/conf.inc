@@ -27,16 +27,29 @@ LIBVOXIN_SHA512=c4bf052de16778c56b2ca4fb4bb50ba14254fd5999c2532e3533232a0cd04a72
 
 #-- speech-dispatcher-voxin
 SPEECHD_VOXIN_URL=https://github.com/Oralux/speechd/archive
+SPEECHD_VOXIN_VERSION_DEV=0.9voxinx
+SPEECHD_IBMTTS_COPYRIGHT_NB_LINES=23
 
-# select the speech-dispatcher sources (development or tag)
+###
+# select the current speech-dispatcher sources (development or tag)
 # - development (SPEECHD_BRANCH)
 #SPEECHD_VOXIN_VERSION=
+#SPEECHD_VOXIN_SHA512=
+#SPEECHD_VOXIN_BRANCH=ibmtts_dynamic_loading
 # - from the 0.9voxin1 tag instead (+sha512)
-SPEECHD_VOXIN_VERSION=0.9voxin1
-SPEECHD_VOXIN_SHA512=8fcd24797525fa59fa775761d7e108e93e8ebe29ace20ddd72e2b6cbe6b668b8a40998cb0d9b4c21ad69d9e1304d6864c18b3914a30c0044986e96301dece6dd
+SPEECHD_VOXIN_VERSION=0.9.0-voxin1
+SPEECHD_VOXIN_SHA512=3cd93d1664cb7e464cc2ecb86b1bc9105263d8f6d2bbb6f417450d4e826986f3da233f5ed6d371ce85a42591be452f34db54e0d5927a64177b5a664df8343d2f
 SPEECHD_VOXIN_BRANCH=ibmtts_dynamic_loading
+###
 
-SPEECHD_IBMTTS_COPYRIGHT_NB_LINES=23
+# speechd: version 0.8.8
+SPEECHD_VOXIN_VERSION_0_8=0.8.8-voxin1
+SPEECHD_VOXIN_SHA512_0_8=463aa4a857b2abd3117bc0b858b812179b24c86b4ac71ab1f8e1e18c86d7bf4c28d4441905bdca863dba204611f93cedf8466710199947cf05d213464bbdfb6b
+
+# speechd: version 0.7.1
+SPEECHD_VOXIN_VERSION_0_7=0.7.1-voxin1
+SPEECHD_VOXIN_SHA512_0_7=
+
 
 # VMX86: VM where voxin-installer is built for x86 architecture
 # The VM is currently used to build on a 64 bits machine the speech-dispatcher module for x86
@@ -287,23 +300,23 @@ getSpeechDispatcherVoxin() {
 	[ "$#" -lt 2 ] && return 1
 	local arch=$1
 	local libvoxinDir=$2
-	local keepDownloadedSources=$3
+	local version=$3
+	local sha512=$4
+	local keepDownloadedSources=$4
 	local archive
 	local archivep
 	local dev
-	local version
 	local pwd=$PWD
 	local workdir=$TMPDIR/speechd_voxin
 	local installDir=$INSTALLDIR/packages/all
 	
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"
 		
-	if [ -n "$SPEECHD_VOXIN_VERSION" ]; then
+	if [ -n "$version" ]; then
 		unset dev
-		version=$SPEECHD_VOXIN_VERSION
 		archive=$version.tar.gz		
 	else
-		version=0.9voxinx
+		version=$SPEECHD_VOXIN_VERSION_DEV
 		dev=1
 		archive=$SPEECHD_VOXIN_BRANCH.zip
 		[ -e "$DWLDIR"/$archive ] && [ -z "$keepDownloadedSources" ] && mv "$DWLDIR"/$archive "$DWLDIR"/$archive.old
@@ -326,7 +339,7 @@ getSpeechDispatcherVoxin() {
 		[ ! -d speechd_voxin-$SPEECHD_VOXIN_BRANCH ] && unzip "$archivep" || true
 	else
 		local a=$(sha512sum "$archivep" | cut -f1 -d" ")
-		if [ "$a" != "$SPEECHD_VOXIN_SHA512" ]; then
+		if [ "$a" != "$sha512" ]; then
 			echo "$archivep: sha512 mismatch !"
 			exit 1
 		fi
@@ -358,19 +371,26 @@ getSpeechDispatcherVoxin() {
 	cp ./config/modules/ibmtts.conf "$confDir"/ibmtts.conf.$version || return 1
 	head -n $SPEECHD_IBMTTS_COPYRIGHT_NB_LINES src/modules/ibmtts.c > "$docDir"/copyright.$version
 	
-	local v=$(getMajMinVersion ${version%voxin*})
-	ln -s sd_ibmtts.$version "$modulesDir"/sd_ibmtts.$v
-	ln -s ibmtts.conf.$version "$confDir"/ibmtts.conf.$v
+	cd "$pwd"
+	return 0
+}
+
+buildVoxinModule() {
+	local pwd="$PWD"
+	local modulesDir="$VOXINDIR"/lib/speech-dispatcher-modules
+	cd "$SRCDIR"/speechd-voxin
+	make clean
+	SD7=$SPEECHD_VOXIN_VERSION_0_7 SD8=$SPEECHD_VOXIN_VERSION_0_8 SD9=$SPEECHD_VOXIN_VERSION make
+	DESTDIR="$modulesDir" make install
 
 	# create symlinks
 	cd "$BUILDPKG/rfs"
 	mkdir -p usr/{lib/speech-dispatcher-modules,share/speech-dispatcher/conf/modules} etc/speech-dispatcher/modules
-	ln -s /opt/oralux/voxin/lib/speech-dispatcher-modules/sd_ibmtts.$v usr/lib/speech-dispatcher-modules/sd_voxin
-	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$v usr/share/speech-dispatcher/conf/modules/voxin.conf
-	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$v etc/speech-dispatcher/modules/voxin.conf
-	
+	ln -s /opt/oralux/voxin/lib/speech-dispatcher-modules/sd_voxin usr/lib/speech-dispatcher-modules/sd_voxin
+	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$SPEECHD_VOXIN_VERSION usr/share/speech-dispatcher/conf/modules/voxin.conf
+	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$SPEECHD_VOXIN_VERSION etc/speech-dispatcher/modules/voxin.conf
+
 	cd "$pwd"
-	return 0
 }
 
 # install the README and LICENSE files
