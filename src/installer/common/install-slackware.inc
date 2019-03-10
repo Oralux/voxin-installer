@@ -53,11 +53,12 @@ installPackage() {
 	local cmd
 	cmd=$(which slackpkg) || return 1
 	slackpkg -batch=on -default_answer=y install "$package" &>>"$LOG"
+	# upgradepkg --reinstall --install-new "$package" &>>"$LOG"
 }
 
 uninstallPackage() {
 	[ $# != 1 ] || [ -z "$1" ] && return
 	local package=$1
-	removepkg"$package" &>>"$LOG"
+	removepkg "$package" &>>"$LOG"
 }
 
