@@ -38,11 +38,11 @@ int main(int argc, char *argv[])
   version++;
   version[strlen(version)-1] = 0;
   if (!strncmp(version, "0.9", 3)) {
-	module = SD9;
+	module = "sd_ibmtts." SD9;
   } else if (!strncmp(version, "0.8", 3)) {
-	module = SD8;
+	module = "sd_ibmtts." SD8;
   } else if (!strncmp(version, "0.7", 3)) {
-	module = SD7;
+	module = "sd_ibmtts." SD7;
   }
 
   execve(module, argv, environ);
