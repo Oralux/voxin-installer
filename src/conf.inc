@@ -817,8 +817,8 @@ buildSlackwarePackage() {
 		DIR=${i%/*}
 		SRC=$(readlink "$i")
 		if [ -z "$DEST" ] || [ -z "$DIR" ] || [ -z "$SRC" ]; then return; fi
-		echo "( cd $DIR && rm -rf $DEST )" >> "$script"
-		echo "( cd $DIR && ln -sf $SRC $DEST )" >> "$script"
+		echo "( cd $DIR ; rm -rf $DEST )" >> "$script"
+		echo "( cd $DIR ; ln -sf $SRC $DEST )" >> "$script"
 		unlink $i
 	done
 
