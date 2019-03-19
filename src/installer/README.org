@@ -65,7 +65,7 @@ orca -s
 
 ** Speech Dispatcher
 
-The voxin-installer installs the voxin module for speech-dispatcher, and will update your configuration after your authorization. Otherwise, modify the speechd.conf file of speech-dispatcher (using for example spd-conf).
+The voxin-installer installs the voxin module for speech-dispatcher, and will update your configuration after your authorization. Otherwise, modify the speechd.conf file of speech-dispatcher (using for example spd-conf, choose the voxin module, not the old ibmtts module ).
 Please note that the Speech Dispatcher server will take in account the new configuration after its restart, for example at next reboot.
 
 ** Emacspeak
@@ -93,7 +93,7 @@ Please note that any ibmtts file will be removed too (under /opt/IBM/ibmtts).
 * Compatible GNU/Linux Distributions
 ** Voxin %VERSION%
 From version 2.0, voxin is compatible with much more distributions (and their family: derivatives, parent distro).
-The included speech dispatcher module works with speech-dispatcher version >= 0.8.5 .
+The included speech dispatcher modules work with speech-dispatcher version >= 0.8 .
 
 The tested distributions are displayed below. Much more should be compatible.
 For support or feedback, please send a mail to contact@oralux.org with possibly the log file (log/voxin.log).

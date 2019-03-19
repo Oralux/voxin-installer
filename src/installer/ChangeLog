@@ -1,3 +1,13 @@
+2019-03-18 Gilles Casse <gcasse@oralux.org>
+	release 2.0: same features as 2.0beta1 plus:
+
+	- include libvoxin 1.3.4: fix an issue with Japanese language (punctuation filter).
+	- compatibility with multiple speech-dispatcher versions (0.9.0, 0.8.x). The list of installed languages is now correctly supplied and enables language switching.
+	- slackware package: fix the doinst.sh script so that it may be correctly parsed by removepkg
+	- slackware/slint installation: fix the removepkg call (thanks to Didier Spaier).
+
+	To download this release, use your usual download url.
+
 2019-03-05 Gilles Casse <gcasse@oralux.org>
 	release 2.0beta1:
 	- compatibility with much more GNU/Linux distributions (and their family: derivatives, parent distro). List below.

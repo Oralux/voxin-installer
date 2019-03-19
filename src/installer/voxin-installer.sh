@@ -92,7 +92,7 @@ if [ -z "$GETTEXT" ]; then
 fi
 
 if [ "$with_uninstall" = "1" ]; then
-    uninstall
+    askUninstall && uninstall
     exit 0
 fi
 
