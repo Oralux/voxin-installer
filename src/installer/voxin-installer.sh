@@ -44,7 +44,11 @@ fi
 with_sd=1
 check_speech_dispatcher_voxin
 if [ "$?" != "0" ]; then
-	askContinue
+	_gettext "Your version of speech-dispatcher is too old (required version >= $SPEECHD_MIN_VERSION)"
+	_gettext "If the installation continues, orca will not be able to use voxin, but emacspeak will"
+	_gettext "Do you really want to continue?"
+	_gettext "If yes, press the ENTER key."
+	yes
 	if [ $? = 1 ]; then
 		_gettext "Good Bye. "
 		exit 0
