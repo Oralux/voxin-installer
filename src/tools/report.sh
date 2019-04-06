@@ -11,8 +11,8 @@ RESULT=/tmp/voxin.report
 	cat /etc/lsb-release
 	DPKG=$(which dpkg)
 	if [ -n "$DPKG" ]; then
-		"DPKG" -l speech-dispatcher
-		"DPKG" -l "*voxin*"
+		"$DPKG" -l speech-dispatcher
+		"$DPKG" -l "*voxin*"
 	else
 		DNF=$(which dnf || which yum)
 		$DNF list installed speech-dispatcher
