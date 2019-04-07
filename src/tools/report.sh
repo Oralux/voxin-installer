@@ -3,6 +3,11 @@
 
 RESULT=/tmp/voxin.report
 
+if [ "$UID" = 0 ]; then
+	echo "Run this script as normal user (not superuser)"
+	exit 1
+fi
+
 {
     set -x
     uname -a
@@ -18,8 +23,19 @@ RESULT=/tmp/voxin.report
 		$DNF list installed speech-dispatcher
 		$DNF list installed "*voxin*"
 	fi
+
+	# check speech-dispatcher setup
+	spd-say -O
+	spd-say -L
+	
+    CONF=$(ls -t /home/*/.speech-dispatcher/conf/speechd.conf /home/*/.config/speech-dispatcher/speechd.conf /etc/speech-dispatcher/speechd.conf /usr/share/speech-dispatcher/conf/speechd.conf 2>/dev/null)
+	for FILE in $CONF; do
+		echo "--> $FILE"
+		cat $FILE
+	done
+	
     set +x
 } 1>$RESULT 2>&1 
 
-echo "Please email to contact@oralux.org the report file: $RESULT"
+echo "Email please to contact@oralux.org this report file: $RESULT"
 
