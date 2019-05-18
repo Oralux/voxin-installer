@@ -108,6 +108,7 @@ if [ -n "$DOWNLOAD" ]; then
 	[ -z "$STATUS" ] && leave "Error: can't download voxin-installer from $VMX86" 1
 fi
 
+checkForeignArch
 checkDep
 init
 [ -n "$BUILDROOT" ] && buildBuildroot
@@ -119,7 +120,7 @@ buildInstallerDir
 unset keepDownloadedSources
 ARCH=$(uname -m)
 getLibvoxin "$ARCH" "$keepDownloadedSources" || leave "Error: can't build libvoxin" 1
-getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION" "$SPEECHD_VOXIN_SHA512" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
+getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION_0_9" "$SPEECHD_VOXIN_SHA512_0_9" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
 getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION_0_8" "$SPEECHD_VOXIN_SHA512_0_8" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
 #getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION_0_7" "$SPEECHD_VOXIN_SHA512_0_7" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
 buildVoxinModule

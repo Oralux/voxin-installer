@@ -1,0 +1,13 @@
+diff --git a/configure.ac b/configure.ac
+index 22a41d5..e6f94c8 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -38,7 +38,7 @@ LT_PREREQ([2.2])
+ LT_INIT([dlopen])
+ AC_CONFIG_SRCDIR([src/server/speechd.c])
+ AC_CONFIG_HEADERS([config.h])
+-AM_GNU_GETTEXT_VERSION([0.19.8])
++AM_GNU_GETTEXT_VERSION([0.19.3])
+ AM_GNU_GETTEXT([external])
+ 
+ # Split version number

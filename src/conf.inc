@@ -1,6 +1,6 @@
 # The BASE variable should be set before including this file
 #
-VOXIN_VER=2.0
+VOXIN_VER=2.1
 
 #-- voxin-rfs32
 # Buildroot
@@ -37,8 +37,8 @@ SPEECHD_IBMTTS_COPYRIGHT_NB_LINES=23
 #SPEECHD_VOXIN_SHA512=
 #SPEECHD_VOXIN_BRANCH=ibmtts_dynamic_loading
 # - from the 0.9voxin1 tag instead (+sha512)
-SPEECHD_VOXIN_VERSION=0.9.0-voxin1
-SPEECHD_VOXIN_SHA512=3cd93d1664cb7e464cc2ecb86b1bc9105263d8f6d2bbb6f417450d4e826986f3da233f5ed6d371ce85a42591be452f34db54e0d5927a64177b5a664df8343d2f
+SPEECHD_VOXIN_VERSION_0_9=0.9.0-voxin1
+SPEECHD_VOXIN_SHA512_0_9=3cd93d1664cb7e464cc2ecb86b1bc9105263d8f6d2bbb6f417450d4e826986f3da233f5ed6d371ce85a42591be452f34db54e0d5927a64177b5a664df8343d2f
 SPEECHD_VOXIN_BRANCH=ibmtts_dynamic_loading
 ###
 
@@ -57,16 +57,18 @@ SPEECHD_VOXIN_SHA512_0_7=
 VMX86=user1@192.168.122.94
 
 # Dependencies
-DEP_PACKAGES="alien bsdtar build-essential fakeroot rpm rsync"
+# libstdc++-4.9-dev:i386 (hard coded in function below)
+DEP_PACKAGES="alien bsdtar build-essential fakeroot rpm rsync build-essential binutils-multiarch libc6-dev-i386 gcc-multilib g++-multilib"
 # Debian9: speech-dispatcher dependencies
 # obtained with apt-get build-dep speech-dispatcher
 DEP_PACKAGES_SPEECHD="espeak-data flite1-dev intltool libao-dev libasound2-dev libaudio-dev \
-  libdotconf-dev libespeak-dev libespeak-ng-dev libespeak1 libflac-dev \
-  libglib2.0-dev libogg-dev libpcre16-3 libpcre3-dev libpcre32-3 libpcrecpp0v5 \
+  libdotconf-dev libespeak-dev libespeak1 libflac-dev \
+  libglib2.0-dev libogg-dev \
   libportaudio2 libpulse-dev libsndfile1-dev libtext-unidecode-perl \
   libvorbis-dev libxau-dev libxml-libxml-perl libxml-namespacesupport-perl \
   libxml-sax-base-perl libxml-sax-perl pkg-config tex-common texinfo \
   x11proto-core-dev xorg-sgml-doctools zlib1g-dev \
+  dh-autoreconf libltdl-dev libtool \
 "
 #####
 
@@ -99,6 +101,13 @@ isPackageInstalled() {
 	grep -A1 "Package: $deb$" /var/lib/dpkg/status | grep "Status: install ok installed" &> /dev/null
 }
 
+
+checkForeignArch() {
+	[ "$(uname -m)" != x86_64 ] && return
+	( dpkg --print-foreign-architectures | grep i386 ) \
+		|| leave "i386 foreign arch needed; please type as root: dpkg --add-architecture i386 && apt-get update" 1
+}
+
 checkDep() {
 	local missing
 	local i
@@ -109,6 +118,11 @@ checkDep() {
 	    isPackageInstalled $i || missing="$missing $i"
 	done
 
+
+	i=libstdc++-4.9-dev:i386
+	dpkg -L $i 2>/dev/null || missing="$missing $i"
+
+	
 	[ -n "$missing" ] && leave "install these required dependencies:\n$missing" 1
 }
 
@@ -352,6 +366,12 @@ getSpeechDispatcherVoxin() {
 	else
 		cd speechd-$version || leave "Can't cd to speechd-$version" 1
 	fi
+
+	# Patches needed to Build sd 0.9 on Debian 8
+	if [ "$SPEECHD_VOXIN_VERSION_0_9" = "$version" ]; then
+	    patch -p1 < $SRCDIR/patch/sd-0.9-gettext-version.patch
+	    patch -p1 < $SRCDIR/patch/sd-0.9-force-modif-acceptance.patch
+	fi
 	./build.sh
 	PLUGIN_DIR="/usr/lib/speech-dispatcher"
 	case "$arch" in
@@ -380,15 +400,15 @@ buildVoxinModule() {
 	local modulesDir="$VOXINDIR"/lib/speech-dispatcher-modules
 	cd "$SRCDIR"/speechd-voxin
 	make clean
-	SD7=$SPEECHD_VOXIN_VERSION_0_7 SD8=$SPEECHD_VOXIN_VERSION_0_8 SD9=$SPEECHD_VOXIN_VERSION make
+	SD7=$SPEECHD_VOXIN_VERSION_0_7 SD8=$SPEECHD_VOXIN_VERSION_0_8 SD9=$SPEECHD_VOXIN_VERSION_0_9 make
 	DESTDIR="$modulesDir" make install
 
 	# create symlinks
 	cd "$BUILDPKG/rfs"
 	mkdir -p usr/{lib/speech-dispatcher-modules,share/speech-dispatcher/conf/modules} etc/speech-dispatcher/modules
 	ln -s /opt/oralux/voxin/lib/speech-dispatcher-modules/sd_voxin usr/lib/speech-dispatcher-modules/sd_voxin
-	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$SPEECHD_VOXIN_VERSION usr/share/speech-dispatcher/conf/modules/voxin.conf
-	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$SPEECHD_VOXIN_VERSION etc/speech-dispatcher/modules/voxin.conf
+	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$SPEECHD_VOXIN_VERSION_0_9 usr/share/speech-dispatcher/conf/modules/voxin.conf
+	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$SPEECHD_VOXIN_VERSION_0_9 etc/speech-dispatcher/modules/voxin.conf
 
 	cd "$pwd"
 }
