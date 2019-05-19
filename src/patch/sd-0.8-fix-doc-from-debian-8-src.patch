@@ -1,0 +1,157 @@
+diff -urN a/doc/Makefile.am b/doc/Makefile.am
+--- a/doc/Makefile.am	2019-05-19 15:55:45.000000000 -0500
++++ b/doc/Makefile.am	2019-05-19 15:44:53.000000000 -0500
+@@ -1,7 +1,7 @@
+ 
+-info_TEXINFOS = ssip.texi speech-dispatcher.texi spd-say.texi
++info_TEXINFOS = ssip.texi speech-dispatcher.texi spd-say.texi speech-dispatcher-cs.texi
+ EXTRA_DIST = figures
+ 
+-speech_dispatcher_TEXINFOS = gpl.texi fdl.texi
+-speech_dispatcher_cs_TEXINFOS = gpl.texi fdl.texi
++speech_dispatcher_TEXINFOS = gpl.texi fdl.texi speech-dispatcher.texi
++speech_dispatcher_cs_TEXINFOS = gpl.texi fdl.texi speech-dispatcher-cs.texi
+ ssip_TEXINFOS = gpl.texi fdl.texi
+diff -urN a/doc/fdl.texi b/doc/fdl.texi
+--- a/doc/fdl.texi	2019-05-19 15:55:45.000000000 -0500
++++ b/doc/fdl.texi	2019-05-19 15:44:53.000000000 -0500
+@@ -401,7 +401,7 @@
+ @end enumerate
+ 
+ @page
+-@appendixsubsec ADDENDUM: How to use this License for your documents
++@appendixsec ADDENDUM: How to use this License for your documents
+ 
+ To use this License in a document you have written, include a copy of
+ the License in the document and put the following copyright and
+diff -urN a/doc/spd-say.texi b/doc/spd-say.texi
+--- a/doc/spd-say.texi	2019-05-19 15:55:45.000000000 -0500
++++ b/doc/spd-say.texi	2019-05-19 15:44:53.000000000 -0500
+@@ -83,7 +83,7 @@
+ Set the language. The parameter is an iso language code, like @code{en} or @code{cs}.
+ Default see below.
+ @item -t or --voice-type
+-Set the prefered voice type (male1, male2, male3, female1, female2,
++Set the preferred voice type (male1, male2, male3, female1, female2,
+ female3, child_male, child_female).
+ @item -L or --list-synthesis-voices
+ List the ''synthesis voices'' supported by an output module.
+diff -urN a/doc/speech-dispatcher.texi b/doc/speech-dispatcher.texi
+--- a/doc/speech-dispatcher.texi	2019-05-19 15:55:45.000000000 -0500
++++ b/doc/speech-dispatcher.texi	2019-05-19 15:44:53.000000000 -0500
+@@ -454,12 +454,12 @@
+ 
+ No special provisions need to be done to run Speech Dispatcher under
+ the current user. The Speech Dispatcher process will use (or create) a
+-@file{~/.speech-dispatcher/} directory for its purposes (logging,
++@file{~/.cache/speech-dispatcher/} directory for its purposes (logging,
+ pidfile).
+ 
+ Optionally, a user can place his own configuration file in
+-@file{.speech-dispatcher/conf/speechd.conf} and it will be
+-automatically loaded by Speech Dispatcher. The prefered way to do so
++@file{~/.config/speech-dispatcher/speechd.conf} and it will be
++automatically loaded by Speech Dispatcher. The preferred way to do so
+ is via the @code{spd-conf} configuration command. If this user
+ configuration file is not found, Speech Dispatcher will simply use the
+ system wide configuration file (e.g. in
+@@ -488,7 +488,7 @@
+ Currently, two different methods are supported for communication
+ between the server and its clients.
+ 
+-For local communication, it's prefered to use @emph{Unix sockets},
++For local communication, it's preferred to use @emph{Unix sockets},
+ where the communication takes place over a Unix socket with its
+ driving file located by default in the user's runtime directory as
+ @code{XDG_RUNTIME_DIR/speech-dispatcher/speechd.sock}. In this way, there can be no
+@@ -540,7 +540,7 @@
+ 
+ @item
+ Check the appropriate logfile in
+-@file{~/.speech-dispatcher/logs/speech-dispatcher.log} for user Speech
++@file{~/.cache/speech-dispatcher/log/speech-dispatcher.log} for user Speech
+ Dispatcher or in @file{/var/log/speech-dispatcher/speech-dispatcher.log}. Look
+ for lines containing the string 'ERROR' and their surrounding
+ contents. If you hear no speech, restart Speech Dispatcher and look
+@@ -595,7 +595,7 @@
+ can configure the global settings through the server configuration
+ file, which can be placed either in the Speech Dispatcher default
+ configuration system path like /etc/speech-dispatcher/ or in your home
+-directory in ~/.speech-dispatcher/conf/ .  There is also support for
++directory in @file{~/.config/speech-dispatcher/}.  There is also support for
+ per-client configuration, this is, specifying different default values
+ for different client applications.
+ 
+@@ -663,7 +663,7 @@
+ options labeled as @code{AudioALSA...} or @code{AudioPulse...} provide
+ a more detailed configuration of the given audio output method.
+ 
+-It is possible to use a list of prefered audio output methods,
++It is possible to use a list of preferred audio output methods,
+ in which case each output module attempts to use the first availble
+ in the given order.
+ 
+@@ -1010,7 +1010,7 @@
+ 
+ The available command options are self-documented through
+ @code{spd-say -h}. In any working mode, the tool asks the user about
+-future actions and prefered configuration of the basic options.
++future actions and preferred configuration of the basic options.
+ 
+ Most useful ways of execution are:
+ @itemize @bullet
+@@ -1158,7 +1158,7 @@
+ and Inet sockets, which are refered as 'unix-socket' and 'inet-socket'
+ respectively. The communication mechanism is decided on startup and
+ cannot be changed at runtime. Unix sockets are now the default and
+-prefered variant for local communication, Inet sockets are necessary
++preferred variant for local communication, Inet sockets are necessary
+ for communication over network.
+ 
+ The mechanism for the decision of which method to use is as follows in
+@@ -1265,17 +1265,19 @@
+ 
+ @item Parse command line options
+ 
+-Read prefered communication method, destinations for logfile and pidfile
++Read preferred communication method, destinations for logfile and pidfile
+ 
+-@item Establish the ~/.speech-dispatcher/ directory
++@item Establish the @file{~/.config/speech-dispatcher/} and
++@file{~/.cache/speech-dispatcher/} directories
+ 
+ If pid and conf paths were not given as command line options, the
+-server will place them in ~/.speech-dispatcher/ by default. If they
++server will place them in @file{~/.config/speech-dispatcher/} and
++@file{~/.cache/speech-dispatcher/} by default. If they
+ are not specified AND the current user doesn't have a system home directory,
+ the server will fail startup.
+ 
+-The configuration file is pointed to ~/.speech-dispatcher/conf/speechd.conf
+-if it exists, otherwise to /etc/speech-dispatcher/speechd.conf or a similar
++The configuration file is pointed to @file{~/.config/speech-dispatcher/speechd.conf}
++if it exists, otherwise to @file{/etc/speech-dispatcher/speechd.conf} or a similar
+ system location according to compile options. One of these files must
+ exists, otherwise Speech Dispatcher will not know where to find its output
+ modules.
+@@ -1459,7 +1461,7 @@
+ functionality as described below.
+ 
+ @code{method} is either @code{SPD_METHOD_UNIX_SOCKET} or @code{SPD_METHOD_INET_SOCKET}. By default,
+-unix socket communication should be prefered, but inet sockets are necessary for cross-network
++unix socket communication should be preferred, but inet sockets are necessary for cross-network
+ communication.
+ 
+ @code{autospawn} is a boolean flag specifying whether the function
+diff -urN a/doc/ssip.texi b/doc/ssip.texi
+--- a/doc/ssip.texi	2019-05-19 15:55:45.000000000 -0500
++++ b/doc/ssip.texi	2019-05-19 15:44:53.000000000 -0500
+@@ -883,7 +883,7 @@
+ 
+ @example
+ SET all DEBUG ON
+-262-/home/hanke/.speech-dispatcher/log/debug
++262-/home/hanke/.cache/speech-dispatcher/log/debug
+ 262 OK DEBUGGING SET
+ @end example
+ 

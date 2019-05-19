@@ -1,6 +1,6 @@
 # The BASE variable should be set before including this file
 #
-VOXIN_VER=2.1
+VOXIN_VER=2.1beta1
 
 #-- voxin-rfs32
 # Buildroot
@@ -37,18 +37,22 @@ SPEECHD_IBMTTS_COPYRIGHT_NB_LINES=23
 #SPEECHD_VOXIN_SHA512=
 #SPEECHD_VOXIN_BRANCH=ibmtts_dynamic_loading
 # - from the 0.9voxin1 tag instead (+sha512)
-SPEECHD_VOXIN_VERSION_0_9=0.9.0-voxin1
-SPEECHD_VOXIN_SHA512_0_9=3cd93d1664cb7e464cc2ecb86b1bc9105263d8f6d2bbb6f417450d4e826986f3da233f5ed6d371ce85a42591be452f34db54e0d5927a64177b5a664df8343d2f
+SPEECHD_VOXIN_VERSION_0_9_0=0.9.0-voxin1
+SPEECHD_VOXIN_SHA512_0_9_0=3cd93d1664cb7e464cc2ecb86b1bc9105263d8f6d2bbb6f417450d4e826986f3da233f5ed6d371ce85a42591be452f34db54e0d5927a64177b5a664df8343d2f
 SPEECHD_VOXIN_BRANCH=ibmtts_dynamic_loading
 ###
 
+# speechd: version 0.8
+SPEECHD_VOXIN_VERSION_0_8=0.8-voxin1
+SPEECHD_VOXIN_SHA512_0_8=78f5d2c3610a5820109825a17302bd176f78099c02a35fa8ef165445316d0708b8f2894a31056fd0f620a54e5ca01148bec377985f01b92a5a3c04a29e355351
+
 # speechd: version 0.8.8
-SPEECHD_VOXIN_VERSION_0_8=0.8.8-voxin1
-SPEECHD_VOXIN_SHA512_0_8=463aa4a857b2abd3117bc0b858b812179b24c86b4ac71ab1f8e1e18c86d7bf4c28d4441905bdca863dba204611f93cedf8466710199947cf05d213464bbdfb6b
+SPEECHD_VOXIN_VERSION_0_8_8=0.8.8-voxin1
+SPEECHD_VOXIN_SHA512_0_8_8=463aa4a857b2abd3117bc0b858b812179b24c86b4ac71ab1f8e1e18c86d7bf4c28d4441905bdca863dba204611f93cedf8466710199947cf05d213464bbdfb6b
 
 # speechd: version 0.7.1
-SPEECHD_VOXIN_VERSION_0_7=0.7.1-voxin1
-SPEECHD_VOXIN_SHA512_0_7=
+SPEECHD_VOXIN_VERSION_0_7_1=0.7.1-voxin1
+SPEECHD_VOXIN_SHA512_0_7_1=
 
 
 # VMX86: VM where voxin-installer is built for x86 architecture
@@ -368,9 +372,11 @@ getSpeechDispatcherVoxin() {
 	fi
 
 	# Patches needed to Build sd 0.9 on Debian 8
-	if [ "$SPEECHD_VOXIN_VERSION_0_9" = "$version" ]; then
+	if [ "$SPEECHD_VOXIN_VERSION_0_9_0" = "$version" ]; then
 	    patch -p1 < $SRCDIR/patch/sd-0.9-gettext-version.patch
 	    patch -p1 < $SRCDIR/patch/sd-0.9-force-modif-acceptance.patch
+	elif [ "$SPEECHD_VOXIN_VERSION_0_8" = "$version" ]; then
+	    patch -p1 < $SRCDIR/patch/sd-0.8-fix-doc-from-debian-8-src.patch	    
 	fi
 	./build.sh
 	PLUGIN_DIR="/usr/lib/speech-dispatcher"
@@ -378,9 +384,15 @@ getSpeechDispatcherVoxin() {
 		x86_64) PLUGIN_DIR="$PLUGIN_DIR:/usr/lib/x86_64-linux-gnu/speech-dispatcher:/usr/lib64/speech-dispatcher";;
 		*86) PLUGIN_DIR="$PLUGIN_DIR:/usr/lib/i386-linux-gnu/speech-dispatcher";;
 	esac
-	# pthread instead of gthread which is not always installed by default (seen in openSUSE Tumbleweed-i586 20190220)
-	GTHREAD_LIBS=-lpthread CFLAGS="-I$libvoxinDir/../include/voxin" LDFLAGS="-L$libvoxinDir" ./configure --prefix="/usr" --with-ibmtts 
-	PLUGIN_DIR=$PLUGIN_DIR make || return 1
+	if [ "$SPEECHD_VOXIN_VERSION_0_8" = "$version" ]; then
+	    unset GTHREAD_LIBS
+	else
+	    # pthread instead of gthread which is not always installed by default (seen in openSUSE Tumbleweed-i586 20190220)
+	    GTHREAD_LIBS=-lpthread
+	fi	    
+	GTHREAD_LIBS=$GTHREAD_LIB CFLAGS="-I$libvoxinDir/../include/voxin" LDFLAGS="-L$libvoxinDir" ./configure --prefix="/usr" --with-ibmtts 
+
+PLUGIN_DIR=$PLUGIN_DIR make || return 1
 	
 	# install
 	local modulesDir="$VOXINDIR"/lib/speech-dispatcher-modules
@@ -400,15 +412,15 @@ buildVoxinModule() {
 	local modulesDir="$VOXINDIR"/lib/speech-dispatcher-modules
 	cd "$SRCDIR"/speechd-voxin
 	make clean
-	SD7=$SPEECHD_VOXIN_VERSION_0_7 SD8=$SPEECHD_VOXIN_VERSION_0_8 SD9=$SPEECHD_VOXIN_VERSION_0_9 make
+	SD7_1=$SPEECHD_VOXIN_VERSION_0_7_1 SD8=$SPEECHD_VOXIN_VERSION_0_8 SD8_8=$SPEECHD_VOXIN_VERSION_0_8_8 SD9_0=$SPEECHD_VOXIN_VERSION_0_9_0 make
 	DESTDIR="$modulesDir" make install
 
 	# create symlinks
 	cd "$BUILDPKG/rfs"
 	mkdir -p usr/{lib/speech-dispatcher-modules,share/speech-dispatcher/conf/modules} etc/speech-dispatcher/modules
 	ln -s /opt/oralux/voxin/lib/speech-dispatcher-modules/sd_voxin usr/lib/speech-dispatcher-modules/sd_voxin
-	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$SPEECHD_VOXIN_VERSION_0_9 usr/share/speech-dispatcher/conf/modules/voxin.conf
-	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$SPEECHD_VOXIN_VERSION_0_9 etc/speech-dispatcher/modules/voxin.conf
+	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$SPEECHD_VOXIN_VERSION_0_9_0 usr/share/speech-dispatcher/conf/modules/voxin.conf
+	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$SPEECHD_VOXIN_VERSION_0_9_0 etc/speech-dispatcher/modules/voxin.conf
 
 	cd "$pwd"
 }

@@ -1,7 +1,9 @@
 LOG="$BASE/log/voxin.log"
 TEMPLATE=voxin-installer.XXXXXXXXXX
 TMPDIR=/tmp
-SPEECHD_MIN_VERSION=0.8.5
+# Only version > 0.8 are compatible
+# set to 0.7.2 since last 0.7 tag was 0.7.1
+SPEECHD_MIN_VERSION=0.7.2
 VOXIN_VERSION=%VERSION%
 
 rm -f "$LOG"
