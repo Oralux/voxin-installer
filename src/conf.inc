@@ -21,9 +21,9 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 # select the libvoxin sources (development or tag)
 # - development (master branch)
 #LIBVOXIN_VERSION=
-# - from the 1.3.4 tag instead (+sha512)
-LIBVOXIN_VERSION=1.3.4
-LIBVOXIN_SHA512=2eba214c50f69f7825f8984ed9ebb54fb0e298824d1b5203aba0567b8a5136306b98e9a572defb38ec4ebe0979ea5a224cf067c6c03c565f5e589ede4f721ad4
+# - from the 1.3.5 tag instead (+sha512)
+LIBVOXIN_VERSION=1.3.5
+LIBVOXIN_SHA512=8457fcd42ea1c32d69057e5b57a287cf0bea98b5495017c70b24580e4af97edfc1ae04b132ff4229d7b34966e8c62a978b1c4ed9146c0876179a5194829d045e
 
 #-- speech-dispatcher-voxin
 SPEECHD_VOXIN_URL=https://github.com/Oralux/speechd/archive
@@ -128,7 +128,7 @@ checkDep() {
 
 init() {
 	local i
-	for i in "$TMPDIR" "$BUILDPKG" "$PKGDIR"/voxin* "$RFS32"; do
+	for i in "$TMPDIR" "$BUILDPKG" "$PKGDIR"/voxin* "$PKGDIR"/rfs* "$RFS32"; do
 		rm -rf "$i"
 	done
 	mkdir -p "$PKGDIR" "$DWLDIR" "$BUILDPKG"/{rfs,build}
@@ -491,7 +491,9 @@ buildReleaseTarball() {
 	tarball=$installDir/rfs_$VOXIN_VER.all.txz
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"
 	fakeroot bash -c "tar -C \"$RFSDIR\" --exclude ./opt/oralux/voxin/bin --exclude ./opt/oralux/voxin/lib -Jcf $tarball ."	
-	
+	# make more visible the minimal rfs tarball, used by the external libvoxin project
+	cp $tarball $PKGDIR
+
 	installDir=$INSTALLDIR/packages/all
 	tarball=$installDir/rfs_$VOXIN_VER.$arch.txz
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"
