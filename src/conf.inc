@@ -58,13 +58,16 @@ SPEECHD_VOXIN_SHA512_0_7_1=
 # VMX86: VM where voxin-installer is built for x86 architecture
 # The VM is currently used to build on a 64 bits machine the speech-dispatcher module for x86
 # 
-VMX86=user1@192.168.122.94
+VMX86=user1@192.168.122.174
 
 # Dependencies
 # libstdc++-4.9-dev:i386 (hard coded in function below)
 DEP_PACKAGES="alien bsdtar build-essential fakeroot rpm rsync build-essential binutils-multiarch libc6-dev-i386 gcc-multilib g++-multilib"
 # Debian9: speech-dispatcher dependencies
 # obtained with apt-get build-dep speech-dispatcher
+
+DEP_PACKAGES_X86="alien bsdtar rpm build-essential flite1-dev intltool libao-dev libasound2-dev libaudio-dev libdotconf-dev libespeak-dev libflac-dev libglib2.0-dev libogg-dev libpulse-dev libsndfile1-dev libvorbis-dev libxau-dev pkg-config tex-common x11proto-core-dev xorg-sgml-doctools zlib1g-dev dh-autoreconf libltdl-dev libtool"
+
 DEP_PACKAGES_SPEECHD="espeak-data flite1-dev intltool libao-dev libasound2-dev libaudio-dev \
   libdotconf-dev libespeak-dev libespeak1 libflac-dev \
   libglib2.0-dev libogg-dev \
@@ -117,8 +120,12 @@ checkDep() {
 	local i
 
 	[ ! -e /var/lib/dpkg/status ] && leave "this script expects a Debian based distro (to check dependencies)" 1
-	
-	for i in $DEP_PACKAGES $DEP_PACKAGES_SPEECHD; do
+
+	local dep="$DEP_PACKAGES"
+	if [ "$(uname -m)" = i686 ]; then
+	    dep="$DEP_PACKAGES_X86"
+	fi	
+	for i in $dep $DEP_PACKAGES_SPEECHD; do
 	    isPackageInstalled $i || missing="$missing $i"
 	done
 

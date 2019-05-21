@@ -95,8 +95,10 @@ if [ -z "$GETTEXT" ]; then
     GETTEXT=0
 fi
 
+installDir=/
+
 if [ "$with_uninstall" = "1" ]; then
-    askUninstall && uninstall
+    askUninstall && uninstall "$installDir"
     exit 0
 fi
 
@@ -108,7 +110,7 @@ for i in speech-dispatcher-ibmtts speech-dispatcher-voxin voxind libvoxin libvox
 	isPackageInstalled $i && uninstallPackage $i
 done
 
-installDir=/
+uninstallOldVoxin "$installDir"
 installSystem "$installDir" || exit 1
 
 installed=0
@@ -138,10 +140,9 @@ askInstallLang && {
 
 if [ "$installed" = "0" ]; then
     askUninstall && {
-		uninstall
+		uninstall "$installDir"
 		exit 0
     }
-
 fi
 
 _gettext "The changes will be taken into account on next boot. "
