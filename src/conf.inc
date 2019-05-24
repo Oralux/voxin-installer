@@ -1,6 +1,6 @@
 # The BASE variable should be set before including this file
 #
-VOXIN_VER=2.1beta1
+VOXIN_VER=2.1
 
 #-- voxin-rfs32
 # Buildroot
@@ -52,7 +52,7 @@ SPEECHD_VOXIN_SHA512_0_8_8=463aa4a857b2abd3117bc0b858b812179b24c86b4ac71ab1f8e1e
 
 # speechd: version 0.7.1
 SPEECHD_VOXIN_VERSION_0_7_1=0.7.1-voxin1
-SPEECHD_VOXIN_SHA512_0_7_1=
+SPEECHD_VOXIN_SHA512_0_7_1=839199d3a4cfe27acc929628ccebf53f9eecd45c2a5646c13bab022da73c71caf6dc1751372c7bbd80f60215234ecf8e2784cbb7d13074960827e14ec1965031
 
 
 # VMX86: VM where voxin-installer is built for x86 architecture
@@ -379,12 +379,18 @@ getSpeechDispatcherVoxin() {
 	fi
 
 	# Patches needed to Build sd 0.9 on Debian 8
-	if [ "$SPEECHD_VOXIN_VERSION_0_9_0" = "$version" ]; then
-	    patch -p1 < $SRCDIR/patch/sd-0.9-gettext-version.patch
-	    patch -p1 < $SRCDIR/patch/sd-0.9-force-modif-acceptance.patch
-	elif [ "$SPEECHD_VOXIN_VERSION_0_8" = "$version" ]; then
-	    patch -p1 < $SRCDIR/patch/sd-0.8-fix-doc-from-debian-8-src.patch	    
-	fi
+	case "$version" in
+	    "$SPEECHD_VOXIN_VERSION_0_9_0")
+		patch -p1 < $SRCDIR/patch/sd-0.9-gettext-version.patch
+		patch -p1 < $SRCDIR/patch/sd-0.9-force-modif-acceptance.patch
+		;;
+	    "$SPEECHD_VOXIN_VERSION_0_8")	
+		patch -p1 < $SRCDIR/patch/sd-0.8-fix-doc-from-debian-8-src.patch	    
+		;;
+	    "$SPEECHD_VOXIN_VERSION_0_7_1")	
+		patch -p1 < $SRCDIR/patch/sd-0.7.1-fix-doc-from-debian-8-src.patch	    
+		;;
+	esac
 	./build.sh
 	PLUGIN_DIR="/usr/lib/speech-dispatcher"
 	case "$arch" in

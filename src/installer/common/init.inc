@@ -1,9 +1,8 @@
 LOG="$BASE/log/voxin.log"
 TEMPLATE=voxin-installer.XXXXXXXXXX
 TMPDIR=/tmp
-# Only version > 0.8 are compatible
-# set to 0.7.2 since last 0.7 tag was 0.7.1
-SPEECHD_MIN_VERSION=0.7.2
+# Only version > 0.7 are compatible
+SPEECHD_MIN_VERSION=0.7
 VOXIN_VERSION=%VERSION%
 
 rm -f "$LOG"
@@ -68,7 +67,7 @@ check_distro() {
 		fedora*) source common/install-rpm-dnf.inc;;
 		gentoo*) source common/install-gentoo.inc;;
 		opensuse*|suse*) source common/install-rpm-zypper.inc;;
-		# rhel*) source common/install-rpm-yum.inc;; # require support of speech-dispatcher 0.7.x
+		rhel*) source common/install-rpm-yum.inc;;
 		slackware*|slint*) source common/install-slackware.inc;;
 		*) status=1;;
 	esac
@@ -235,8 +234,10 @@ uninstallOldVoxin()
 	local rfsdir="$1"
 	uninstallPackage voxin
 	DIR="$rfsdir/opt/oralux/voxin"
-	[ -e "$DIR.old" ] && rm -rf "$DIR.old"
-	mv "$DIR" "$DIR.old"
+	if [ -e "$DIR" ]; then
+		[ -e "$DIR.old" ] && rm -rf "$DIR.old"
+		mv "$DIR" "$DIR.old"
+	fi
 }
 
 uninstallSystem()
