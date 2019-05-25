@@ -54,9 +54,15 @@ SPEECHD_VOXIN_SHA512_0_8_8=463aa4a857b2abd3117bc0b858b812179b24c86b4ac71ab1f8e1e
 SPEECHD_VOXIN_VERSION_0_7_1=0.7.1-voxin1
 SPEECHD_VOXIN_SHA512_0_7_1=839199d3a4cfe27acc929628ccebf53f9eecd45c2a5646c13bab022da73c71caf6dc1751372c7bbd80f60215234ecf8e2784cbb7d13074960827e14ec1965031
 
+# VMX86_64: VM where voxin-installer is built for x86_64 architecture
+# This VM is currently used to build libvoxin on a Debian 8 environment
+# (mostly due to puncfilter and its libstdc++ dependency)
+# 
+VMX86_64=user1@192.168.122.218
 
 # VMX86: VM where voxin-installer is built for x86 architecture
-# The VM is currently used to build on a 64 bits machine the speech-dispatcher module for x86
+# This VM is currently used to build on a 64 bits machine the
+# speech-dispatcher module for x86
 # 
 VMX86=user1@192.168.122.174
 

@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 BASE=$(dirname $(realpath "$0"))
 NAME=$(basename "$0")
