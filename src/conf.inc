@@ -68,7 +68,7 @@ VMX86=user1@192.168.122.174
 
 # Dependencies
 # libstdc++-4.9-dev:i386 (hard coded in function below)
-DEP_PACKAGES="alien bsdtar build-essential fakeroot rpm rsync build-essential binutils-multiarch libc6-dev-i386 gcc-multilib g++-multilib"
+DEP_PACKAGES="alien bsdtar build-essential fakeroot rpm rsync build-essential binutils-multiarch libc6-dev-i386 gcc-multilib g++-multilib patchelf"
 # Debian9: speech-dispatcher dependencies
 # obtained with apt-get build-dep speech-dispatcher
 
@@ -411,14 +411,20 @@ getSpeechDispatcherVoxin() {
 	fi	    
 	GTHREAD_LIBS=$GTHREAD_LIB CFLAGS="-I$libvoxinDir/../include/voxin" LDFLAGS="-L$libvoxinDir" ./configure --prefix="/usr" --with-ibmtts 
 
-PLUGIN_DIR=$PLUGIN_DIR make || return 1
+	PLUGIN_DIR=$PLUGIN_DIR make || return 1
 	
 	# install
 	local modulesDir="$VOXINDIR"/lib/speech-dispatcher-modules
 	local confDir="$VOXINDIR"/share/speech-dispatcher/conf
 	local docDir="$VOXINDIR"/share/doc/speech-dispatcher-voxin
 	mkdir -p "$modulesDir" "$confDir" "$docDir"
-	cp src/modules/sd_ibmtts "$modulesDir"/sd_ibmtts.$version || return 1
+	local module=src/modules/sd_ibmtts
+	[ -e src/modules/.libs/sd_ibmtts ] && module=src/modules/.libs/sd_ibmtts
+	if [ "$SPEECHD_VOXIN_VERSION_0_7_1" = "$version" ]; then
+	    # CentOS7: rpath to libsdaudio
+	    patchelf --set-rpath /usr/lib64/speech-dispatcher "$module"
+	fi	    
+	cp "$module" "$modulesDir"/sd_ibmtts.$version || return 1
 	cp ./config/modules/ibmtts.conf "$confDir"/ibmtts.conf.$version || return 1
 	head -n $SPEECHD_IBMTTS_COPYRIGHT_NB_LINES src/modules/ibmtts.c > "$docDir"/copyright.$version
 	

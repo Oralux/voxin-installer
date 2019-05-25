@@ -15,12 +15,6 @@ ssh $VMX86_64 "mv home/*/VOXIN ."
 
 ssh $VMX86_64 'cd voxin-installer && ./build.sh -t src/list.vv'
 
-echo "Rsync from VM?"
-read a
-rsync  --dry-run -av --exclude .git --exclude build $VMX86_64:voxin-installer/ voxin-installer
-rsync  --dry-run -av --exclude .git --exclude build $VMX86_64:voxin-installer/build/packages voxin-installer/build/packages
+cd $BASE
+./get.sh
 
-echo "Really rsync from VM?"
-read a
-rsync -av --exclude .git --exclude build $VMX86_64:voxin-installer/ voxin-installer
-rsync -av --exclude .git --exclude build $VMX86_64:voxin-installer/build/packages/ voxin-installer/build/packages
