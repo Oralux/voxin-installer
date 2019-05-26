@@ -5,13 +5,26 @@ BASE=$(dirname $(realpath "$0"))
 . $BASE/src/conf.inc
 cd $BASE/..
 
-echo "Rsync from VM? (dry-run)"
-read a
-rsync  --dry-run -av --exclude .git --exclude build $VMX86_64:voxin-installer/ voxin-installer
-rsync  --dry-run -av --exclude .git --exclude build $VMX86_64:voxin-installer/build/packages voxin-installer/build/packages
+rsync_from_vm64() {
+	rsync  $1 -av --exclude .git --exclude build $VMX86_64:voxin-installer/ voxin-installer
+	rsync  $1 -av --exclude .git --exclude build $VMX86_64:voxin-installer/build/packages voxin-installer/build/packages
+}
 
-echo "Really rsync from VM?"
+
+echo "Rsync (dry-run) from VM64 ($VMX86_64)? (y|N)"
 read a
-rsync -av --exclude .git --exclude build $VMX86_64:voxin-installer/ voxin-installer
-rsync -av --exclude .git --exclude build $VMX86_64:voxin-installer/build/packages/ voxin-installer/build/packages
+case "$a" in
+	y|Y) ;;
+	*) exit 0;;
+esac
+
+rsync_from_vm64 --dry-run
+
+echo "Really rsync from VM64? (y|N)"
+read a
+case "$a" in
+	y|Y) ;;
+	*) exit 0;;
+esac
+rsync_from_vm64
 
