@@ -1,3 +1,10 @@
+2019-05-25 Gilles Casse <gcasse@oralux.org>
+	release 2.1: add compatibility with older distributions (Debian 8, CentOS7)
+	- rebuild on Debian 8 instead of Debian 9 originally due to unresolved symbol in libstdc++
+	- rebuild the minimal rfs32 from Buildroot on older kernel headers (3.10)
+	- patch speech-dispatcher 0.9 to compile the ibmtts module on Debian 8
+	- include additional ibmtts modules for speech-dispatcher 0.8 (only 0.8.8 before) and 0.7.1
+
 2019-03-18 Gilles Casse <gcasse@oralux.org>
 	release 2.0: same features as 2.0beta1 plus:
 
@@ -21,7 +28,7 @@
 	- i686: Debian 9, openSUSE Tumbleweed-i586
 
 	To download this beta-release, append to your download url these 8 characters:
-	&v=beta1 
+	&v=beta1
 
 2018-07-22 Gilles Casse <gcasse@oralux.org>
 	release 1.15:

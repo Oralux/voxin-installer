@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 BASE=$(dirname $(realpath "$0"))
 NAME=$(basename "$0")
@@ -108,6 +108,7 @@ if [ -n "$DOWNLOAD" ]; then
 	[ -z "$STATUS" ] && leave "Error: can't download voxin-installer from $VMX86" 1
 fi
 
+checkForeignArch
 checkDep
 init
 [ -n "$BUILDROOT" ] && buildBuildroot
@@ -119,9 +120,10 @@ buildInstallerDir
 unset keepDownloadedSources
 ARCH=$(uname -m)
 getLibvoxin "$ARCH" "$keepDownloadedSources" || leave "Error: can't build libvoxin" 1
-getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION" "$SPEECHD_VOXIN_SHA512" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
+getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION_0_9_0" "$SPEECHD_VOXIN_SHA512_0_9_0" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
 getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION_0_8" "$SPEECHD_VOXIN_SHA512_0_8" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
-#getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION_0_7" "$SPEECHD_VOXIN_SHA512_0_7" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
+getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION_0_8_8" "$SPEECHD_VOXIN_SHA512_0_8_8" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
+getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION_0_7_1" "$SPEECHD_VOXIN_SHA512_0_7_1" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
 buildVoxinModule
 getVoxinDoc
 buildPackage "$ARCH" || leave "Error: can't build packages" 1

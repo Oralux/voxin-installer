@@ -3,7 +3,7 @@
 
 RESULT=/tmp/voxin.report
 
-if [ "$UID" = 0 ]; then
+if [ "$1" != "-f" ] && " [ "$UID" = 0 ]; then
 	echo "Run this script as normal user (not superuser)"
 	exit 1
 fi
@@ -33,6 +33,10 @@ fi
 		echo "--> $FILE"
 		cat $FILE
 	done
+
+
+    echo "### ps"
+    ps -ef
 	
     set +x
 } 1>$RESULT 2>&1 

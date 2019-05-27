@@ -1,6 +1,6 @@
 # The BASE variable should be set before including this file
 #
-VOXIN_VER=2.0
+VOXIN_VER=2.1
 
 #-- voxin-rfs32
 # Buildroot
@@ -21,9 +21,9 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 # select the libvoxin sources (development or tag)
 # - development (master branch)
 #LIBVOXIN_VERSION=
-# - from the 1.3.4 tag instead (+sha512)
-LIBVOXIN_VERSION=1.3.4
-LIBVOXIN_SHA512=2eba214c50f69f7825f8984ed9ebb54fb0e298824d1b5203aba0567b8a5136306b98e9a572defb38ec4ebe0979ea5a224cf067c6c03c565f5e589ede4f721ad4
+# - from the 1.3.5 tag instead (+sha512)
+LIBVOXIN_VERSION=1.3.5
+LIBVOXIN_SHA512=8457fcd42ea1c32d69057e5b57a287cf0bea98b5495017c70b24580e4af97edfc1ae04b132ff4229d7b34966e8c62a978b1c4ed9146c0876179a5194829d045e
 
 #-- speech-dispatcher-voxin
 SPEECHD_VOXIN_URL=https://github.com/Oralux/speechd/archive
@@ -37,36 +37,51 @@ SPEECHD_IBMTTS_COPYRIGHT_NB_LINES=23
 #SPEECHD_VOXIN_SHA512=
 #SPEECHD_VOXIN_BRANCH=ibmtts_dynamic_loading
 # - from the 0.9voxin1 tag instead (+sha512)
-SPEECHD_VOXIN_VERSION=0.9.0-voxin1
-SPEECHD_VOXIN_SHA512=3cd93d1664cb7e464cc2ecb86b1bc9105263d8f6d2bbb6f417450d4e826986f3da233f5ed6d371ce85a42591be452f34db54e0d5927a64177b5a664df8343d2f
+SPEECHD_VOXIN_VERSION_0_9_0=0.9.0-voxin1
+SPEECHD_VOXIN_SHA512_0_9_0=3cd93d1664cb7e464cc2ecb86b1bc9105263d8f6d2bbb6f417450d4e826986f3da233f5ed6d371ce85a42591be452f34db54e0d5927a64177b5a664df8343d2f
 SPEECHD_VOXIN_BRANCH=ibmtts_dynamic_loading
 ###
 
+# speechd: version 0.8
+SPEECHD_VOXIN_VERSION_0_8=0.8-voxin1
+SPEECHD_VOXIN_SHA512_0_8=78f5d2c3610a5820109825a17302bd176f78099c02a35fa8ef165445316d0708b8f2894a31056fd0f620a54e5ca01148bec377985f01b92a5a3c04a29e355351
+
 # speechd: version 0.8.8
-SPEECHD_VOXIN_VERSION_0_8=0.8.8-voxin1
-SPEECHD_VOXIN_SHA512_0_8=463aa4a857b2abd3117bc0b858b812179b24c86b4ac71ab1f8e1e18c86d7bf4c28d4441905bdca863dba204611f93cedf8466710199947cf05d213464bbdfb6b
+SPEECHD_VOXIN_VERSION_0_8_8=0.8.8-voxin1
+SPEECHD_VOXIN_SHA512_0_8_8=463aa4a857b2abd3117bc0b858b812179b24c86b4ac71ab1f8e1e18c86d7bf4c28d4441905bdca863dba204611f93cedf8466710199947cf05d213464bbdfb6b
 
 # speechd: version 0.7.1
-SPEECHD_VOXIN_VERSION_0_7=0.7.1-voxin1
-SPEECHD_VOXIN_SHA512_0_7=
+SPEECHD_VOXIN_VERSION_0_7_1=0.7.1-voxin1
+SPEECHD_VOXIN_SHA512_0_7_1=839199d3a4cfe27acc929628ccebf53f9eecd45c2a5646c13bab022da73c71caf6dc1751372c7bbd80f60215234ecf8e2784cbb7d13074960827e14ec1965031
 
+# VMX86_64: VM where voxin-installer is built for x86_64 architecture
+# This VM is currently used to build libvoxin on a Debian 8 environment
+# (mostly due to puncfilter and its libstdc++ dependency)
+# 
+VMX86_64=user1@192.168.122.218
 
 # VMX86: VM where voxin-installer is built for x86 architecture
-# The VM is currently used to build on a 64 bits machine the speech-dispatcher module for x86
+# This VM is currently used to build on a 64 bits machine the
+# speech-dispatcher module for x86
 # 
-VMX86=user1@192.168.122.94
+VMX86=user1@192.168.122.174
 
 # Dependencies
-DEP_PACKAGES="alien bsdtar build-essential fakeroot rpm rsync"
+# libstdc++-4.9-dev:i386 (hard coded in function below)
+DEP_PACKAGES="alien bsdtar build-essential fakeroot rpm rsync build-essential binutils-multiarch libc6-dev-i386 gcc-multilib g++-multilib patchelf"
 # Debian9: speech-dispatcher dependencies
 # obtained with apt-get build-dep speech-dispatcher
+
+DEP_PACKAGES_X86="alien bsdtar rpm build-essential flite1-dev intltool libao-dev libasound2-dev libaudio-dev libdotconf-dev libespeak-dev libflac-dev libglib2.0-dev libogg-dev libpulse-dev libsndfile1-dev libvorbis-dev libxau-dev pkg-config tex-common x11proto-core-dev xorg-sgml-doctools zlib1g-dev dh-autoreconf libltdl-dev libtool"
+
 DEP_PACKAGES_SPEECHD="espeak-data flite1-dev intltool libao-dev libasound2-dev libaudio-dev \
-  libdotconf-dev libespeak-dev libespeak-ng-dev libespeak1 libflac-dev \
-  libglib2.0-dev libogg-dev libpcre16-3 libpcre3-dev libpcre32-3 libpcrecpp0v5 \
+  libdotconf-dev libespeak-dev libespeak1 libflac-dev \
+  libglib2.0-dev libogg-dev \
   libportaudio2 libpulse-dev libsndfile1-dev libtext-unidecode-perl \
   libvorbis-dev libxau-dev libxml-libxml-perl libxml-namespacesupport-perl \
   libxml-sax-base-perl libxml-sax-perl pkg-config tex-common texinfo \
   x11proto-core-dev xorg-sgml-doctools zlib1g-dev \
+  dh-autoreconf libltdl-dev libtool \
 "
 #####
 
@@ -99,22 +114,38 @@ isPackageInstalled() {
 	grep -A1 "Package: $deb$" /var/lib/dpkg/status | grep "Status: install ok installed" &> /dev/null
 }
 
+
+checkForeignArch() {
+	[ "$(uname -m)" != x86_64 ] && return
+	( dpkg --print-foreign-architectures | grep i386 ) \
+		|| leave "i386 foreign arch needed; please type as root: dpkg --add-architecture i386 && apt-get update" 1
+}
+
 checkDep() {
 	local missing
 	local i
 
 	[ ! -e /var/lib/dpkg/status ] && leave "this script expects a Debian based distro (to check dependencies)" 1
-	
-	for i in $DEP_PACKAGES $DEP_PACKAGES_SPEECHD; do
+
+	local dep="$DEP_PACKAGES"
+	if [ "$(uname -m)" = i686 ]; then
+	    dep="$DEP_PACKAGES_X86"
+	fi	
+	for i in $dep $DEP_PACKAGES_SPEECHD; do
 	    isPackageInstalled $i || missing="$missing $i"
 	done
 
+
+	i=libstdc++-4.9-dev:i386
+	dpkg -L $i 2>/dev/null || missing="$missing $i"
+
+	
 	[ -n "$missing" ] && leave "install these required dependencies:\n$missing" 1
 }
 
 init() {
 	local i
-	for i in "$TMPDIR" "$BUILDPKG" "$PKGDIR"/voxin* "$RFS32"; do
+	for i in "$TMPDIR" "$BUILDPKG" "$PKGDIR"/voxin* "$PKGDIR"/rfs* "$RFS32"; do
 		rm -rf "$i"
 	done
 	mkdir -p "$PKGDIR" "$DWLDIR" "$BUILDPKG"/{rfs,build}
@@ -352,14 +383,34 @@ getSpeechDispatcherVoxin() {
 	else
 		cd speechd-$version || leave "Can't cd to speechd-$version" 1
 	fi
+
+	# Patches needed to Build sd 0.9 on Debian 8
+	case "$version" in
+	    "$SPEECHD_VOXIN_VERSION_0_9_0")
+		patch -p1 < $SRCDIR/patch/sd-0.9-gettext-version.patch
+		patch -p1 < $SRCDIR/patch/sd-0.9-force-modif-acceptance.patch
+		;;
+	    "$SPEECHD_VOXIN_VERSION_0_8")	
+		patch -p1 < $SRCDIR/patch/sd-0.8-fix-doc-from-debian-8-src.patch	    
+		;;
+	    "$SPEECHD_VOXIN_VERSION_0_7_1")	
+		patch -p1 < $SRCDIR/patch/sd-0.7.1-fix-doc-from-debian-8-src.patch	    
+		;;
+	esac
 	./build.sh
 	PLUGIN_DIR="/usr/lib/speech-dispatcher"
 	case "$arch" in
 		x86_64) PLUGIN_DIR="$PLUGIN_DIR:/usr/lib/x86_64-linux-gnu/speech-dispatcher:/usr/lib64/speech-dispatcher";;
 		*86) PLUGIN_DIR="$PLUGIN_DIR:/usr/lib/i386-linux-gnu/speech-dispatcher";;
 	esac
-	# pthread instead of gthread which is not always installed by default (seen in openSUSE Tumbleweed-i586 20190220)
-	GTHREAD_LIBS=-lpthread CFLAGS="-I$libvoxinDir/../include/voxin" LDFLAGS="-L$libvoxinDir" ./configure --prefix="/usr" --with-ibmtts 
+	if [ "$SPEECHD_VOXIN_VERSION_0_8" = "$version" ]; then
+	    unset GTHREAD_LIBS
+	else
+	    # pthread instead of gthread which is not always installed by default (seen in openSUSE Tumbleweed-i586 20190220)
+	    GTHREAD_LIBS=-lpthread
+	fi	    
+	GTHREAD_LIBS=$GTHREAD_LIB CFLAGS="-I$libvoxinDir/../include/voxin" LDFLAGS="-L$libvoxinDir" ./configure --prefix="/usr" --with-ibmtts 
+
 	PLUGIN_DIR=$PLUGIN_DIR make || return 1
 	
 	# install
@@ -367,7 +418,13 @@ getSpeechDispatcherVoxin() {
 	local confDir="$VOXINDIR"/share/speech-dispatcher/conf
 	local docDir="$VOXINDIR"/share/doc/speech-dispatcher-voxin
 	mkdir -p "$modulesDir" "$confDir" "$docDir"
-	cp src/modules/sd_ibmtts "$modulesDir"/sd_ibmtts.$version || return 1
+	local module=src/modules/sd_ibmtts
+	[ -e src/modules/.libs/sd_ibmtts ] && module=src/modules/.libs/sd_ibmtts
+	if [ "$SPEECHD_VOXIN_VERSION_0_7_1" = "$version" ]; then
+	    # CentOS7: rpath to libsdaudio
+	    patchelf --set-rpath /usr/lib64/speech-dispatcher "$module"
+	fi	    
+	cp "$module" "$modulesDir"/sd_ibmtts.$version || return 1
 	cp ./config/modules/ibmtts.conf "$confDir"/ibmtts.conf.$version || return 1
 	head -n $SPEECHD_IBMTTS_COPYRIGHT_NB_LINES src/modules/ibmtts.c > "$docDir"/copyright.$version
 	
@@ -380,15 +437,15 @@ buildVoxinModule() {
 	local modulesDir="$VOXINDIR"/lib/speech-dispatcher-modules
 	cd "$SRCDIR"/speechd-voxin
 	make clean
-	SD7=$SPEECHD_VOXIN_VERSION_0_7 SD8=$SPEECHD_VOXIN_VERSION_0_8 SD9=$SPEECHD_VOXIN_VERSION make
+	SD7_1=$SPEECHD_VOXIN_VERSION_0_7_1 SD8=$SPEECHD_VOXIN_VERSION_0_8 SD8_8=$SPEECHD_VOXIN_VERSION_0_8_8 SD9_0=$SPEECHD_VOXIN_VERSION_0_9_0 make
 	DESTDIR="$modulesDir" make install
 
 	# create symlinks
 	cd "$BUILDPKG/rfs"
 	mkdir -p usr/{lib/speech-dispatcher-modules,share/speech-dispatcher/conf/modules} etc/speech-dispatcher/modules
 	ln -s /opt/oralux/voxin/lib/speech-dispatcher-modules/sd_voxin usr/lib/speech-dispatcher-modules/sd_voxin
-	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$SPEECHD_VOXIN_VERSION usr/share/speech-dispatcher/conf/modules/voxin.conf
-	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$SPEECHD_VOXIN_VERSION etc/speech-dispatcher/modules/voxin.conf
+	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$SPEECHD_VOXIN_VERSION_0_9_0 usr/share/speech-dispatcher/conf/modules/voxin.conf
+	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$SPEECHD_VOXIN_VERSION_0_9_0 etc/speech-dispatcher/modules/voxin.conf
 
 	cd "$pwd"
 }
@@ -471,7 +528,9 @@ buildReleaseTarball() {
 	tarball=$installDir/rfs_$VOXIN_VER.all.txz
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"
 	fakeroot bash -c "tar -C \"$RFSDIR\" --exclude ./opt/oralux/voxin/bin --exclude ./opt/oralux/voxin/lib -Jcf $tarball ."	
-	
+	# make more visible the minimal rfs tarball, used by the external libvoxin project
+	cp $tarball $PKGDIR
+
 	installDir=$INSTALLDIR/packages/all
 	tarball=$installDir/rfs_$VOXIN_VER.$arch.txz
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"

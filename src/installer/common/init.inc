@@ -1,7 +1,8 @@
 LOG="$BASE/log/voxin.log"
 TEMPLATE=voxin-installer.XXXXXXXXXX
 TMPDIR=/tmp
-SPEECHD_MIN_VERSION=0.8.5
+# Only version > 0.7 are compatible
+SPEECHD_MIN_VERSION=0.7
 VOXIN_VERSION=%VERSION%
 
 rm -f "$LOG"
@@ -46,8 +47,10 @@ END
 }
 
 uninstall() {
+    [ $# != 1 ] || [ -z "$1" ] && return 1
+    local rfsdir="$1"
     spd_conf_unset voxin
-    uninstallSystem
+    uninstallSystem "$rfsdir"
     _gettext "Operation completed. "    
 }
 
@@ -64,7 +67,7 @@ check_distro() {
 		fedora*) source common/install-rpm-dnf.inc;;
 		gentoo*) source common/install-gentoo.inc;;
 		opensuse*|suse*) source common/install-rpm-zypper.inc;;
-		# rhel*) source common/install-rpm-yum.inc;; # require support of speech-dispatcher 0.7.x
+		rhel*) source common/install-rpm-yum.inc;;
 		slackware*|slint*) source common/install-slackware.inc;;
 		*) status=1;;
 	esac
@@ -130,11 +133,11 @@ postInstViavoiceTarball() {
 	[ $# != 2 ] && return 1
 	[ -z "$1" ] || [ -z "$2" ] && return 1
 
-	local rfsdir=$1
-	local destdir=$2
-	local inidir=$rfsdir/opt/IBM/ibmtts/etc
-	local newconf=$rfsdir/var/opt/IBM/ibmtts/cfg/eci.ini
-	local rfs32=$rfsdir/opt/oralux/voxin/rfs32
+	local rfsdir="$1"
+	local destdir="$2"
+	local inidir="$rfsdir/opt/IBM/ibmtts/etc"
+	local newconf="$rfsdir/var/opt/IBM/ibmtts/cfg/eci.ini"
+	local rfs32="$rfsdir/opt/oralux/voxin/rfs32"
 	local LANG
 	local i
 
@@ -181,7 +184,7 @@ postInstViavoiceTarball() {
 
 installLang() {
 	[ $# != 1 ] || [ -z "$1" ] && return 1
-	local rfsdir=$1
+	local rfsdir="$1"
 	local status
 	local i
 
@@ -225,20 +228,34 @@ getArch() {
     esac
 }
 
+uninstallOldVoxin()
+{	
+	[ $# != 1 ] || [ -z "$1" ] && return 1
+	local rfsdir="$1"
+	uninstallPackage voxin
+	DIR="$rfsdir/opt/oralux/voxin"
+	if [ -e "$DIR" ]; then
+		[ -e "$DIR.old" ] && rm -rf "$DIR.old"
+		mv "$DIR" "$DIR.old"
+	fi
+}
+
 uninstallSystem()
 {	
+	[ $# != 1 ] || [ -z "$1" ] && return 1
+	local rfsdir="$1"
 	uninstallPackage voxin
-	for i in /opt/oralux/voxin /opt/IBM/ibmtts /var/opt/IBM/ibmtts; do
+	for i in "$rfsdir/opt/oralux/voxin" "$rfsdir/opt/IBM/ibmtts" "$rfsdir/var/opt/IBM/ibmtts"; do
 		rm -rf $i
 	done
-	for i in /opt/oralux /opt/IBM /var/opt/IBM; do
+	for i in "$rfsdir/opt/oralux" "$rfsdir/opt/IBM" "$rfsdir/var/opt/IBM"; do
 		[ -z "$(ls -A $i)" ] && rm -rf $i
 	done
 }
 
 installSystem() {	
 	[ $# != 1 ] || [ -z "$1" ] && return 1
-	local rfsdir=$1
+	local rfsdir="$1"
 	local status=0
 	local voxinPackage=$(getVoxinPackage)
 	local rfsAllTarball=$(getRootfilesystemAllTarball) || return 1

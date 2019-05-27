@@ -102,13 +102,14 @@ For support or feedback, please send a mail to contact@oralux.org with possibly 
 | Tested distributions       | Architectures |
 |----------------------------+---------------|
 | Arch Linux                 | x86_64        |
-| Debian 9                   | x86_64, i686  |
-| Fedora 29                  | x86_64        |
+| CentOS 7                   | x86_64        |
+| Debian 8, 9                | x86_64, i686  |
+| Fedora 29, 30              | x86_64        |
 | Gentoo                     | x86_64        |
 | openSUSE Leap 15.0         | x86_64        |
 | openSUSE Tumbleweed-i586   | i686          |
 | Slint64-14.2.1.1, 14.2.1.2 | x86_64        |
-| Ubuntu 18.04               | x86_64        |
+| Ubuntu 18.04, 19.04        | x86_64        |
 |----------------------------+---------------|
 
 ** voxin 1.15
