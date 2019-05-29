@@ -1,4 +1,4 @@
-The voxin installer installs voxin and its dependencies on various GNU/Linux distributions (e.g. Arch Linux, Debian, Fedora, Gentoo, openSUSE, Slackware, Slint, Ubuntu,...). 
+The voxin installer installs voxin and its dependencies on various GNU/Linux distributions (e.g. Arch Linux, CentOS, Debian, Fedora, Gentoo, openSUSE, Slackware, Slint, Ubuntu,...). 
 
 The current goal is to provide:
 - distribution-independent tarballs (installed under /opt), 
@@ -13,7 +13,7 @@ The standard 32 bits libraries are built by [[https://buildroot.org][Buildroot]]
 By default, libvoxin is built, and installed into the local opt/oralux/voxin directory.
 A minimal 32 bits rootfilesystem is supposed to be already available (see paragraph "minimal 32 bits rootfilesystem"). 
 The build.sh script expects a Debian 8 based distro (mostly due to the libstdc++ dependency of puncfilter). 
-See rsync.sh to export voxin-installer to an x86_64 Debian 8 VM (and get.sh to retrieve the built thereafter).
+See rsync.sh to export voxin-installer to an x86_64 Debian 8 VM (and get.sh to retrieve the built tarballs thereafter).
 
 ** Command
 #+BEGIN_SRC shell
