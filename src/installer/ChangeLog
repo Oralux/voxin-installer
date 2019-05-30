@@ -1,3 +1,6 @@
+2019-05-30 Gilles Casse <gcasse@oralux.org>
+	release 2.2: Ignore unknown characters instead of replacing them by '?' (libvoxin 1.3.6)
+
 2019-05-25 Gilles Casse <gcasse@oralux.org>
 	release 2.1: add compatibility with older distributions (Debian 8, CentOS7)
 	- rebuild on Debian 8 instead of Debian 9 originally due to unresolved symbol in libstdc++
