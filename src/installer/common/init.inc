@@ -5,6 +5,17 @@ TMPDIR=/tmp
 SPEECHD_MIN_VERSION=0.7
 VOXIN_VERSION=%VERSION%
 
+unset WITH_TTS
+ls $BASE/packages/all/voxin-viavoice-all* ~> /dev/null && WITH_TTS=viavoice
+ls $BASE/packages/all/voxin-nve-all* ~> /dev/null && WITH_TTS=nve
+case "$WITH_TTS" in
+	viavoice) postInstTarball=postInstViavoiceTarball;;
+	*) postInstTarball=noOp;;
+esac
+
+
+
+
 rm -f "$LOG"
 
 unset outputArray
@@ -121,12 +132,16 @@ getRootfilesystemArchTarball() {
     echo "$tarball"
 }
 
-getViavoiceAllTarball() {
-	find packages/all -name "voxin-viavoice-all*.txz"
+noOp() {
+	return 0
 }
 
-getViavoiceTarballs() {
-	find packages/all -name "voxin-viavoice*.txz" ! -name "voxin-viavoice-all*.txz"
+getVoiceAllTarball() {
+	find packages/all -name "voxin-*-all*.txz"
+}
+
+getVoiceTarball() {
+	find packages/all -name "voxin-*txz" ! -name "voxin-*-all*.txz"
 }
 
 postInstViavoiceTarball() {
@@ -190,9 +205,9 @@ installLang() {
 
     askLicense || return 1
 
-	i=$(getViavoiceAllTarball)
+	i=$(getVoiceAllTarball)
 	if [ -z "$i" ]; then
-		_gettext "Error: no viavoice-all tarball" >> "$LOG"
+		_gettext "Error: no 'all' tarball" >> "$LOG"
 		return 1
 	fi
 	tar -C "$rfsdir" --no-overwrite-dir -xf "$i"
@@ -202,7 +217,7 @@ installLang() {
 		return $status
 	fi
 	
-	getViavoiceTarballs | while read i; do
+	getVoiceTarballs | while read i; do
 		tar -C "$rfsdir" --no-overwrite-dir -xf "$i"
 		status=$?
 		if [ "$status" != 0 ]; then
@@ -211,7 +226,7 @@ installLang() {
 		fi
 	done
 
-	postInstViavoiceTarball "$rfsdir" "/"
+	postInstTarball "$rfsdir" "/"
 	
     return 0
 }
@@ -245,7 +260,7 @@ uninstallSystem()
 	[ $# != 1 ] || [ -z "$1" ] && return 1
 	local rfsdir="$1"
 	uninstallPackage voxin
-	for i in "$rfsdir/opt/oralux/voxin" "$rfsdir/opt/IBM/ibmtts" "$rfsdir/var/opt/IBM/ibmtts"; do
+	for i in "$rfsdir/opt/oralux/voxin" "$rfsdir/opt/IBM/ibmtts" "$rfsdir/var/opt/IBM/ibmtts" "$rfsdir/opt/oralux/nve" ; do
 		rm -rf $i
 	done
 	for i in "$rfsdir/opt/oralux" "$rfsdir/opt/IBM" "$rfsdir/var/opt/IBM"; do

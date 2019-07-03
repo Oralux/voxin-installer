@@ -1,4 +1,15 @@
 
+case "$WITH_TTS" in
+	viavoice)
+		askLicense=askLicenseViavoice
+		;;
+	# nve)
+	# 	;;
+	*)
+		askLicense=noOp
+		;;
+esac
+
 askContinue() {
     local status
 	_gettext "Your version of speech-dispatcher is too old (required version >= $SPEECHD_MIN_VERSION)"
@@ -45,7 +56,7 @@ askUninstall()
     return $?
 }
 
-askLicense()
+askLicenseViavoice()
 {
 	local VIAVOICE_ARCHIVE=$(getViavoiceAllTarball)
 	local VIAVOICE_AGREEMENT=opt/oralux/voxin/share/doc/voxin-viavoice-all/AGREEMENT
@@ -115,3 +126,4 @@ askLicense()
     return 0
 }
 
+# init

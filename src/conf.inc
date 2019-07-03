@@ -1,6 +1,6 @@
 # The BASE variable should be set before including this file
 #
-VOXIN_VER=2.2
+VOXIN_VER=3.0rc1
 
 #-- voxin-rfs32
 # Buildroot
@@ -21,9 +21,9 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 # select the libvoxin sources (development or tag)
 # - development (master branch)
 #LIBVOXIN_VERSION=
-# - from the 1.3.6 tag instead (+sha512)
-LIBVOXIN_VERSION=1.3.6
-LIBVOXIN_SHA512=532c26ff3562886307d1f9ea304c90539c86d8bb6b031d25b226b98fc3ab50aee17f11619b69e2716dd73b19a9290991b4ecffaf88311e92fa9b13abc1d1c99d
+# - from the 1.4.0 tag instead (+sha512)
+LIBVOXIN_VERSION=1.4.0
+LIBVOXIN_SHA512=5798b07b5e7389665d1fa8d11887ad3e5f428f52d6dbd02af1bc66d18daff87902cd69d0243ed8d641989ec70554b0ba470dcc050747e7ca3455cafa141d6c7d
 
 #-- speech-dispatcher-voxin
 SPEECHD_VOXIN_URL=https://github.com/Oralux/speechd/archive
@@ -47,8 +47,8 @@ SPEECHD_VOXIN_VERSION_0_8=0.8-voxin1
 SPEECHD_VOXIN_SHA512_0_8=78f5d2c3610a5820109825a17302bd176f78099c02a35fa8ef165445316d0708b8f2894a31056fd0f620a54e5ca01148bec377985f01b92a5a3c04a29e355351
 
 # speechd: version 0.8.8
-SPEECHD_VOXIN_VERSION_0_8_8=0.8.8-voxin1
-SPEECHD_VOXIN_SHA512_0_8_8=463aa4a857b2abd3117bc0b858b812179b24c86b4ac71ab1f8e1e18c86d7bf4c28d4441905bdca863dba204611f93cedf8466710199947cf05d213464bbdfb6b
+SPEECHD_VOXIN_VERSION_0_8_8=0.8.8-voxin3rc1
+SPEECHD_VOXIN_SHA512_0_8_8=0de620f4e7997c71a6530795e292dc2bedf8f88b3aea90e1dbb064511b939391459bae203656c17cc50e8b08fe9a9efd79ffc2c62d075602ad38be550f26f930
 
 # speechd: version 0.7.1
 SPEECHD_VOXIN_VERSION_0_7_1=0.7.1-voxin1
@@ -67,16 +67,20 @@ VMX86_64=user1@192.168.122.218
 VMX86=user1@192.168.122.174
 
 # Dependencies
-# libstdc++-4.9-dev:i386 (hard coded in function below)
-DEP_PACKAGES="alien bsdtar build-essential fakeroot rpm rsync build-essential binutils-multiarch libc6-dev-i386 gcc-multilib g++-multilib patchelf"
+# # libstdc++-4.9-dev:i386 (hard coded in function below)
+#DEP_PACKAGES="alien bsdtar build-essential fakeroot rpm rsync build-essential binutils-multiarch libc6-dev-i386 gcc-multilib g++-multilib patchelf"
+DEP_PACKAGES="alien bsdtar build-essential fakeroot rpm rsync"
 # Debian9: speech-dispatcher dependencies
 # obtained with apt-get build-dep speech-dispatcher
 
 DEP_PACKAGES_X86="alien bsdtar rpm build-essential flite1-dev intltool libao-dev libasound2-dev libaudio-dev libdotconf-dev libespeak-dev libflac-dev libglib2.0-dev libogg-dev libpulse-dev libsndfile1-dev libvorbis-dev libxau-dev pkg-config tex-common x11proto-core-dev xorg-sgml-doctools zlib1g-dev dh-autoreconf libltdl-dev libtool"
 
+# DEP_PACKAGES_SPEECHD="espeak-data flite1-dev intltool libao-dev libasound2-dev libaudio-dev \
+#   libdotconf-dev libespeak-dev libespeak1 libflac-dev \
+#   libglib2.0-dev libogg-dev \
 DEP_PACKAGES_SPEECHD="espeak-data flite1-dev intltool libao-dev libasound2-dev libaudio-dev \
-  libdotconf-dev libespeak-dev libespeak1 libflac-dev \
-  libglib2.0-dev libogg-dev \
+  libdotconf-dev libespeak-dev libespeak-ng-dev libespeak1 libflac-dev \
+  libglib2.0-dev libogg-dev libpcre16-3 libpcre3-dev libpcre32-3 libpcrecpp0v5 \
   libportaudio2 libpulse-dev libsndfile1-dev libtext-unidecode-perl \
   libvorbis-dev libxau-dev libxml-libxml-perl libxml-namespacesupport-perl \
   libxml-sax-base-perl libxml-sax-perl pkg-config tex-common texinfo \
@@ -116,9 +120,10 @@ isPackageInstalled() {
 
 
 checkForeignArch() {
-	[ "$(uname -m)" != x86_64 ] && return
-	( dpkg --print-foreign-architectures | grep i386 ) \
-		|| leave "i386 foreign arch needed; please type as root: dpkg --add-architecture i386 && apt-get update" 1
+return
+	# [ "$(uname -m)" != x86_64 ] && return
+	# ( dpkg --print-foreign-architectures | grep i386 ) \
+	# 	|| leave "i386 foreign arch needed; please type as root: dpkg --add-architecture i386 && apt-get update" 1
 }
 
 checkDep() {
@@ -136,8 +141,8 @@ checkDep() {
 	done
 
 
-	i=libstdc++-4.9-dev:i386
-	dpkg -L $i 2>/dev/null || missing="$missing $i"
+	# i=libstdc++-4.9-dev:i386
+	# dpkg -L $i 2>/dev/null || missing="$missing $i"
 
 	
 	[ -n "$missing" ] && leave "install these required dependencies:\n$missing" 1
@@ -511,10 +516,24 @@ tar -C \"$rfsdir\" \
 	buildSlackwarePackage "$tarball" "$installDir" "$name" "$VOXIN_VER" "$arch" "$depends" "$title" "$description" "LGPL-2.1+"
 }
 
+getLangFromViavoiceTarball() {
+	local lang=$(echo "$tarball" | sed 's/.*voxin-viavoice-\(.*\)_.*/\1/')
+	echo "$lang"
+}
+
+getLangFromNveTarball() {
+	local lang=$(echo "$tarball" | sed 's/.*voxin-nve-\(.*\)_.*/\1/')
+	if [ "$lang" != all ]; then
+		lang=$(echo "$lang" | sed 's/.*-\(.*\)-embedded-\(.*\)/\1-\2/')
+	fi
+	echo "$lang"
+}
+
 buildReleaseTarball() {
-	[ $# != 2 ] && return 1
+	[ $# != 3 ] && return 1
 	local files=$1
 	local arch=$2
+	local withTTS=$3
 	local releaseDir=$PKGDIR/voxin-$VOXIN_VER
 	local installerDir
 	local installerTar
@@ -522,6 +541,13 @@ buildReleaseTarball() {
 	local tarball
 	local pwd=$PWD
 	local exclude
+
+	case "$withTTS" in
+		viavoice) getLangFromTarball=getLangFromViavoiceTarball;;
+		nve) getLangFromTarball=getLangFromNveTarball;;
+		*) echo "Error: withTTS=$withTTS"; return;;
+	esac
+
 	
 	# build the final rfsdir tarball and install it in the installer tree
 	installDir=$INSTALLDIR/packages/all
@@ -563,8 +589,8 @@ buildReleaseTarball() {
 		for t in $(cat "$files"); do
 		    tarball=$(eval echo $t)
 		    case "$tarball" in
-				*voxin-viavoice-*txz)
-					lang=$(echo "$tarball" | sed 's/.*-\(.*\)_.*/\1/')
+				*voxin-viavoice-*txz|*voxin-nve-*txz)
+					lang=$($getLangFromTarball)
 					if [ "$lang" = "all" ]; then
 						all=$tarball
 					else
@@ -913,15 +939,20 @@ uploadToX86VM() {
 	local SRC="voxin-installer voxin-installer/build/packages/buildroot_2017.02.9.txz voxin-installer/build/.gitignore"
 	rsync --exclude build --exclude tmp -aRvz $SRC $VMX86:
 
+	cd $HOME
 	local VVDIR=VOXIN/voxin-viavoice/build/packages
 	if [ -e "$HOME/$VVDIR" ]; then
-		cd $HOME
 		rsync -aRvz $VVDIR/voxin-viavoice-* $VMX86:
 	fi
+
+	VVDIR=VOXIN/voxin-nve/build/packages
+	if [ -e "$HOME/$VVDIR" ]; then
+		rsync -aRvz $VVDIR/voxin-nve-* $VMX86:
+	fi
+
 	ssh $VMX86 'cd voxin-installer && ./build.sh -t src/list.vv'
 	cd "$pwd"
 }
-
 
 getOtherArch() {
 	local TARBALL="$DWLX86/voxin-update-$VOXIN_VER.tgz"

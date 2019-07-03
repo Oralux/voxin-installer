@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 BASE=$(dirname $(realpath "$0"))
 NAME=$(basename "$0")
@@ -44,6 +44,7 @@ Examples:
 
 # build all, extract and merge the tarballs in list.txt
  $0 -t src/list.vv
+ $0 -t src/list.nve
 
 # upload voxin-installer to the X86 VM ($VMX86) and build it
  $0 -u x86
@@ -56,7 +57,7 @@ Examples:
 
 }
 
-unset CLEAN DOWNLOAD HELP BUILDROOT TARBALLS UPLOAD
+unset CLEAN DOWNLOAD HELP BUILDROOT TARBALLS UPLOAD WITH_TTS
 
 OPTIONS=`getopt -o cd:hbt:u: --long clean,download:,help,buildroot,tarballs:,upload: \
              -n "$NAME" -- "$@"`
@@ -86,6 +87,9 @@ fi
 
 if [ -n "$TARBALLS" ]; then
 	t=$(readlink -e "$TARBALLS") || leave "Error: the tarballs file does not exist (-t $TARBALLS)" 1
+	grep voxin-viavoice-all "$t" && WITH_TTS=viavoice
+	grep voxin-nve-all "$t" && WITH_TTS=nve
+	[ -n "$WITH_TTS" ] || leave "Error: the tarballs file does not include text-to-speech tarballs (-t $TARBALLS)" 1
 	TARBALLS=$t
 fi
 
@@ -120,10 +124,10 @@ buildInstallerDir
 unset keepDownloadedSources
 ARCH=$(uname -m)
 getLibvoxin "$ARCH" "$keepDownloadedSources" || leave "Error: can't build libvoxin" 1
-getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION_0_9_0" "$SPEECHD_VOXIN_SHA512_0_9_0" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
-getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION_0_8" "$SPEECHD_VOXIN_SHA512_0_8" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
-getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION_0_8_8" "$SPEECHD_VOXIN_SHA512_0_8_8" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
-getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION_0_7_1" "$SPEECHD_VOXIN_SHA512_0_7_1" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
+#getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION_0_9_0" "$SPEECHD_VOXIN_SHA512_0_9_0" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
+# getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION_0_8" "$SPEECHD_VOXIN_SHA512_0_8" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
+ getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION_0_8_8" "$SPEECHD_VOXIN_SHA512_0_8_8" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
+# getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION_0_7_1" "$SPEECHD_VOXIN_SHA512_0_7_1" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
 buildVoxinModule
 getVoxinDoc
 buildPackage "$ARCH" || leave "Error: can't build packages" 1
@@ -131,5 +135,5 @@ keepDownloadedSources=1
 
 [ "$ARCH" = x86_64 ] && getOtherArch
 
-buildReleaseTarball "$TARBALLS" "$ARCH" || leave "Error: can't build release tarball" 1
+buildReleaseTarball "$TARBALLS" "$ARCH" "$WITH_TTS" || leave "Error: can't build release tarball" 1
 

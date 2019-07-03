@@ -45,7 +45,7 @@ Voxin is released several times a year:
 - to complete the list of compatible distros (usually after user request),
 - to add new features and fixes (libvoxin offers paths of improvement). 
 
-The [[http://voxin.oralux.net/update/][voxin updates]] includes free softwares and does not include the IBM TTS packages.
+The [[http://voxin.oralux.net/update/][voxin updates]] includes free softwares and does not include the text-to-speech packages.
 
 ** Orca
 
@@ -55,7 +55,7 @@ Then, if needed, configure Orca as indicated below.
 
 In the Orca Preferences window, Speech tab:
 - set "Speech system" to "Speech Dispatcher"
-- set "Speech synthesizer" to ibmtts
+- set "Speech synthesizer" to voxin
 
 then press the Apply button.
 
@@ -88,7 +88,7 @@ Voxin %VERSION% can be uninstalled with this command line as root:
 
 ./voxin-installer.sh -u
 
-Please note that any ibmtts file will be removed too (under /opt/IBM/ibmtts).
+Please note that the text-to-speech files will be removed too (under /opt/IBM/ibmtts or /opt/oralux/nve).
 
 * Compatible GNU/Linux Distributions
 ** Voxin %VERSION%

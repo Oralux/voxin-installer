@@ -49,6 +49,13 @@ Files: /opt/oralux/voxin/share/doc/speech-dispatcher-voxin/* /opt/oralux/voxin/l
 Copyright: 2004,2007 Brailcom, o.p.s. 
 License: LGPL-2.1+
 
+#Source: https://voxin.oralux.net
+#Upstream-Name: Nuance Vocalizer Embedded
+Files: /opt/oralux/nve/*
+Copyright: Nuance
+License: Nuance Vocalizer Embedded
+Comment: optional software
+
 License: BSD-3-CLAUSE-IBM
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions are
