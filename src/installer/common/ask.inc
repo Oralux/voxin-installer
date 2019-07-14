@@ -6,7 +6,7 @@ case "$WITH_TTS" in
 	# nve)
 	# 	;;
 	*)
-		askLicense=noOp
+		askLicense=askLicenseNve
 		;;
 esac
 
@@ -24,11 +24,9 @@ askContinue() {
 askInstallLang()
 {
     local status
-	local list=$(getViavoiceTarballs)
+	local list=$(getVoiceTarball)
     if [ -z "list" ]; then
 		status=1
-    elif [ ! -e "/opt/IBM/ibmtts" ]; then
-		status=0
     else
 		_gettext "Do you want to install a new language?"
 		_gettext "If yes, press the ENTER key."
@@ -91,7 +89,7 @@ askLicenseViavoice()
 		esac
 		
 		$CLEAR
-		tar -Oxf "$VIAVOICE_ARCHIVE" "$VIAVOICE_AGREEMENT" | $LESS 
+		tar -Oxf "$VIAVOICE_ARCHIVE" "$VIAVOICE_AGREEMENT" 2>/dev/null || tar -Oxf "$VIAVOICE_ARCHIVE" ./"$VIAVOICE_AGREEMENT" | $LESS 
     }
 
     $CLEAR
@@ -103,7 +101,7 @@ askLicenseViavoice()
     _gettext "If yes, press the ENTER key."    
     yes && {
 		$CLEAR
-		tar -Oxf "$VIAVOICE_ARCHIVE" "$VIAVOICE_LICENSE" | $LESS 
+		tar -Oxf "$VIAVOICE_ARCHIVE" "$VIAVOICE_LICENSE" 2>/dev/null || tar -Oxf "$VIAVOICE_ARCHIVE" ./"$VIAVOICE_LICENSE" | $LESS 
     }
 
     $CLEAR
@@ -115,7 +113,59 @@ askLicenseViavoice()
     _gettext "If yes, press the ENTER key."    
     yes && {
 		$CLEAR
-		tar -Oxf "$RFS_ARCHIVE" "$LIBVOXIN_LGPL" | $LESS 
+		tar -Oxf "$RFS_ARCHIVE" "$LIBVOXIN_LGPL" 2>/dev/null || tar -Oxf "$RFS_ARCHIVE" ./"$LIBVOXIN_LGPL" | $LESS 
+    }	
+
+    $CLEAR
+    _gettext "If you agree to the LGPL license, press the ENTER key"
+    yes || return 1
+    
+    $CLEAR
+    return 0
+}
+
+askLicenseNve()
+{
+	local NVE_ARCHIVE=$(getVoxindTarball)
+	local NVE_AGREEMENT=opt/oralux/nve/share/doc/voxind-nve/AGREEMENT
+	local RFS_ARCHIVE=$(getRootfilesystemAllTarball)
+	local LIBVOXIN_LGPL=opt/oralux/voxin/share/doc/libvoxin/LGPL.txt
+	local LESS
+	local CLEAR
+	
+    if [ "$TERM" = "dumb" ]; then
+		LESS=cat
+		CLEAR=
+    else
+		LESS="less -e"
+		CLEAR=clear
+    fi
+
+	_gettext "Do you agree the licenses?"
+    _gettext "If yes, press the ENTER key."    
+    yes && return 0
+
+    _gettext "1. Do you want to read again the End-User Agreement?"
+    _gettext "If yes, press the ENTER key."    
+    yes && {
+		if [ "$TERM" != "dumb" ]; then
+			_gettext "Please use the space bar to scroll through the document."
+		fi
+				
+		$CLEAR
+		tar -Oxf "$NVE_ARCHIVE" "$NVE_AGREEMENT" 2>/dev/null || tar -Oxf "$NVE_ARCHIVE" ./"$NVE_AGREEMENT" | $LESS 
+    }
+
+    $CLEAR
+    _gettext "If you agree to the End-User Agreement, press the ENTER key"
+    yes || return 1
+
+    $CLEAR
+    _gettext "2. Do you want to read again the LGPL License?"
+    _gettext "If yes, press the ENTER key."    
+    yes && {
+		$CLEAR
+		tar -Oxf "$RFS_ARCHIVE" "$LIBVOXIN_LGPL" 2>/dev/null || tar -Oxf "$RFS_ARCHIVE" ./"$LIBVOXIN_LGPL" | $LESS 
     }	
 
     $CLEAR

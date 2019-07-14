@@ -17,9 +17,33 @@ See rsync.sh to export voxin-installer to an x86_64 Debian 8 VM (and get.sh to r
 
 ** Command
 #+BEGIN_SRC shell
+# build all
 cd voxin-installer
 ./build.sh
 #+END_SRC
+
+#+BEGIN_SRC shell
+# build all, extract and merge the tarballs in list.vv
+./build.sh -t src/list.vv
+
+# This list provides the paths to the necessary tarballs.
+# The common tarballs (*all*, *voxind*) are expected to be placed 
+# at the beginning of the list
+
+# For example to test English and French, these paths would be:
+
+$HOME/VOXIN/voxin-viavoice/build/packages/voxin-viavoice-all_6.7-1.0-1.txz
+$HOME/VOXIN/voxin-viavoice/build/packages/voxin-viavoice-enu_6.7-1.0-1.txz
+$HOME/VOXIN/voxin-viavoice/build/packages/voxin-viavoice-fra_6.7-1.0-1.txz
+
+or
+$HOME/VOXIN/voxin-nve/build/packages/voxind-nve_1.4.0.x86_64.txz
+$HOME/VOXIN/voxin-nve/build/packages/voxin-nve-all_3.3.0-1.txz
+$HOME/VOXIN/voxin-nve/build/packages/voxin-nve-enu-nathan-embedded-high_1.0.0-1.txz
+$HOME/VOXIN/voxin-nve/build/packages/voxin-nve-frf-thomas-embedded-high_1.0.2-1.txz
+
+#+END_SRC
+
 	
 Sequence followed:
 - extract files from the minimal 32 bits rfs

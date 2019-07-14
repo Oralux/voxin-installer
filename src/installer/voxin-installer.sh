@@ -56,7 +56,7 @@ if [ "$?" != "0" ]; then
 	with_sd=0
 fi
 
-TEMP=`getopt -o hlsuv --long help,lang,sd,uninstall,verbose -- "$@"`
+TEMP=`getopt -o hluv --long help,lang,uninstall,verbose -- "$@"`
 if [ $? != 0 ] ; then
     usage
     exit 1

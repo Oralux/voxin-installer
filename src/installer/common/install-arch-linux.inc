@@ -29,13 +29,13 @@ getPackageFileVersion() {
 installLocalPackage() {
 	[ $# != 1 ] || [ -z "$1" ] && return
 	local package=$1
-	pacman -U --noconfirm "$package" &>>"$LOG"
+	pacman --force -U --noconfirm "$package" &>>"$LOG"
 }
 
 installPackage() {
 	[ $# != 1 ] || [ -z "$1" ] && return
 	local package=$1
-    pacman -S --noconfirm "$package" &>>"$LOG"
+    pacman --force -S --noconfirm "$package" &>>"$LOG"
 }
 
 uninstallPackage() {

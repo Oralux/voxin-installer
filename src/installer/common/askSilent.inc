@@ -16,8 +16,5 @@ askUninstall()
     return $((! with_uninstall))
 }
 
-askLicense()
-{
-    return 0
-}
+askLicense=noOp
 

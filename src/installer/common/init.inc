@@ -2,12 +2,14 @@ LOG="$BASE/log/voxin.log"
 TEMPLATE=voxin-installer.XXXXXXXXXX
 TMPDIR=/tmp
 # Only version > 0.7 are compatible
-SPEECHD_MIN_VERSION=0.7
+#SPEECHD_MIN_VERSION=0.7
+# TODO 3.0rc1 only version > 0.8.5
+SPEECHD_MIN_VERSION=0.8.5
 VOXIN_VERSION=%VERSION%
 
 unset WITH_TTS
-ls $BASE/packages/all/voxin-viavoice-all* ~> /dev/null && WITH_TTS=viavoice
-ls $BASE/packages/all/voxin-nve-all* ~> /dev/null && WITH_TTS=nve
+ls $BASE/packages/all/voxin-viavoice-all* &> /dev/null && WITH_TTS=viavoice
+ls $BASE/packages/all/voxin-nve-all* &> /dev/null && WITH_TTS=nve
 case "$WITH_TTS" in
 	viavoice) postInstTarball=postInstViavoiceTarball;;
 	*) postInstTarball=noOp;;
@@ -144,6 +146,10 @@ getVoiceTarball() {
 	find packages/all -name "voxin-*txz" ! -name "voxin-*-all*.txz"
 }
 
+getVoxindTarball() {
+	find packages/all -name "voxind-*txz"
+}
+
 postInstViavoiceTarball() {
 	[ $# != 2 ] && return 1
 	[ -z "$1" ] || [ -z "$2" ] && return 1
@@ -203,7 +209,7 @@ installLang() {
 	local status
 	local i
 
-    askLicense || return 1
+    "$askLicense" || return 1
 
 	i=$(getVoiceAllTarball)
 	if [ -z "$i" ]; then
@@ -216,8 +222,28 @@ installLang() {
 		_gettext "Error: untar failure ($i)" >> "$LOG"
 		return $status
 	fi
+
+	if [ "$WITH_TTS" = nve ]; then
+		i=$(getVoxindTarball)
+		if [ -z "$i" ]; then
+			_gettext "Error: no 'voxind' tarball" >> "$LOG"
+			return 1
+		fi
+		tar -C "$rfsdir" --no-overwrite-dir -xf "$i"
+		status=$?
+		if [ "$status" != 0 ]; then
+			_gettext "Error: untar failure ($i)" >> "$LOG"
+			return $status
+		fi
+
+		# TODO to be removed when libvoxin is able to select the nve engine
+		local VOXIND_NVE="$rfsdir/opt/oralux/nve/bin/voxind-nve"
+		local VOXIND="$rfsdir/opt/oralux/voxin/rfs32/usr/bin/voxind"
+		[ ! -e "$VOXIND.orig" ] && cp "$VOXIND" "$VOXIND.orig"
+		cp "$VOXIND_NVE" "$VOXIND"		
+	fi
 	
-	getVoiceTarballs | while read i; do
+	getVoiceTarball | while read i; do
 		tar -C "$rfsdir" --no-overwrite-dir -xf "$i"
 		status=$?
 		if [ "$status" != 0 ]; then
@@ -226,7 +252,7 @@ installLang() {
 		fi
 	done
 
-	postInstTarball "$rfsdir" "/"
+	"$postInstTarball" "$rfsdir" "/"
 	
     return 0
 }

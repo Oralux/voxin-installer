@@ -21,9 +21,9 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 # select the libvoxin sources (development or tag)
 # - development (master branch)
 #LIBVOXIN_VERSION=
-# - from the 1.4.0 tag instead (+sha512)
-LIBVOXIN_VERSION=1.4.0
-LIBVOXIN_SHA512=5798b07b5e7389665d1fa8d11887ad3e5f428f52d6dbd02af1bc66d18daff87902cd69d0243ed8d641989ec70554b0ba470dcc050747e7ca3455cafa141d6c7d
+# - from the 1.4.1 tag instead (+sha512)
+LIBVOXIN_VERSION=1.4.1
+LIBVOXIN_SHA512=0e07bc50b1461dec4a29c829ef9f6bbeeab84a696c9078b107607502580e68cca422b0ec805b33aebee6f4856d3f6e6b6c1d81b5387fe92f9c295eb8d1779a68
 
 #-- speech-dispatcher-voxin
 SPEECHD_VOXIN_URL=https://github.com/Oralux/speechd/archive
@@ -37,8 +37,8 @@ SPEECHD_IBMTTS_COPYRIGHT_NB_LINES=23
 #SPEECHD_VOXIN_SHA512=
 #SPEECHD_VOXIN_BRANCH=ibmtts_dynamic_loading
 # - from the 0.9voxin1 tag instead (+sha512)
-SPEECHD_VOXIN_VERSION_0_9_0=0.9.0-voxin1
-SPEECHD_VOXIN_SHA512_0_9_0=3cd93d1664cb7e464cc2ecb86b1bc9105263d8f6d2bbb6f417450d4e826986f3da233f5ed6d371ce85a42591be452f34db54e0d5927a64177b5a664df8343d2f
+SPEECHD_VOXIN_VERSION_0_9_0=0.9.0-voxin3rc1
+SPEECHD_VOXIN_SHA512_0_9_0=ca7767d2ad3624248d8af62cb71078796fb2094db7e4413af52cbf23c25cc4310f66126333afd9dbfc72790c2d4be27c9934711ff1a82f2b90041c3bf93fdc50
 SPEECHD_VOXIN_BRANCH=ibmtts_dynamic_loading
 ###
 
@@ -547,7 +547,6 @@ buildReleaseTarball() {
 		nve) getLangFromTarball=getLangFromNveTarball;;
 		*) echo "Error: withTTS=$withTTS"; return;;
 	esac
-
 	
 	# build the final rfsdir tarball and install it in the installer tree
 	installDir=$INSTALLDIR/packages/all
@@ -585,11 +584,17 @@ buildReleaseTarball() {
 	if [ -f "$files" ]; then
 		local all
 		local lang
+		local voxind
 		local t
+		# the common tarballs (*all*, *voxind*) are expected to be placed at the beginning of the list
 		for t in $(cat "$files"); do
 		    tarball=$(eval echo $t)
+			[ -e "$tarball" ] || leave "Tarball not found: $tarball" 1 
 		    case "$tarball" in
-				*voxin-viavoice-*txz|*voxin-nve-*txz)
+				*voxind-*txz)
+					voxind=$tarball
+					;;
+				*voxin-*txz)
 					lang=$($getLangFromTarball)
 					if [ "$lang" = "all" ]; then
 						all=$tarball
@@ -598,7 +603,7 @@ buildReleaseTarball() {
 						installerTar="$releaseDir/voxin-$lang-$VOXIN_VER.tgz"
 						mkdir -p "$installerDir" || return 1
 						rsync -a "$INSTALLDIR"/ "$installerDir"
-						cp -a "$tarball" "$all" "$installerDir"/packages/all
+						cp -a "$tarball" "$all" "$voxind" "$installerDir"/packages/all
 						fakeroot bash -c "tar -C \"$releaseDir\" -zcf \"$installerTar\" voxin-$VOXIN_VER" || return 1
 						rm -rf "$releaseDir/voxin-$VOXIN_VER"
 						echo "$installerTar"
