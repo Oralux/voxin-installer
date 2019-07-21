@@ -137,5 +137,6 @@ keepDownloadedSources=1
 
 [ "$ARCH" = x86_64 ] && getOtherArch
 
-buildReleaseTarball "$TARBALLS" "$ARCH" "$WITH_TTS" || leave "Error: can't build release tarball" 1
-
+if [ -n "$TARBALLS" ]; then
+	buildReleaseTarball "$TARBALLS" "$ARCH" "$WITH_TTS" || leave "Error: can't build release tarball" 1
+fi

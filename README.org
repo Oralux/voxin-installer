@@ -90,3 +90,5 @@ rfs32
 #+END_SRC
 
 
+* Memo: version 
+The program version is stored in src/conf.inc (VOXIN_VER)

@@ -31,8 +31,10 @@ For example, on Ubuntu with voxin-enu-%VERSION%:
 #+BEGIN_ASCII 
 cd voxin-%VERSION%
 cd voxin-enu-%VERSION%
-sudo ./voxin-installer.sh
+sudo --login ./voxin-installer.sh
 #+END_ASCII 
+
+On other distributions, use "su --login" instead of "sudo --login"  .
 
 ** Voxin updates
 Your download url is usually permanent and points on the last voxin release.
@@ -103,7 +105,7 @@ For support or feedback, please send a mail to contact@oralux.org with possibly 
 |----------------------------+---------------|
 | Arch Linux                 | x86_64        |
 | CentOS 7                   | x86_64        |
-| Debian 8, 9, 10 alpha      | x86_64, i686  |
+| Debian 8, 9, 10            | x86_64, i686  |
 | Fedora 29, 30              | x86_64        |
 | Gentoo                     | x86_64        |
 | openSUSE Leap 15.0         | x86_64        |
