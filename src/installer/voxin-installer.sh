@@ -118,25 +118,17 @@ askInstallLang && {
     installLang "$installDir" || exit 1
     installed=1
 
-    unset PLAY OPT 
-    PLAY=$(which paplay 2>/dev/null)
-    if [ -n "$PLAY" ]; then
-		OPT="--rate=11025 --channels=1 --format=s16le" 
-    else
-		PLAY=$(which aplay 2>/dev/null)
-		if [ -n "$PLAY" ]; then
-			OPT="-r 11025 -c 1 -f S16_LE"
-		fi
+    unset PLAY OPT
+    PLAY=$(which aplay 2>/dev/null)
+    if [ -z "$PLAY" ]; then
+		PLAY=$(which paplay 2>/dev/null)
     fi
 
     export LD_LIBRARY_PATH="$installDir"/opt/oralux/voxin/lib
     if [ -n "$PLAY" ]; then
-		# $OPT can usually be omitted (needed during the test on Gentoo)
-		"$installDir"/opt/oralux/voxin/bin/voxin-say "Voxin: OK" | "$PLAY" $OPT &>> "$LOG"
+		"$installDir"/opt/oralux/voxin/bin/voxin-say "Voxin: OK" | "$PLAY" &>> "$LOG"
     fi
 }
-
-[ "$with_sd" = 1 ] && askUpdateConfAuthorization && spd_conf_set voxin
 
 if [ "$installed" = "0" ]; then
     askUninstall && {

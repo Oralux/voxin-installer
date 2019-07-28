@@ -49,7 +49,7 @@ askUpdateConfAuthorization() {
 askUninstall()
 {
     _gettext "Do you want to uninstall the TTS?"
-    _gettext "If you agree please type OK ";
+    _gettext "If you agree please type OK in uppercase";
     ok
     return $?
 }

@@ -62,7 +62,6 @@ END
 uninstall() {
     [ $# != 1 ] || [ -z "$1" ] && return 1
     local rfsdir="$1"
-    spd_conf_unset voxin
     uninstallSystem "$rfsdir"
     _gettext "Operation completed. "    
 }

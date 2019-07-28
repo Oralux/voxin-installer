@@ -1,37 +1,34 @@
 # Voxin po file
-# Copyright (C) 2007-2019, Oralux.org Association
-# This file is distributed under the LGPL license.
-# Ali Savas <ali-savas@gmx.de>, July 2010.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: voxin-installer 3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-28 16:07+0200\n"
-"PO-Revision-Date: 2019-07-28 16:10+0200\n"
+"POT-Creation-Date: 2019-07-28 16:45+0200\n"
+"PO-Revision-Date: 2019-07-28 16:45+0200\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: ../common/ask.inc:79 ../common/ask.inc:148
 msgid "1. Do you want to read again the End-User Agreement?"
-msgstr "1. Möchten Sie den Endbenutzerlizenzvertrag noch einmal lesen?"
+msgstr "1.エンドユーザー契約をもう一度読みますか？"
 
 #: ../common/ask.inc:100
 msgid "2. Do you want to read again the IBM License Agreement?"
-msgstr "2. Möchten Sie den IBM-Endbenutzerlizenzvertrag noch einmal lesen?"
+msgstr "2. IBM使用許諾契約書をもう一度読みますか？"
 
 #: ../common/ask.inc:164
 msgid "2. Do you want to read again the LGPL License?"
-msgstr "3. Möchten Sie die LGPL-Lizenz noch einmal lesen?"
+msgstr "2. LGPLライセンスをもう一度読みますか？"
 
 #: ../common/ask.inc:112
 msgid "3. Do you want to read again the LGPL License?"
-msgstr "3. Möchten Sie die LGPL-Lizenz noch einmal lesen?"
+msgstr "3. LGPLライセンスをもう一度読みますか？ "
 
 #: ../common/ask.inc:75 ../common/ask.inc:144
 msgid "Do you agree the licenses?"
-msgstr "Haben Sie die Lizenzen zu akzeptieren??"
+msgstr "ライセンスに同意しますか"
 
 #: ../common/ask.inc:42
 msgid "Do you authorize the update of the configuration files (speechd.conf)?"
@@ -39,31 +36,31 @@ msgstr ""
 
 #: ../voxin-installer.sh:49 ../common/ask.inc:17
 msgid "Do you really want to continue?"
-msgstr "Möchten Sie wirklich fortfahren?"
+msgstr "本当に続けたいですか？"
 
 #: ../common/ask.inc:31
 msgid "Do you want to install a new language?"
-msgstr "Möchten Sie eine neue Sprache installieren?"
+msgstr "新しい言語をインストールしますか？"
 
 #: ../common/ask.inc:51
 msgid "Do you want to uninstall the TTS?"
-msgstr "Möchten Sie die TTS deinstallieren?"
+msgstr "TTSをアンインストールしますか？"
 
 #: ../common/init.inc:215
 msgid "Error: no 'all' tarball"
-msgstr "Fehler: Kein 'All' Tarball"
+msgstr "エラー： 'all' tarballがありません"
 
 #: ../common/init.inc:228
 msgid "Error: no 'voxind' tarball"
-msgstr "Fehler: Kein 'voxind' Tarball"
+msgstr "エラー： 'voxind' tarballがありません"
 
 #: ../voxin-installer.sh:34 ../voxin-installer.sh:40
 msgid "For support, email to contact at oralux.org "
-msgstr "Für Support senden Sie eine E-Mail an contact at oralux.org"
+msgstr "サポートのために、contact at oralux.orgに電子メールを送りなさい"
 
 #: ../voxin-installer.sh:53 ../voxin-installer.sh:141
 msgid "Good Bye. "
-msgstr "Auf wiedersehen. "
+msgstr "さようなら。"
 
 #: ../voxin-installer.sh:48 ../common/ask.inc:16
 msgid ""
@@ -76,70 +73,67 @@ msgstr ""
 #: ../common/ask.inc:101 ../common/ask.inc:113 ../common/ask.inc:145
 #: ../common/ask.inc:149 ../common/ask.inc:165
 msgid "If yes, press the ENTER key."
-msgstr "Wenn ja, drücken Sie die Eingabetaste."
+msgstr "表示されている場合は、ENTERキーを押してください。"
 
 #: ../common/ask.inc:52
 msgid "If you agree please type OK in uppercase"
-msgstr ""
-"Wenn Sie damit einverstanden sind, geben Sie bitte OK in Großbuchstaben ein"
+msgstr "同意する場合は大文字でOKを入力してください"
 
 #: ../common/ask.inc:96 ../common/ask.inc:160
 msgid "If you agree to the End-User Agreement, press the ENTER key"
-msgstr ""
-"Wenn Sie dem Lizenzbedingungen zustimmen, drücken Sie die Eingabetaste."
+msgstr "使用許諾契約書に同意する場合は、ENTERキーを押してください。"
 
 #: ../common/ask.inc:108
 msgid "If you agree to the IBM license agreement, press the ENTER key"
-msgstr ""
-"Wenn Sie dem IBM-Endbenutzerlizenzvertrag zustimmen, drücken Sie die "
-"Eingabetaste."
+msgstr "IBM使用許諾契約に同意する場合は、ENTERキーを押してください。"
 
 #: ../common/ask.inc:120 ../common/ask.inc:172
 msgid "If you agree to the LGPL license, press the ENTER key"
-msgstr "Wenn Sie der LGPL-Lizenz zustimmen, drücken Sie die Eingabetaste."
+msgstr "LGPLライセンスに同意する場合は、ENTERキーを押してください。"
 
 #: ../voxin-installer.sh:106
 msgid "Initialization; please wait... "
-msgstr "Initialisierung; Warten Sie mal... "
+msgstr "初期化お待ちください..."
 
 #: ../voxin-installer.sh:105
 msgid "Logs written in log/voxin.log"
-msgstr "Logs geschrieben in log/voxin.log"
+msgstr "logsはlog/に書かれています"
 
 #: ../common/init.inc:66
 msgid "Operation completed. "
-msgstr "Die Operation wurde abgeschlossen. "
+msgstr "操作は完了しました。"
 
 #: ../voxin-installer.sh:29
 msgid "Please run voxin-installer as root. "
-msgstr "Bitte starten Sie voxin-installer als root. "
+msgstr "rootとしてvoxin-installerを実行してください。"
 
 #: ../common/ask.inc:83 ../common/ask.inc:152
 msgid "Please use the space bar to scroll through the document."
-msgstr "Bitte benutzen sie die Leertaste, um durch das Dokument zu scrollen."
+msgstr "スペースバーを使って文書をスクロールしてください。"
 
 #: ../voxin-installer.sh:33
 msgid "Sorry, this distribution is not yet supported. "
-msgstr "Das Linux-Distribution noch nicht unterstützt wird. "
+msgstr ""
+"申し訳ありませんが、このディストリビューションはまだサポートされていません。"
 
 #: ../voxin-installer.sh:39
 msgid "Sorry, this installer does not expect a symbolic link /opt"
 msgstr ""
-"Entschuldigung, dieses Installationsprogramm erwartet keinen symbolischen "
-"Link /opt"
+"申し訳ありませんが、このインストーラはシンボリックリンク/optを期待していませ"
+"ん"
 
 #: ../voxin-installer.sh:140
 msgid "The changes will be taken into account on next boot. "
-msgstr "Die Änderungen werden beim nächsten Start berücksichtigt werden. "
+msgstr "変更は次回の起動時に考慮されます。"
 
 #: ../common/ask.inc:41
 msgid "Voxin can be set as default text-to-speech."
-msgstr "Voxin kann als Standard für die Sprachausgabe festgelegt werden."
+msgstr "Voxinをデフォルトの音声合成に設定できます。"
 
 #: ../common/init.inc:119 ../common/init.inc:130
 msgid "rfs all tarball not found!"
-msgstr "rfs all tarball nicht gefunden!"
+msgstr "rfs all tarballが見つかりません。"
 
 #: ../common/init.inc:310
 msgid "voxin package not found!"
-msgstr "voxin tarball nicht gefunden!"
+msgstr "voxinパッケージが見つかりません！"
