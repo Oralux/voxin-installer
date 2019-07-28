@@ -29,9 +29,10 @@ Just run ./voxin-installer.sh as root and answer to the questions.
 For example, on Ubuntu with voxin-enu-%VERSION%:
 
 #+BEGIN_ASCII 
+sudo --login 
 cd voxin-%VERSION%
 cd voxin-enu-%VERSION%
-sudo --login ./voxin-installer.sh
+./voxin-installer.sh
 #+END_ASCII 
 
 On other distributions, use "su --login" instead of "sudo --login"  .
