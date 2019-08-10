@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-28 16:45+0200\n"
+"POT-Creation-Date: 2019-08-10 23:55+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,23 +17,23 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../common/ask.inc:79 ../common/ask.inc:148
+#: ../common/ask.inc:78 ../common/ask.inc:147
 msgid "1. Do you want to read again the End-User Agreement?"
 msgstr ""
 
-#: ../common/ask.inc:100
+#: ../common/ask.inc:99
 msgid "2. Do you want to read again the IBM License Agreement?"
 msgstr ""
 
-#: ../common/ask.inc:164
+#: ../common/ask.inc:163
 msgid "2. Do you want to read again the LGPL License?"
 msgstr ""
 
-#: ../common/ask.inc:112
+#: ../common/ask.inc:111
 msgid "3. Do you want to read again the LGPL License?"
 msgstr ""
 
-#: ../common/ask.inc:75 ../common/ask.inc:144
+#: ../common/ask.inc:74 ../common/ask.inc:143
 msgid "Do you agree the licenses?"
 msgstr ""
 
@@ -49,15 +49,15 @@ msgstr ""
 msgid "Do you want to install a new language?"
 msgstr ""
 
-#: ../common/ask.inc:51
+#: ../common/ask.inc:50
 msgid "Do you want to uninstall the TTS?"
 msgstr ""
 
-#: ../common/init.inc:215
+#: ../common/init.inc:221
 msgid "Error: no 'all' tarball"
 msgstr ""
 
-#: ../common/init.inc:228
+#: ../common/init.inc:234
 msgid "Error: no 'voxind' tarball"
 msgstr ""
 
@@ -65,7 +65,7 @@ msgstr ""
 msgid "For support, email to contact at oralux.org "
 msgstr ""
 
-#: ../voxin-installer.sh:53 ../voxin-installer.sh:141
+#: ../voxin-installer.sh:53 ../voxin-installer.sh:143
 msgid "Good Bye. "
 msgstr ""
 
@@ -76,25 +76,25 @@ msgid ""
 msgstr ""
 
 #: ../voxin-installer.sh:50 ../common/ask.inc:18 ../common/ask.inc:32
-#: ../common/ask.inc:43 ../common/ask.inc:76 ../common/ask.inc:80
-#: ../common/ask.inc:101 ../common/ask.inc:113 ../common/ask.inc:145
-#: ../common/ask.inc:149 ../common/ask.inc:165
+#: ../common/ask.inc:75 ../common/ask.inc:79 ../common/ask.inc:100
+#: ../common/ask.inc:112 ../common/ask.inc:144 ../common/ask.inc:148
+#: ../common/ask.inc:164
 msgid "If yes, press the ENTER key."
 msgstr ""
 
-#: ../common/ask.inc:52
-msgid "If you agree please type OK in uppercase"
+#: ../common/ask.inc:43 ../common/ask.inc:51
+msgid "If you agree please type OK and press the ENTER key."
 msgstr ""
 
-#: ../common/ask.inc:96 ../common/ask.inc:160
+#: ../common/ask.inc:95 ../common/ask.inc:159
 msgid "If you agree to the End-User Agreement, press the ENTER key"
 msgstr ""
 
-#: ../common/ask.inc:108
+#: ../common/ask.inc:107
 msgid "If you agree to the IBM license agreement, press the ENTER key"
 msgstr ""
 
-#: ../common/ask.inc:120 ../common/ask.inc:172
+#: ../common/ask.inc:119 ../common/ask.inc:171
 msgid "If you agree to the LGPL license, press the ENTER key"
 msgstr ""
 
@@ -106,7 +106,7 @@ msgstr ""
 msgid "Logs written in log/voxin.log"
 msgstr ""
 
-#: ../common/init.inc:66
+#: ../common/init.inc:72
 msgid "Operation completed. "
 msgstr ""
 
@@ -114,7 +114,7 @@ msgstr ""
 msgid "Please run voxin-installer as root. "
 msgstr ""
 
-#: ../common/ask.inc:83 ../common/ask.inc:152
+#: ../common/ask.inc:82 ../common/ask.inc:151
 msgid "Please use the space bar to scroll through the document."
 msgstr ""
 
@@ -126,18 +126,26 @@ msgstr ""
 msgid "Sorry, this installer does not expect a symbolic link /opt"
 msgstr ""
 
-#: ../voxin-installer.sh:140
+#: ../voxin-installer.sh:142
 msgid "The changes will be taken into account on next boot. "
 msgstr ""
 
 #: ../common/ask.inc:41
-msgid "Voxin can be set as default text-to-speech."
+msgid "The voxin module must be added to the configuration files"
 msgstr ""
 
-#: ../common/init.inc:119 ../common/init.inc:130
+#: ../common/init.inc:125 ../common/init.inc:136
 msgid "rfs all tarball not found!"
 msgstr ""
 
-#: ../common/init.inc:310
+#: ../common/init.inc:316
 msgid "voxin package not found!"
+msgstr ""
+
+#: ../common/init.inc:49
+msgid "you authorize the installer to perform this operation"
+msgstr ""
+
+#: ../common/init.inc:51
+msgid "you do not authorize the installer to perform this operation"
 msgstr ""

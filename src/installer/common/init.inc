@@ -44,7 +44,12 @@ ok() {
     local status=1
     local a
     read a
-    case "$a" in [oO][kK]) status=0;; esac
+    case "$a" in [oO][kK]*) status=0;; esac
+	if [ "$status" = "0" ]; then
+		_gettext "you authorize the installer to perform this operation"
+	else
+		_gettext "you do not authorize the installer to perform this operation"
+	fi	
     return $status
 }
 
@@ -62,6 +67,7 @@ END
 uninstall() {
     [ $# != 1 ] || [ -z "$1" ] && return 1
     local rfsdir="$1"
+	spd_conf_unset voxin	
     uninstallSystem "$rfsdir"
     _gettext "Operation completed. "    
 }
@@ -289,7 +295,7 @@ uninstallSystem()
 		rm -rf $i
 	done
 	for i in "$rfsdir/opt/oralux" "$rfsdir/opt/IBM" "$rfsdir/var/opt/IBM"; do
-		[ -z "$(ls -A $i)" ] && rm -rf $i
+		[ -e "$i" ] && [ -z "$(ls -A "$i")" ] && rm -rf "$i"
 	done
 }
 

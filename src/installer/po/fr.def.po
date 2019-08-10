@@ -7,36 +7,37 @@ msgid ""
 msgstr ""
 "Project-Id-Version: voxin-installer 3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-28 15:56+0200\n"
-"PO-Revision-Date: 2019-07-28 16:03+0200\n"
+"POT-Creation-Date: 2019-08-10 23:50+0200\n"
+"PO-Revision-Date: 2019-08-10 23:54+0200\n"
 "Last-Translator: Gilles Casse <gcasse@oralux.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: ../common/ask.inc:79 ../common/ask.inc:148
+#: ../common/ask.inc:78 ../common/ask.inc:147
 msgid "1. Do you want to read again the End-User Agreement?"
 msgstr "1. Souhaitez-vous relire la licence utilisateur ?"
 
-#: ../common/ask.inc:100
+#: ../common/ask.inc:99
 msgid "2. Do you want to read again the IBM License Agreement?"
 msgstr "2. Souhaitez-vous relire la licence IBM (en anglais) ?"
 
-#: ../common/ask.inc:164
+#: ../common/ask.inc:163
 msgid "2. Do you want to read again the LGPL License?"
 msgstr "3. Souhaitez-vous relire la licence LGPL?"
 
-#: ../common/ask.inc:112
+#: ../common/ask.inc:111
 msgid "3. Do you want to read again the LGPL License?"
 msgstr "3. Souhaitez-vous relire la licence LGPL (en anglais) ?"
 
-#: ../common/ask.inc:75 ../common/ask.inc:144
+#: ../common/ask.inc:74 ../common/ask.inc:143
 msgid "Do you agree the licenses?"
 msgstr "Acceptez-vous les licences ?"
 
 #: ../common/ask.inc:42
 msgid "Do you authorize the update of the configuration files (speechd.conf)?"
-msgstr "Autorisez-vous la mise à jour des fichiers de configurations (speechd.conf) ?"
+msgstr ""
+"Autorisez-vous la mise à jour des fichiers de configurations (speechd.conf) ?"
 
 #: ../voxin-installer.sh:49 ../common/ask.inc:17
 msgid "Do you really want to continue?"
@@ -46,15 +47,15 @@ msgstr "Voulez-vous vraiment continuer ?"
 msgid "Do you want to install a new language?"
 msgstr "Souhaitez-vous installer une nouvelle langue ?"
 
-#: ../common/ask.inc:51
+#: ../common/ask.inc:50
 msgid "Do you want to uninstall the TTS?"
 msgstr "Souhaitez-vous désinstaller la synthèse vocale ?"
 
-#: ../common/init.inc:215
+#: ../common/init.inc:221
 msgid "Error: no 'all' tarball"
 msgstr "Erreur : aucune archive 'all'"
 
-#: ../common/init.inc:228
+#: ../common/init.inc:234
 msgid "Error: no 'voxind' tarball"
 msgstr "Erreur : aucune archive voxind"
 
@@ -62,7 +63,7 @@ msgstr "Erreur : aucune archive voxind"
 msgid "For support, email to contact at oralux.org "
 msgstr "Pour tout support, écrivez à contact at oralux.org "
 
-#: ../voxin-installer.sh:53 ../voxin-installer.sh:141
+#: ../voxin-installer.sh:53 ../voxin-installer.sh:143
 msgid "Good Bye. "
 msgstr "Au revoir. "
 
@@ -75,25 +76,25 @@ msgstr ""
 "emacspeak le pourra"
 
 #: ../voxin-installer.sh:50 ../common/ask.inc:18 ../common/ask.inc:32
-#: ../common/ask.inc:43 ../common/ask.inc:76 ../common/ask.inc:80
-#: ../common/ask.inc:101 ../common/ask.inc:113 ../common/ask.inc:145
-#: ../common/ask.inc:149 ../common/ask.inc:165
+#: ../common/ask.inc:75 ../common/ask.inc:79 ../common/ask.inc:100
+#: ../common/ask.inc:112 ../common/ask.inc:144 ../common/ask.inc:148
+#: ../common/ask.inc:164
 msgid "If yes, press the ENTER key."
 msgstr "Si oui, appuyez sur la touche Entrée."
 
-#: ../common/ask.inc:52
-msgid "If you agree please type OK in uppercase"
-msgstr "Si vous acceptez, tapez OK en majuscules"
+#: ../common/ask.inc:43 ../common/ask.inc:51
+msgid "If you agree please type OK and press the ENTER key."
+msgstr "Si vous acceptez, tapez OK et appuyez sur la touche Entrée"
 
-#: ../common/ask.inc:96 ../common/ask.inc:160
+#: ../common/ask.inc:95 ../common/ask.inc:159
 msgid "If you agree to the End-User Agreement, press the ENTER key"
 msgstr "Si vous acceptez la licence utilisateur, appuyez sur la touche Entrée"
 
-#: ../common/ask.inc:108
+#: ../common/ask.inc:107
 msgid "If you agree to the IBM license agreement, press the ENTER key"
 msgstr "Si vous acceptez la licence IBM, appuyez sur la touche Entrée"
 
-#: ../common/ask.inc:120 ../common/ask.inc:172
+#: ../common/ask.inc:119 ../common/ask.inc:171
 msgid "If you agree to the LGPL license, press the ENTER key"
 msgstr "Si vous acceptez la licence LGPL, appuyez sur la touche Entrée"
 
@@ -105,7 +106,7 @@ msgstr "Initialisation; patientez svp... "
 msgid "Logs written in log/voxin.log"
 msgstr "Logs écrits dans log/voxin.log"
 
-#: ../common/init.inc:66
+#: ../common/init.inc:72
 msgid "Operation completed. "
 msgstr "L'opération est terminée. "
 
@@ -113,7 +114,7 @@ msgstr "L'opération est terminée. "
 msgid "Please run voxin-installer as root. "
 msgstr "Lancez svp voxin-installer en tant que root. "
 
-#: ../common/ask.inc:83 ../common/ask.inc:152
+#: ../common/ask.inc:82 ../common/ask.inc:151
 msgid "Please use the space bar to scroll through the document."
 msgstr "Appuyez svp sur la barre d'espace pour passez de page en page."
 
@@ -125,19 +126,27 @@ msgstr "Désolé, cette distribution n'est pas encore supportée. "
 msgid "Sorry, this installer does not expect a symbolic link /opt"
 msgstr "Désolé cet installeur ne gère pas le lien symbolique en /opt"
 
-#: ../voxin-installer.sh:140
+#: ../voxin-installer.sh:142
 msgid "The changes will be taken into account on next boot. "
 msgstr ""
 "Les modifications seront prises en compte au prochain démarrage du PC. "
 
 #: ../common/ask.inc:41
-msgid "Voxin can be set as default text-to-speech."
-msgstr "Voxin peut être choisie comme synthèse vocale par défaut."
+msgid "The voxin module must be added to the configuration files"
+msgstr "Le module Voxin doit être ajouté aux fichiers de configuration"
 
-#: ../common/init.inc:119 ../common/init.inc:130
+#: ../common/init.inc:125 ../common/init.inc:136
 msgid "rfs all tarball not found!"
 msgstr "l'archive rfs all est absente !"
 
-#: ../common/init.inc:310
+#: ../common/init.inc:316
 msgid "voxin package not found!"
 msgstr "le paquet voxin est absent !"
+
+#: ../common/init.inc:49
+msgid "you authorize the installer to perform this operation"
+msgstr "vous autorisez l'installeur à exécuter cette opération"
+
+#: ../common/init.inc:51
+msgid "you do not authorize the installer to perform this operation"
+msgstr "vous n'autorisez pas l'installeur à exécuter cette opération"

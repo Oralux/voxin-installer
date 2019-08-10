@@ -38,18 +38,17 @@ askInstallLang()
 
 askUpdateConfAuthorization() {
     local status
-	_gettext "Voxin can be set as default text-to-speech."
+	_gettext "The voxin module must be added to the configuration files"
 	_gettext "Do you authorize the update of the configuration files (speechd.conf)?"
-	_gettext "If yes, press the ENTER key."
-	yes
-	status=$?
-    return $status
+    _gettext "If you agree please type OK and press the ENTER key.";
+    ok
+    return $?
 }
 
 askUninstall()
 {
     _gettext "Do you want to uninstall the TTS?"
-    _gettext "If you agree please type OK in uppercase";
+    _gettext "If you agree please type OK and press the ENTER key.";
     ok
     return $?
 }

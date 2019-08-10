@@ -130,6 +130,8 @@ askInstallLang && {
     fi
 }
 
+[ "$with_sd" = 1 ] && spd_conf_is_update_required && askUpdateConfAuthorization && spd_conf_set voxin
+
 if [ "$installed" = "0" ]; then
     askUninstall && {
 		uninstall "$installDir"
