@@ -8,21 +8,22 @@ DIR=/tmp/voxinDebug
 mkdir -p $DIR/{home,etc,usr}
 
 # copy some speech-dispatcher files (configuration, modules)
-cp -a $HOME/.config/speech-dispatcher $DIR/home
-cp -a /etc/speech-dispatcher $DIR/etc
-cp -a /usr/share/speech-dispatcher $DIR/usr
-cp -a /usr/lib64/speech-dispatcher-modules $DIR/usr
+cp -a $HOME/.config/speech-dispatcher $DIR/home 2>/dev/null
+cp -a /etc/speech-dispatcher $DIR/etc 2>/dev/null
+cp -a /usr/share/speech-dispatcher $DIR/usr 2>/dev/null
+cp -a /usr/lib64/speech-dispatcher-modules $DIR/usr 2>/dev/null
 
 # copy the IBMTTS configuration
-cp -a /var/opt/IBM $DIR
+cp -a /var/opt/IBM $DIR 2>/dev/null
 
 # trace the access to libvoxin
-touch /tmp/libvoxin.ok
+touch /tmp/libvoxin.ok $HOME/libvoxin.ok
 spd-say -o voxin hello
 mv /tmp/libvoxin* $DIR/
+rm $HOME/libvoxin.ok
 
 # orca config
-cp $HOME/.local/share/orca/user-settings.conf $DIR/home
+cp $HOME/.local/share/orca/user-settings.conf $DIR/home 2>/dev/null
 
 # software versions
 cp /etc/os-release $DIR/etc
