@@ -4,34 +4,40 @@ LIST="/home/*/.config/speech-dispatcher/speechd.conf /etc/speech-dispatcher/spee
 
 getDefault() {
     local filename="$1"
-	grep -E '^[[:space:]]*DefaultModule' "$filename"  | cut -f2 -d" "
+	[ ! -e "$filename" ] && return
+	grep -E '^[[:space:]]*DefaultModule' "$filename" | cut -f2 -d" "
 }
 
 getAdded() {
     local filename="$1"
+	[ ! -e "$filename" ] && return
 	grep -E '^[[:space:]]*AddModule[[:space:]]+' "$filename" | cut -f2 -d'"'
 }
 
 isAdded() {
     local filename="$1"
     local module="$2"
+	[ ! -e "$filename" ] && return
     grep -Eq '^[[:space:]]*AddModule[[:space:]]+"'"$module"'"[[:space:]]+"sd_'"$module"'"[[:space:]]+"'"$module"'.conf"[[:space:]]*' "$filename"
 }
 
 isAnyAdded() {
     local filename="$1"
+	[ ! -e "$filename" ] && return
     grep -Eq '^[[:space:]]*AddModule[[:space:]]+' "$filename"
 }
 
 addModule() {
     local filename="$1"
     local module="$2"
+	[ ! -e "$filename" ] && return
     sed -i -e '/^[[:space:]]*AddModule[[:space:]]/b ins' -e b -e ':ins' -e 'a\'$'\n''AddModule "'$module'"        "sd_'$module'"     "'$module'.conf"' -e ': done' -e 'n;b done' "$filename"
 }
 
 removeModule() {
     local filename="$1"
     local module="$2"
+	[ ! -e "$filename" ] && return
     sed -i -r '/^.*AddModule[[:space:]]+"'$module'"[[:space:]]+.*/d' "$filename"
 }
 
@@ -39,6 +45,7 @@ removeModule() {
 isDefaultModule() {
     local filename="$1"
     local module="$2"
+	[ ! -e "$filename" ] && return
     grep -Eq '^[[:space:]]*DefaultModule[[:space:]]+'"$module"'[[:space:]]*' "$filename"
 }
 
@@ -79,6 +86,7 @@ function spd_conf_set() {
 # the speechd.conf file and distinct from default or voxin module
 function spd_conf_is_update_required() {
 	local filename="$1"
+	[ ! -e "$filename" ] && return
 	local default="$(getDefault "$filename")"
 	local added="$(getAdded "$filename")"
 	[ -z "$added" ] && return

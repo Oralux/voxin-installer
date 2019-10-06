@@ -3,11 +3,12 @@
 
 BASE=$(dirname $(realpath "$0"))
 . $BASE/src/conf.inc
-cd $BASE/..
 
 rsync_from_vm64() {
-	rsync  $1 -av --exclude .git --exclude build $VMX86_64:voxin-installer/ voxin-installer
-	rsync  $1 -av --exclude .git --exclude build $VMX86_64:voxin-installer/build/packages voxin-installer/build/packages
+	pushd $HOME/VOXIN
+	rsync  $1 -av --exclude .git --exclude build $VMX86_64:$VMVOXDIR/voxin-installer/ voxin-installer
+	rsync  $1 -av --exclude .git --exclude build $VMX86_64:$VMVOXDIR/voxin-installer/build/packages voxin-installer/build/
+	popd
 }
 
 

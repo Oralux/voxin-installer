@@ -21,9 +21,9 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 # select the libvoxin sources (development or tag)
 # - development (master branch)
 #LIBVOXIN_VERSION=
-# - from the 1.4.2 tag instead (+sha512)
-LIBVOXIN_VERSION=1.4.3
-LIBVOXIN_SHA512=8fc8f68f84fc4903b9ac227403aa9164e2f53f3a8cb4ba3862f469b80870633c382bfd1a20a6926d973547b45605efc25ee9a1740733fae1fd3de2d44cf8baab
+# - from the 1.4.4 tag instead (+sha512)
+LIBVOXIN_VERSION=1.4.4
+LIBVOXIN_SHA512=b423612e3013d95f699854683d263672bd6fbea33789c41ea559daad42aaf80fc0f00496d78d7226f4b86dbe313e4d190a710de04bd5e279cd178c69ea1e7487
 
 #-- speech-dispatcher-voxin
 SPEECHD_VOXIN_URL=https://github.com/Oralux/speechd/archive
@@ -37,18 +37,18 @@ SPEECHD_IBMTTS_COPYRIGHT_NB_LINES=23
 #SPEECHD_VOXIN_SHA512=
 #SPEECHD_VOXIN_BRANCH=ibmtts_dynamic_loading
 # - from the 0.9voxin1 tag instead (+sha512)
-SPEECHD_VOXIN_VERSION_0_9_0=0.9.0-voxin3rc2
-SPEECHD_VOXIN_SHA512_0_9_0=7c795a49208acf9e26f01a20b11f5d5a2ca8addf3912de6974072eedc8a7f7271db318c70f728b746205cdce37e7a716d834396125be38738f8c4ace1121cf69
+SPEECHD_VOXIN_VERSION_0_9_0=0.9.0-voxin3rc3
+SPEECHD_VOXIN_SHA512_0_9_0=1c801095a6d6d00adf224aad9aad66adf9ff7eaeded68bb108025cc2c9d870123a1265351bbe41ccc6c5e9073b376fcb5cf7d5914ad9729b503e9c292063378d
 SPEECHD_VOXIN_BRANCH=ibmtts_dynamic_loading
 ###
 
 # speechd: version 0.8
-SPEECHD_VOXIN_VERSION_0_8=0.8-voxin1
-SPEECHD_VOXIN_SHA512_0_8=78f5d2c3610a5820109825a17302bd176f78099c02a35fa8ef165445316d0708b8f2894a31056fd0f620a54e5ca01148bec377985f01b92a5a3c04a29e355351
+SPEECHD_VOXIN_VERSION_0_8=0.8-voxin3rc3
+SPEECHD_VOXIN_SHA512_0_8=a7595025d70510475964d79e76f3b7ee292286e18d1f98ff1b2fa093b7b77396e5c3ded3c371f133b678a1263ba1647886182dc97fde07c46186e06a410edb54
 
 # speechd: version 0.8.8
-SPEECHD_VOXIN_VERSION_0_8_8=0.8.8-voxin3rc2
-SPEECHD_VOXIN_SHA512_0_8_8=e99fdb64bb6134da1065aa6c74ca6af61fba6e406f4affbe3309221643f7ef58f1bb8f213873068477471b55d8387b33cf1d1780c0d55ac27f94655d3b2eab4d
+SPEECHD_VOXIN_VERSION_0_8_8=0.8.8-voxin3rc3
+SPEECHD_VOXIN_SHA512_0_8_8=a699f79718f6054602484a0f0e49ec35eaf152d72800460b0605aa1c2da8c3e393ed6e6d3874d19041860e39d60a7e2f9f8efd4c2fe1e7e9b1ef0f2362e5ad26
 
 # speechd: version 0.7.1
 SPEECHD_VOXIN_VERSION_0_7_1=0.7.1-voxin1
@@ -59,6 +59,8 @@ SPEECHD_VOXIN_SHA512_0_7_1=839199d3a4cfe27acc929628ccebf53f9eecd45c2a5646c13bab0
 # (mostly due to puncfilter and its libstdc++ dependency)
 # 
 VMX86_64=user1@192.168.122.218
+VMVOXDIR=/home/user1/VOXIN
+VMLIBVOXDIR=$VMVOXDIR/LIBVOXIN
 
 # VMX86: VM where voxin-installer is built for x86 architecture
 # This VM is currently used to build on a 64 bits machine the
@@ -79,14 +81,17 @@ DEP_PACKAGES_X86="alien bsdtar rpm build-essential flite1-dev intltool libao-dev
 #   libdotconf-dev libespeak-dev libespeak1 libflac-dev \
 #   libglib2.0-dev libogg-dev \
 DEP_PACKAGES_SPEECHD="espeak-data flite1-dev intltool libao-dev libasound2-dev libaudio-dev \
-  libdotconf-dev libespeak-dev libespeak-ng-dev libespeak1 libflac-dev \
-  libglib2.0-dev libogg-dev libpcre16-3 libpcre3-dev libpcre32-3 libpcrecpp0v5 \
+  libdotconf-dev libespeak-dev libespeak1 libflac-dev \
+  libglib2.0-dev libogg-dev libpcre3-dev \
   libportaudio2 libpulse-dev libsndfile1-dev libtext-unidecode-perl \
   libvorbis-dev libxau-dev libxml-libxml-perl libxml-namespacesupport-perl \
   libxml-sax-base-perl libxml-sax-perl pkg-config tex-common texinfo \
   x11proto-core-dev xorg-sgml-doctools zlib1g-dev \
   dh-autoreconf libltdl-dev libtool \
 "
+# If host more recent than Debian 8
+DEP_PACKAGES_SPEECHD_OTHER="libespeak-ng-dev libpcre16-3 libpcre32-3 libpcrecpp0v5"
+
 #####
 
 PKGDIR=$BASE/build/packages
@@ -135,7 +140,13 @@ checkDep() {
 	local dep="$DEP_PACKAGES"
 	if [ "$(uname -m)" = i686 ]; then
 	    dep="$DEP_PACKAGES_X86"
-	fi	
+	fi
+	# if host more recent than Debian 8 complete dependencies
+	local id=$(awk -F= '/^ID=/{print $2}' /etc/os-release)
+	local version_id=$(awk -F'"' '/VERSION_ID/{print $2}' /etc/os-release)
+	if [ "$id" != debian ] || [ "$version_id" != 8 ]; then
+		DEP_PACKAGES_SPEECHD=$(echo $DEP_PACKAGES_SPEECHD $DEP_PACKAGES_SPEECHD_OTHER)
+	fi
 	for i in $dep $DEP_PACKAGES_SPEECHD; do
 	    isPackageInstalled $i || missing="$missing $i"
 	done
@@ -572,14 +583,18 @@ buildReleaseTarball() {
 	#                          voxin-$VOXIN_VER/voxin-$LANG-$VOXIN_VER
 	#
 	# voxin-update
-	installerDir="$releaseDir"/voxin-$VOXIN_VER/voxin-update-$VOXIN_VER
-	installerTar="$releaseDir"/voxin-update-$VOXIN_VER.tgz
-	mkdir -p "$installerDir" || return 1
-	rsync -a "$INSTALLDIR"/ "$installerDir"
+	# TODO nve: specific name + update installer...
+	if [ "$withTTS" != nve ]; then
+		installerDir="$releaseDir"/voxin-$VOXIN_VER/voxin-update-$VOXIN_VER
+		installerTar="$releaseDir"/voxin-update-$VOXIN_VER.tgz
+		mkdir -p "$installerDir" || return 1
+		rsync -a "$INSTALLDIR"/ "$installerDir"
 	
-	fakeroot bash -c "tar -C \"$releaseDir\" -zcf \"$installerTar\" voxin-$VOXIN_VER" || return 1
+		fakeroot bash -c "tar -C \"$releaseDir\" -zcf \"$installerTar\" voxin-$VOXIN_VER" || return 1
+		rm -rf "$releaseDir/voxin-$VOXIN_VER"
+		echo "$installerTar"
+	fi
 	rm -rf "$releaseDir/voxin-$VOXIN_VER"
-	echo "$installerTar"
 
 	if [ -f "$files" ]; then
 		local all
@@ -956,6 +971,7 @@ uploadToX86VM() {
 	fi
 
 	ssh $VMX86 'cd voxin-installer && ./build.sh -t src/list.vv'
+	ssh $VMX86 'cd voxin-installer && ./build.sh -t src/list.nve'
 	cd "$pwd"
 }
 

@@ -2,9 +2,7 @@ LOG="$BASE/log/voxin.log"
 TEMPLATE=voxin-installer.XXXXXXXXXX
 TMPDIR=/tmp
 # Only version > 0.7 are compatible
-#SPEECHD_MIN_VERSION=0.7
-# TODO 3.0rc1 only version > 0.8.5
-SPEECHD_MIN_VERSION=0.8.5
+SPEECHD_MIN_VERSION=0.7
 VOXIN_VERSION=%VERSION%
 
 unset WITH_TTS
@@ -240,12 +238,6 @@ installLang() {
 			_gettext "Error: untar failure ($i)" >> "$LOG"
 			return $status
 		fi
-
-		# TODO to be removed when libvoxin is able to select the nve engine
-		local VOXIND_NVE="$rfsdir/opt/oralux/nve/bin/voxind-nve"
-		local VOXIND="$rfsdir/opt/oralux/voxin/rfs32/usr/bin/voxind"
-		[ ! -e "$VOXIND.orig" ] && cp "$VOXIND" "$VOXIND.orig"
-		cp "$VOXIND_NVE" "$VOXIND"		
 	fi
 	
 	getVoiceTarball | while read i; do

@@ -36,7 +36,8 @@ $HOME/VOXIN/voxin-viavoice/build/packages/voxin-viavoice-all_6.7-1.0-1.txz
 $HOME/VOXIN/voxin-viavoice/build/packages/voxin-viavoice-enu_6.7-1.0-1.txz
 $HOME/VOXIN/voxin-viavoice/build/packages/voxin-viavoice-fra_6.7-1.0-1.txz
 
-or
+# build all, extract and merge the tarballs in list.nve
+./build.sh -t src/list.nve
 $HOME/VOXIN/voxin-nve/build/packages/voxind-nve_1.4.0.x86_64.txz
 $HOME/VOXIN/voxin-nve/build/packages/voxin-nve-all_3.3.0-1.txz
 $HOME/VOXIN/voxin-nve/build/packages/voxin-nve-enu-nathan-embedded-high_1.0.0-1.txz
