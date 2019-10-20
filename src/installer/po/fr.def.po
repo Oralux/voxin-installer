@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: voxin-installer 3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-08-10 23:50+0200\n"
-"PO-Revision-Date: 2019-08-10 23:54+0200\n"
+"POT-Creation-Date: 2019-10-20 11:50+0200\n"
+"PO-Revision-Date: 2019-10-20 11:52+0200\n"
 "Last-Translator: Gilles Casse <gcasse@oralux.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -39,7 +39,7 @@ msgid "Do you authorize the update of the configuration files (speechd.conf)?"
 msgstr ""
 "Autorisez-vous la mise à jour des fichiers de configurations (speechd.conf) ?"
 
-#: ../voxin-installer.sh:49 ../common/ask.inc:17
+#: ../voxin-installer.sh:50 ../voxin-installer.sh:62 ../common/ask.inc:17
 msgid "Do you really want to continue?"
 msgstr "Voulez-vous vraiment continuer ?"
 
@@ -63,11 +63,11 @@ msgstr "Erreur : aucune archive voxind"
 msgid "For support, email to contact at oralux.org "
 msgstr "Pour tout support, écrivez à contact at oralux.org "
 
-#: ../voxin-installer.sh:53 ../voxin-installer.sh:143
+#: ../voxin-installer.sh:54 ../voxin-installer.sh:66 ../voxin-installer.sh:156
 msgid "Good Bye. "
 msgstr "Au revoir. "
 
-#: ../voxin-installer.sh:48 ../common/ask.inc:16
+#: ../voxin-installer.sh:49 ../common/ask.inc:16
 msgid ""
 "If the installation continues, orca will not be able to use voxin, but "
 "emacspeak will"
@@ -75,10 +75,10 @@ msgstr ""
 "Si l'installation est poursuivie, orca ne pourra pas utiliser voxin mais "
 "emacspeak le pourra"
 
-#: ../voxin-installer.sh:50 ../common/ask.inc:18 ../common/ask.inc:32
-#: ../common/ask.inc:75 ../common/ask.inc:79 ../common/ask.inc:100
-#: ../common/ask.inc:112 ../common/ask.inc:144 ../common/ask.inc:148
-#: ../common/ask.inc:164
+#: ../voxin-installer.sh:51 ../voxin-installer.sh:63 ../common/ask.inc:18
+#: ../common/ask.inc:32 ../common/ask.inc:75 ../common/ask.inc:79
+#: ../common/ask.inc:100 ../common/ask.inc:112 ../common/ask.inc:144
+#: ../common/ask.inc:148 ../common/ask.inc:164
 msgid "If yes, press the ENTER key."
 msgstr "Si oui, appuyez sur la touche Entrée."
 
@@ -98,11 +98,11 @@ msgstr "Si vous acceptez la licence IBM, appuyez sur la touche Entrée"
 msgid "If you agree to the LGPL license, press the ENTER key"
 msgstr "Si vous acceptez la licence LGPL, appuyez sur la touche Entrée"
 
-#: ../voxin-installer.sh:106
+#: ../voxin-installer.sh:119
 msgid "Initialization; please wait... "
 msgstr "Initialisation; patientez svp... "
 
-#: ../voxin-installer.sh:105
+#: ../voxin-installer.sh:118
 msgid "Logs written in log/voxin.log"
 msgstr "Logs écrits dans log/voxin.log"
 
@@ -118,6 +118,10 @@ msgstr "Lancez svp voxin-installer en tant que root. "
 msgid "Please use the space bar to scroll through the document."
 msgstr "Appuyez svp sur la barre d'espace pour passez de page en page."
 
+#: ../common/init.inc:49
+msgid "Please wait..."
+msgstr "Patientez svp..."
+
 #: ../voxin-installer.sh:33
 msgid "Sorry, this distribution is not yet supported. "
 msgstr "Désolé, cette distribution n'est pas encore supportée. "
@@ -126,7 +130,7 @@ msgstr "Désolé, cette distribution n'est pas encore supportée. "
 msgid "Sorry, this installer does not expect a symbolic link /opt"
 msgstr "Désolé cet installeur ne gère pas le lien symbolique en /opt"
 
-#: ../voxin-installer.sh:142
+#: ../voxin-installer.sh:155
 msgid "The changes will be taken into account on next boot. "
 msgstr ""
 "Les modifications seront prises en compte au prochain démarrage du PC. "
@@ -135,18 +139,18 @@ msgstr ""
 msgid "The voxin module must be added to the configuration files"
 msgstr "Le module Voxin doit être ajouté aux fichiers de configuration"
 
+#: ../common/init.inc:51
+msgid "You do not authorize the installer to perform this operation"
+msgstr "vous n'autorisez pas l'installeur à exécuter cette opération"
+
+#: ../voxin-installer.sh:60
+msgid "Your version of speech-dispatcher has not been recognized."
+msgstr "Votre version de speech-dispatcher n'a pas été reconnue."
+
 #: ../common/init.inc:125 ../common/init.inc:136
 msgid "rfs all tarball not found!"
 msgstr "l'archive rfs all est absente !"
 
-#: ../common/init.inc:316
+#: ../common/init.inc:310
 msgid "voxin package not found!"
 msgstr "le paquet voxin est absent !"
-
-#: ../common/init.inc:49
-msgid "you authorize the installer to perform this operation"
-msgstr "vous autorisez l'installeur à exécuter cette opération"
-
-#: ../common/init.inc:51
-msgid "you do not authorize the installer to perform this operation"
-msgstr "vous n'autorisez pas l'installeur à exécuter cette opération"

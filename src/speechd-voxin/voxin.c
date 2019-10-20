@@ -71,7 +71,8 @@ static int get_module(const char *version, char **module) {
   }
 
   m = *module;
-  
+
+  #define SDMAX SD9_0
   if (!strncmp(version, "0.9", 3)) {
     m = "sd_ibmtts." SD9_0;
   } else if (!strncmp(version, "0.8", 3)) {
@@ -112,8 +113,13 @@ int main(int argc, char *argv[])
 #endif
 
   err = get_version(buf, MAX_BUF, &version);
-  if (err)
-    return err;
+  if (err) {
+    // unknown version, built from git?
+    // suppose compatibility with the max known version
+    strncpy(buf, SDMAX, MAX_BUF);
+    version = buf;
+    err = 0;
+  }
   
   err = get_module(version, &module);
   if (err)

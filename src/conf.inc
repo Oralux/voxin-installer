@@ -23,7 +23,7 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 #LIBVOXIN_VERSION=
 # - from the 1.4.4 tag instead (+sha512)
 LIBVOXIN_VERSION=1.4.4
-LIBVOXIN_SHA512=b423612e3013d95f699854683d263672bd6fbea33789c41ea559daad42aaf80fc0f00496d78d7226f4b86dbe313e4d190a710de04bd5e279cd178c69ea1e7487
+LIBVOXIN_SHA512=f7e1d5a66d9b05ac536e0514ab3d8c078adec37f19448ab509e79e9f2febd70d2faafb152601b6aba54dc6097adc3fd856ffb43cd15435ac20a0ec7e1f08b51b
 
 #-- speech-dispatcher-voxin
 SPEECHD_VOXIN_URL=https://github.com/Oralux/speechd/archive
@@ -453,7 +453,8 @@ buildVoxinModule() {
 	local modulesDir="$VOXINDIR"/lib/speech-dispatcher-modules
 	cd "$SRCDIR"/speechd-voxin
 	make clean
-	SD7_1=$SPEECHD_VOXIN_VERSION_0_7_1 SD8=$SPEECHD_VOXIN_VERSION_0_8 SD8_8=$SPEECHD_VOXIN_VERSION_0_8_8 SD9_0=$SPEECHD_VOXIN_VERSION_0_9_0 make
+	SD7_1=$SPEECHD_VOXIN_VERSION_0_7_1 SD8=$SPEECHD_VOXIN_VERSION_0_8 SD8_8=$SPEECHD_VOXIN_VERSION_0_8_8 SD9_0=$SPEECHD_VOXIN_VERSION_0_9_0 SDMAX=$SPEECHD_VOXIN_VERSION_0_9_0 make
+	SDMAX=
 	DESTDIR="$modulesDir" make install
 
 	# create symlinks

@@ -41,21 +41,6 @@ if [ -h /opt ]; then
     exit 1
 fi
 
-with_sd=1
-check_speech_dispatcher_voxin
-if [ "$?" != "0" ]; then
-	_gettext "Your version of speech-dispatcher is too old (required version >= $SPEECHD_MIN_VERSION)"
-	_gettext "If the installation continues, orca will not be able to use voxin, but emacspeak will"
-	_gettext "Do you really want to continue?"
-	_gettext "If yes, press the ENTER key."
-	yes
-	if [ $? = 1 ]; then
-		_gettext "Good Bye. "
-		exit 0
-	fi
-	with_sd=0
-fi
-
 TEMP=`getopt -o hluv --long help,lang,uninstall,verbose -- "$@"`
 if [ $? != 0 ] ; then
     usage
@@ -78,6 +63,36 @@ while true ; do
 		*) usage; exit 1;;
     esac
 done
+
+if [ "$with_uninstall" = 0 ]; then
+	with_sd=1
+	check_speech_dispatcher_voxin
+	case $? in
+		1)
+			_gettext "Your version of speech-dispatcher is too old (required version >= $SPEECHD_MIN_VERSION)"
+			_gettext "If the installation continues, orca will not be able to use voxin, but emacspeak will"
+			_gettext "Do you really want to continue?"
+			_gettext "If yes, press the ENTER key."
+			yes
+			if [ $? = 1 ]; then
+				_gettext "Good Bye. "
+				exit 0
+			fi
+			with_sd=0
+			;;
+		2)
+			_gettext "Your version of speech-dispatcher has not been recognized."
+			_gettext "If the installation continues, voxin will use its module for speech-dispatcher $SPEECHD_MAX_VERSION"
+			_gettext "Do you really want to continue?"
+			_gettext "If yes, press the ENTER key."
+			yes
+			if [ $? = 1 ]; then
+				_gettext "Good Bye. "
+				exit 0
+			fi
+			with_sd=0
+	esac
+fi
 
 if [ "$with_verbose" = "1" ]; then
     set -x

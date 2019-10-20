@@ -3,6 +3,7 @@ TEMPLATE=voxin-installer.XXXXXXXXXX
 TMPDIR=/tmp
 # Only version > 0.7 are compatible
 SPEECHD_MIN_VERSION=0.7
+SPEECHD_MAX_VERSION=0.9
 VOXIN_VERSION=%VERSION%
 
 unset WITH_TTS
@@ -41,12 +42,13 @@ yes() {
 ok() {
     local status=1
     local a
+	echo -n " "
     read a
     case "$a" in [oO][kK]*) status=0;; esac
-	if [ "$status" = "0" ]; then
-		_gettext "you authorize the installer to perform this operation"
+	if [ "$status" = "0" ]; then		
+		_gettext "Please wait..."
 	else
-		_gettext "you do not authorize the installer to perform this operation"
+		_gettext "You do not authorize the installer to perform this operation"
 	fi	
     return $status
 }
@@ -336,6 +338,18 @@ install_gettext() {
     . gettext.sh
 }
 
+# getMajorMinorMicro
+# The result is supplied in the outputArray (index 0:major, 1:minor, 2:micro)
+#
+# major.minor.micro
+# major: n digits
+# minor: n digits
+# micro: n digits (optionally followed by non digits characters which will be filtered)
+# e.g.
+# 0.7.1_abce
+# gives major=0, minor=7, micro=1
+#
+# Return 0 if ok, 1 otherwise
 getMajorMinorMicro() {
 	[ $# != 1 ] && return 1
 	local version=$1
@@ -359,16 +373,23 @@ getMajorMinorMicro() {
 	return 0
 }
 
+# compare version1 to version2
+#
+# RETURN
+# 0: ver1 >= ver2
+# 1: ver1 < ver2
+# 2: ver1 with unexpected format (see getMajorMinorMicro)
+# 3: ver2 with unexpected format
 isVersionGreater() {
 	[ $# != 2 ] && return 1
 	local ver1=$1
 	local ver2=$2
 
-	getMajorMinorMicro "$ver1" || return 1
+	getMajorMinorMicro "$ver1" || return 2
 	ver1=("${outputArray[@]}") 
 
 	getMajorMinorMicro "$ver2"
-	ver2=("${outputArray[@]}")
+	ver2=("${outputArray[@]}") || return 3
 
 	i=0
 	while [ "$i" -le 2 ]; do
