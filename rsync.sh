@@ -45,7 +45,7 @@ if [ -n "$a" ]; then
 	upload_to_server
 	ssh $SERVER "cd $VMVOXDIR/voxin-installer && ./build.sh -u x86"
 	ssh $SERVER "cd $VMVOXDIR/voxin-installer && ./build.sh -d x86 -t src/list.vv"
-	ssh $SERVER "cd $VMVOXDIR/voxin-installer && ./build.sh -d x86 -t src/list.nve"
+	ssh $SERVER "cd $VMVOXDIR/voxin-installer && ./build.sh -d x86 -t src/list.ve"
 else
 	echo "Only build on VM64 ($SERVER)? (y|N)"
 	read a
@@ -56,7 +56,7 @@ else
 	if [ -n "$a" ]; then
 		upload_to_server
 		ssh $SERVER "cd $VMVOXDIR/voxin-installer && ./build.sh -t src/list.vv"
-		ssh $SERVER "cd $VMVOXDIR/voxin-installer && ./build.sh -t src/list.nve"
+		ssh $SERVER "cd $VMVOXDIR/voxin-installer && ./build.sh -t src/list.ve"
 	fi
 fi
 

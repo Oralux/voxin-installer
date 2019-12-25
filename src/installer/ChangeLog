@@ -1,3 +1,20 @@
+2019-12-25 Gilles Casse <gcasse@oralux.org>
+	release 3.0: New voices, new languages in Voxin based on Vocalizer Embedded (libvoxin 1.4.4).
+	The aim is to have more TTS choices for Orca, Emacspeak and possibly the console based screen readers (x86, x86_64, or arm v5, v7-a, v8-a).
+	IBM TTS is still proposed.
+
+	Here are the known current limits of voxin 3.0.
+	These limits should be removed in the forthcoming updates.
+
+	- only for x86_64 architecture (not yet x86, arm),
+	- compatible with Speech-Dispatcher (version > 0.7),
+	- compatible with a previous installation of voxin (version >= 2.0),
+	- only for UTF-8 texts,
+	- limited set of parameters (language, speed, volume, pitch),
+	- not yet compatible with Emacspeak,
+	- no support yet for dictionaries or annotations,
+	- cannot automatically switch from one language to another one.
+
 2019-05-30 Gilles Casse <gcasse@oralux.org>
 	release 2.2: Ignore unknown characters instead of replacing them by '?' (libvoxin 1.3.6)
 

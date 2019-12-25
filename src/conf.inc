@@ -1,6 +1,6 @@
 # The BASE variable should be set before including this file
 #
-VOXIN_VER=3.0rc3
+VOXIN_VER=3.0
 
 #-- voxin-rfs32
 # Buildroot
@@ -23,7 +23,7 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 #LIBVOXIN_VERSION=
 # - from the 1.4.4 tag instead (+sha512)
 LIBVOXIN_VERSION=1.4.4
-LIBVOXIN_SHA512=f7e1d5a66d9b05ac536e0514ab3d8c078adec37f19448ab509e79e9f2febd70d2faafb152601b6aba54dc6097adc3fd856ffb43cd15435ac20a0ec7e1f08b51b
+LIBVOXIN_SHA512=858180060f73379abedb157d08698d93ac233dbfc78ca965f92a6b80462c9091044b23ad32efbdc975d1cc5c5e0ea049cd816aa561164678c76db7bb65e328f8
 
 #-- speech-dispatcher-voxin
 SPEECHD_VOXIN_URL=https://github.com/Oralux/speechd/archive
@@ -51,8 +51,8 @@ SPEECHD_VOXIN_VERSION_0_8_8=0.8.8-voxin3rc3
 SPEECHD_VOXIN_SHA512_0_8_8=a699f79718f6054602484a0f0e49ec35eaf152d72800460b0605aa1c2da8c3e393ed6e6d3874d19041860e39d60a7e2f9f8efd4c2fe1e7e9b1ef0f2362e5ad26
 
 # speechd: version 0.7.1
-SPEECHD_VOXIN_VERSION_0_7_1=0.7.1-voxin1
-SPEECHD_VOXIN_SHA512_0_7_1=839199d3a4cfe27acc929628ccebf53f9eecd45c2a5646c13bab022da73c71caf6dc1751372c7bbd80f60215234ecf8e2784cbb7d13074960827e14ec1965031
+SPEECHD_VOXIN_VERSION_0_7_1=0.7.1-voxin3rc3
+SPEECHD_VOXIN_SHA512_0_7_1=41bf118ca5a4a233aa0d11810c7f5c5a6efeb0688500df37bab3e2fd6a683d9e22c966a8bada5567ec3bf76e25e5ad6320078af9aca3c1f98f739a353dac0d96
 
 # VMX86_64: VM where voxin-installer is built for x86_64 architecture
 # This VM is currently used to build libvoxin on a Debian 8 environment
@@ -533,12 +533,25 @@ getLangFromViavoiceTarball() {
 	echo "$lang"
 }
 
-getLangFromNveTarball() {
-	local lang=$(echo "$tarball" | sed 's/.*voxin-nve-\(.*\)_.*/\1/')
-	if [ "$lang" != all ]; then
-		lang=$(echo "$lang" | sed 's/.*-\(.*\)-embedded-\(.*\)/\1-\2/')
-	fi
-	echo "$lang"
+# build the voice tarball for a specific release
+# voice: update-ve,...
+# tarball: *voxind*,...
+# all: *voxin-nve-all*,...
+buildVoiceTarball() {
+	local voice=$1
+	local tarball=$2
+	local all=$3
+	local releaseDir=$PKGDIR/voxin-$VOXIN_VER
+	local installDir=$INSTALLDIR/packages/all
+	local installerDir="$releaseDir/voxin-$VOXIN_VER/voxin-$voice-$VOXIN_VER"
+	local installerTar="$releaseDir/voxin-$voice-$VOXIN_VER.tgz"
+
+	mkdir -p "$installerDir" || return 1
+	rsync -a "$INSTALLDIR"/ "$installerDir"
+	cp -a "$tarball" "$all" "$installerDir"/packages/all
+	fakeroot bash -c "tar -C \"$releaseDir\" -zcf \"$installerTar\" voxin-$VOXIN_VER" || return 1
+	rm -rf "$releaseDir/voxin-$VOXIN_VER"
+	echo "$installerTar"	
 }
 
 buildReleaseTarball() {
@@ -547,6 +560,8 @@ buildReleaseTarball() {
 	local arch=$2
 	local withTTS=$3
 	local releaseDir=$PKGDIR/voxin-$VOXIN_VER
+	# prefixed by withTTS to prevent deletion by next init() call
+	local releaseTarball=$PKGDIR/${withTTS}_voxin-$VOXIN_VER.tgz
 	local installerDir
 	local installerTar
 	local installDir
@@ -554,12 +569,6 @@ buildReleaseTarball() {
 	local pwd=$PWD
 	local exclude
 
-	case "$withTTS" in
-		viavoice) getLangFromTarball=getLangFromViavoiceTarball;;
-		nve) getLangFromTarball=getLangFromNveTarball;;
-		*) echo "Error: withTTS=$withTTS"; return;;
-	esac
-	
 	# build the final rfsdir tarball and install it in the installer tree
 	installDir=$INSTALLDIR/packages/all
 	tarball=$installDir/rfs_$VOXIN_VER.all.txz
@@ -607,28 +616,24 @@ buildReleaseTarball() {
 		    tarball=$(eval echo $t)
 			[ -e "$tarball" ] || leave "Tarball not found: $tarball" 1 
 		    case "$tarball" in
-				*voxind-*txz)
-					voxind=$tarball
-					;;
-				*voxin-*txz)
-					lang=$($getLangFromTarball)
+				*voxind-*txz) voxind=$tarball;;
+				*voxin-nve-all*txz) all=$tarball;;
+				*voxin-viavoice*txz)
+					lang=$(getLangFromViavoiceTarball)
 					if [ "$lang" = "all" ]; then
 						all=$tarball
 					else
-						installerDir="$releaseDir/voxin-$VOXIN_VER/voxin-$lang-$VOXIN_VER"
-						installerTar="$releaseDir/voxin-$lang-$VOXIN_VER.tgz"
-						mkdir -p "$installerDir" || return 1
-						rsync -a "$INSTALLDIR"/ "$installerDir"
-						cp -a "$tarball" "$all" "$voxind" "$installerDir"/packages/all
-						fakeroot bash -c "tar -C \"$releaseDir\" -zcf \"$installerTar\" voxin-$VOXIN_VER" || return 1
-						rm -rf "$releaseDir/voxin-$VOXIN_VER"
-						echo "$installerTar"
+						buildVoiceTarball $lang $tarball $all
 					fi
 					;;
 				*) ;;
 			esac
 		done
 
+		if [ "$withTTS" = nve ]; then
+			buildVoiceTarball update-ve $voxind $all
+		fi
+		
 		local sha512=$BASE/check/$VOXIN_VER/voxin-$VOXIN_VER.sha512
 		if [ -e "$sha512" ]; then
 			rm "$sha512"
@@ -640,6 +645,7 @@ buildReleaseTarball() {
 			sha512sum "$i" >> "$sha512"
 		done
 		cd "$pwd"
+		tar -C $(dirname "$releaseDir") -zcf "$releaseTarball" $(basename "$releaseDir")
 	fi
 }
 
@@ -972,7 +978,7 @@ uploadToX86VM() {
 	fi
 
 	ssh $VMX86 'cd voxin-installer && ./build.sh -t src/list.vv'
-	ssh $VMX86 'cd voxin-installer && ./build.sh -t src/list.nve'
+	ssh $VMX86 'cd voxin-installer && ./build.sh -t src/list.ve'
 	cd "$pwd"
 }
 

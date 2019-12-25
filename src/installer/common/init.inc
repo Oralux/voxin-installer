@@ -81,7 +81,7 @@ check_distro() {
 	status=0
 	case "$ID" in
 		arch*) source common/install-arch-linux.inc;;
-		debian*) source common/install-deb.inc;;
+		debian*|ubuntu*) source common/install-deb.inc;;
 		fedora*) source common/install-rpm-dnf.inc;;
 		gentoo*) source common/install-gentoo.inc;;
 		opensuse*|suse*) source common/install-rpm-zypper.inc;;
