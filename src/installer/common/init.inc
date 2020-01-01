@@ -144,11 +144,11 @@ noOp() {
 }
 
 getVoiceAllTarball() {
-	find packages/all -name "voxin-*-all*.txz"
+	find packages/all -name "voxin-*-all_*.txz"
 }
 
 getVoiceTarball() {
-	find packages/all -name "voxin-*txz" ! -name "voxin-*-all*.txz"
+	find packages/all -name "voxin-*txz" ! -name "voxin-*-all_*.txz"
 }
 
 getVoxindTarball() {

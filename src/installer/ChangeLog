@@ -1,3 +1,6 @@
+2020-01-01 Gilles Casse <gcasse@oralux.org>
+        init.inc: fix conflict between filenames, allison and the all filename suffix
+
 2019-12-25 Gilles Casse <gcasse@oralux.org>
 	release 3.0: New voices, new languages in Voxin based on Vocalizer Embedded (libvoxin 1.4.4).
 	The aim is to have more TTS choices for Orca, Emacspeak and possibly the console based screen readers (x86, x86_64, or arm v5, v7-a, v8-a).
