@@ -1,6 +1,6 @@
 # The BASE variable should be set before including this file
 #
-VOXIN_VER=3.0
+VOXIN_VER=3.1rc1
 
 #-- voxin-rfs32
 # Buildroot
@@ -22,8 +22,8 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 # - development (master branch)
 #LIBVOXIN_VERSION=
 # - from the 1.4.4 tag instead (+sha512)
-LIBVOXIN_VERSION=1.4.4
-LIBVOXIN_SHA512=858180060f73379abedb157d08698d93ac233dbfc78ca965f92a6b80462c9091044b23ad32efbdc975d1cc5c5e0ea049cd816aa561164678c76db7bb65e328f8
+LIBVOXIN_VERSION=1.4.5
+LIBVOXIN_SHA512=318226bce2590aa2363ab5d4bd42fe88436afa27c7b51d2f24b2b324275e8d0002df0f3eb0c35dc263b44a61bce48d92f25ad3fb39d964e15d54e6e93a1613f1
 
 #-- speech-dispatcher-voxin
 SPEECHD_VOXIN_URL=https://github.com/Oralux/speechd/archive

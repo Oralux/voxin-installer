@@ -1,3 +1,10 @@
+2020-01-05 Gilles Casse <gcasse@oralux.org>
+	release 3.1rc1 for IBM TTS:
+	- fix issue which caused texts to be filtered (not spoken); filter
+	  now only an utf-8 character having no counterpart in the charset
+	  expected by the text-to-speech.
+	- replace any utf-8 character related to a quote to its equivalent in ascii (0x27)
+
 2020-01-01 Gilles Casse <gcasse@oralux.org>
         init.inc: fix conflict between filenames, allison and the all filename suffix
 
