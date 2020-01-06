@@ -1,3 +1,7 @@
+2020-01-06 Gilles Casse <gcasse@oralux.org>
+	release 3.1rc2 for IBM TTS (x86_64):
+	- fix the list of utf-8 characters to be replaced by the ascii quote
+
 2020-01-05 Gilles Casse <gcasse@oralux.org>
 	release 3.1rc1 for IBM TTS:
 	- fix issue which caused texts to be filtered (not spoken); filter
