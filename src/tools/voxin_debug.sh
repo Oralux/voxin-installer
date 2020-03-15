@@ -29,7 +29,7 @@ cp $HOME/.local/share/orca/user-settings.conf $DIR/home 2>/dev/null
 cp /etc/os-release $DIR/etc
 speech-dispatcher -v >> $DIR/report.txt
 spd-say -O >> $DIR/report.txt
-spd-say -L >> $DIR/report.txt
+spd-say -o voxin -L >> $DIR/report.txt
 
 # build the tgz
 cd /tmp
