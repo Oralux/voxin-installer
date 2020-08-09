@@ -12,8 +12,9 @@
 #define VOXIND_DBG "/tmp/test_voxind"
 #endif
 
-// .../sd_ibmtts.0.7.1-voxin1
-#define MODULE_MAX PATH_MAX+30 
+// .../sd_voxin.0.7.1-voxin1
+// .../sd_voxin.0.9.1-voxin3rc4
+#define MODULE_MAX PATH_MAX+40 
 static char path[MODULE_MAX];  
 
 
@@ -74,11 +75,11 @@ static int get_module(const char *version, char **module) {
 
   #define SDMAX SD9_0
   if (!strncmp(version, "0.9", 3)) {
-    m = "sd_ibmtts." SD9_0;
+    m = "sd_voxin." SD9_0;
   } else if (!strncmp(version, "0.8", 3)) {
-    m = (!version[3]) ? "sd_ibmtts." SD8 : "sd_ibmtts." SD8_8;
+    m = (!version[3]) ? "sd_voxin." SD8 : "sd_voxin." SD8_8;
   } else if (!strncmp(version, "0.7", 3)) {
-    m = "sd_ibmtts." SD7_1;
+    m = "sd_voxin." SD7_1;
   } else {
     err = 21;
     dbg("unexpected version %s", version);
@@ -141,7 +142,15 @@ int main(int argc, char *argv[])
   
   strncpy(basename+1, module, MODULE_MAX - strlen(path));
   dbg("execve %s", path);
-  execl(path, path, NULL);  
+
+  {
+    void **arg = calloc(1, (argc+1)*sizeof(*argv));
+    if (arg) {
+      memcpy(arg, argv, argc*sizeof(*argv));
+      execv(path, (char* const *)arg);
+    }
+    free(arg);
+  }
 
  exit0:
   if (err) {

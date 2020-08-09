@@ -1,6 +1,6 @@
 # The BASE variable should be set before including this file
 #
-VOXIN_VER=3.1rc2
+VOXIN_VER=3.1rc3
 
 #-- voxin-rfs32
 # Buildroot
@@ -21,25 +21,24 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 # select the libvoxin sources (development or tag)
 # - development (master branch)
 #LIBVOXIN_VERSION=
-# - from the 1.4.4 tag instead (+sha512)
-LIBVOXIN_VERSION=1.4.6
-LIBVOXIN_SHA512=d454a19f9c36323d8dd314793c7a25b552f796188b0bfbd9f0e5edea65c22c7a15f84af9b42329f0c1a2cee50eda6e2aec382c64ef6394b3b0e9555b8f6fa513
+# - from the last tag instead (+sha512)
+LIBVOXIN_VERSION=1.5.0
+LIBVOXIN_SHA512=d6956221e454239c6c610f965e2456a4009a6f81c5320660555f4b89204fcb4a93d891fa47a0ff8fd8eebfce8e153867eada649633f48ed183af2a478713b172
 
 #-- speech-dispatcher-voxin
 SPEECHD_VOXIN_URL=https://github.com/Oralux/speechd/archive
 SPEECHD_VOXIN_VERSION_DEV=0.9voxinx
-SPEECHD_IBMTTS_COPYRIGHT_NB_LINES=23
+SPEECHD_SD_MODULE_COPYRIGHT_NB_LINES=25
 
 ###
 # select the current speech-dispatcher sources (development or tag)
 # - development (SPEECHD_BRANCH)
 #SPEECHD_VOXIN_VERSION=
 #SPEECHD_VOXIN_SHA512=
-#SPEECHD_VOXIN_BRANCH=ibmtts_dynamic_loading
-# - from the 0.9voxin1 tag instead (+sha512)
-SPEECHD_VOXIN_VERSION_0_9_0=0.9.0-voxin3rc3
-SPEECHD_VOXIN_SHA512_0_9_0=1c801095a6d6d00adf224aad9aad66adf9ff7eaeded68bb108025cc2c9d870123a1265351bbe41ccc6c5e9073b376fcb5cf7d5914ad9729b503e9c292063378d
-SPEECHD_VOXIN_BRANCH=ibmtts_dynamic_loading
+SPEECHD_VOXIN_BRANCH=master
+# - from the 0.9.1-voxin3rc4 tag instead (+sha512)
+SPEECHD_VOXIN_VERSION_0_9_1=0.9.1-voxin3rc4
+SPEECHD_VOXIN_SHA512_0_9_1=6afd8be70c38854e7f950a17d5fc51cf0746990a9927637c70e3a046a628769d98c00851eac50829b237890730765f34b1a22418570c9914560ef814536a0186
 ###
 
 # speechd: version 0.8
@@ -402,9 +401,9 @@ getSpeechDispatcherVoxin() {
 
 	# Patches needed to Build sd 0.9 on Debian 8
 	case "$version" in
-	    "$SPEECHD_VOXIN_VERSION_0_9_0")
-		patch -p1 < $SRCDIR/patch/sd-0.9-gettext-version.patch
-		patch -p1 < $SRCDIR/patch/sd-0.9-force-modif-acceptance.patch
+	    "$SPEECHD_VOXIN_VERSION_0_9_1")
+		# patch -p1 < $SRCDIR/patch/sd-0.9-gettext-version.patch
+		# patch -p1 < $SRCDIR/patch/sd-0.9-force-modif-acceptance.patch
 		;;
 	    "$SPEECHD_VOXIN_VERSION_0_8")	
 		patch -p1 < $SRCDIR/patch/sd-0.8-fix-doc-from-debian-8-src.patch	    
@@ -414,35 +413,30 @@ getSpeechDispatcherVoxin() {
 		;;
 	esac
 	./build.sh
-	PLUGIN_DIR="/usr/lib/speech-dispatcher"
-	case "$arch" in
-		x86_64) PLUGIN_DIR="$PLUGIN_DIR:/usr/lib/x86_64-linux-gnu/speech-dispatcher:/usr/lib64/speech-dispatcher";;
-		*86) PLUGIN_DIR="$PLUGIN_DIR:/usr/lib/i386-linux-gnu/speech-dispatcher";;
-	esac
-	if [ "$SPEECHD_VOXIN_VERSION_0_8" = "$version" ]; then
-	    unset GTHREAD_LIBS
-	else
-	    # pthread instead of gthread which is not always installed by default (seen in openSUSE Tumbleweed-i586 20190220)
-	    GTHREAD_LIBS=-lpthread
-	fi	    
-	GTHREAD_LIBS=$GTHREAD_LIB CFLAGS="-I$libvoxinDir/../include/voxin" LDFLAGS="-L$libvoxinDir" ./configure --prefix="/usr" --with-ibmtts 
-
-	PLUGIN_DIR=$PLUGIN_DIR make || return 1
+	# if [ "$SPEECHD_VOXIN_VERSION_0_8" = "$version" ]; then
+	#     unset GTHREAD_LIBS
+	# else
+	#     # pthread instead of gthread which is not always installed by default (seen in openSUSE Tumbleweed-i586 20190220)
+	#     GTHREAD_LIBS=-lpthread
+	# fi	    
+#	GTHREAD_LIBS=$GTHREAD_LIB CFLAGS="-I$libvoxinDir/../include/voxin" LDFLAGS="-L$libvoxinDir" ./configure --prefix="/usr" --with-voxin
+	CFLAGS="-I$libvoxinDir/../include/voxin" LDFLAGS="-L$libvoxinDir" ./configure --prefix="/usr"
+	make || return 1
 	
 	# install
 	local modulesDir="$VOXINDIR"/lib/speech-dispatcher-modules
 	local confDir="$VOXINDIR"/share/speech-dispatcher/conf
 	local docDir="$VOXINDIR"/share/doc/speech-dispatcher-voxin
 	mkdir -p "$modulesDir" "$confDir" "$docDir"
-	local module=src/modules/sd_ibmtts
-	[ -e src/modules/.libs/sd_ibmtts ] && module=src/modules/.libs/sd_ibmtts
+	local module=src/modules/sd_voxin
+	[ -e src/modules/.libs/sd_voxin ] && module=src/modules/.libs/sd_voxin
 	if [ "$SPEECHD_VOXIN_VERSION_0_7_1" = "$version" ]; then
 	    # CentOS7: rpath to libsdaudio
 	    patchelf --set-rpath /usr/lib64/speech-dispatcher "$module"
 	fi	    
-	cp "$module" "$modulesDir"/sd_ibmtts.$version || return 1
-	cp ./config/modules/ibmtts.conf "$confDir"/ibmtts.conf.$version || return 1
-	head -n $SPEECHD_IBMTTS_COPYRIGHT_NB_LINES src/modules/ibmtts.c > "$docDir"/copyright.$version
+	cp "$module" "$modulesDir"/sd_voxin.$version || return 1
+	cp ./config/modules/voxin.conf "$confDir"/voxin.conf.$version || return 1
+	head -n $SPEECHD_SD_MODULE_COPYRIGHT_NB_LINES src/modules/voxin.c > "$docDir"/copyright.$version
 	
 	cd "$pwd"
 	return 0
@@ -453,7 +447,7 @@ buildVoxinModule() {
 	local modulesDir="$VOXINDIR"/lib/speech-dispatcher-modules
 	cd "$SRCDIR"/speechd-voxin
 	make clean
-	SD7_1=$SPEECHD_VOXIN_VERSION_0_7_1 SD8=$SPEECHD_VOXIN_VERSION_0_8 SD8_8=$SPEECHD_VOXIN_VERSION_0_8_8 SD9_0=$SPEECHD_VOXIN_VERSION_0_9_0 SDMAX=$SPEECHD_VOXIN_VERSION_0_9_0 make
+	SD7_1=$SPEECHD_VOXIN_VERSION_0_7_1 SD8=$SPEECHD_VOXIN_VERSION_0_8 SD8_8=$SPEECHD_VOXIN_VERSION_0_8_8 SD9_0=$SPEECHD_VOXIN_VERSION_0_9_1 SDMAX=$SPEECHD_VOXIN_VERSION_0_9_1 make
 	SDMAX=
 	DESTDIR="$modulesDir" make install
 
@@ -461,8 +455,8 @@ buildVoxinModule() {
 	cd "$BUILDPKG/rfs"
 	mkdir -p usr/{lib/speech-dispatcher-modules,share/speech-dispatcher/conf/modules} etc/speech-dispatcher/modules
 	ln -s /opt/oralux/voxin/lib/speech-dispatcher-modules/sd_voxin usr/lib/speech-dispatcher-modules/sd_voxin
-	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$SPEECHD_VOXIN_VERSION_0_9_0 usr/share/speech-dispatcher/conf/modules/voxin.conf
-	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/ibmtts.conf.$SPEECHD_VOXIN_VERSION_0_9_0 etc/speech-dispatcher/modules/voxin.conf
+	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/voxin.conf.$SPEECHD_VOXIN_VERSION_0_9_1 usr/share/speech-dispatcher/conf/modules/voxin.conf
+	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/voxin.conf.$SPEECHD_VOXIN_VERSION_0_9_1 etc/speech-dispatcher/modules/voxin.conf
 
 	cd "$pwd"
 }
