@@ -24,8 +24,8 @@ update_tarball.sh voxin-update-3.1rc3.tgz voxin-enu-3.0.tgz build_dir
 [ -f "$2" ] || leave "$2 is not a file" 1
 [ -d "$3" ] || leave "$3 is not a directory" 1
 
-UPDATE_NEW=$1
-VOICE_OLD=$2
+UPDATE_NEW=$(realpath $1)
+VOICE_OLD=$(realpath $2)
 BUILD=$3
 
 is_ve() {
