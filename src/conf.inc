@@ -1,6 +1,9 @@
 # The BASE variable should be set before including this file
 #
-VOXIN_VER=3.1rc3
+VOXIN_VERSION=3.1rc3
+
+VOXIN_INSTALLER_GIT_URL=https://github.com/Oralux/voxin-installer.git
+VOXIN_INSTALLER_TAG=$VOXIN_VERSION
 
 #-- voxin-rfs32
 # Buildroot
@@ -24,34 +27,6 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 # - from the last tag instead (+sha512)
 LIBVOXIN_VERSION=1.5.0
 LIBVOXIN_SHA512=d6956221e454239c6c610f965e2456a4009a6f81c5320660555f4b89204fcb4a93d891fa47a0ff8fd8eebfce8e153867eada649633f48ed183af2a478713b172
-
-#-- speech-dispatcher-voxin
-SPEECHD_VOXIN_URL=https://github.com/Oralux/speechd/archive
-SPEECHD_VOXIN_VERSION_DEV=0.9voxinx
-SPEECHD_SD_MODULE_COPYRIGHT_NB_LINES=25
-
-###
-# select the current speech-dispatcher sources (development or tag)
-# - development (SPEECHD_BRANCH)
-#SPEECHD_VOXIN_VERSION=
-#SPEECHD_VOXIN_SHA512=
-SPEECHD_VOXIN_BRANCH=master
-# - from the 0.9.1-voxin3rc4 tag instead (+sha512)
-SPEECHD_VOXIN_VERSION_0_9_1=0.9.1-voxin3rc4
-SPEECHD_VOXIN_SHA512_0_9_1=6afd8be70c38854e7f950a17d5fc51cf0746990a9927637c70e3a046a628769d98c00851eac50829b237890730765f34b1a22418570c9914560ef814536a0186
-###
-
-# speechd: version 0.8
-SPEECHD_VOXIN_VERSION_0_8=0.8-voxin3rc3
-SPEECHD_VOXIN_SHA512_0_8=a7595025d70510475964d79e76f3b7ee292286e18d1f98ff1b2fa093b7b77396e5c3ded3c371f133b678a1263ba1647886182dc97fde07c46186e06a410edb54
-
-# speechd: version 0.8.8
-SPEECHD_VOXIN_VERSION_0_8_8=0.8.8-voxin3rc3
-SPEECHD_VOXIN_SHA512_0_8_8=a699f79718f6054602484a0f0e49ec35eaf152d72800460b0605aa1c2da8c3e393ed6e6d3874d19041860e39d60a7e2f9f8efd4c2fe1e7e9b1ef0f2362e5ad26
-
-# speechd: version 0.7.1
-SPEECHD_VOXIN_VERSION_0_7_1=0.7.1-voxin3rc3
-SPEECHD_VOXIN_SHA512_0_7_1=41bf118ca5a4a233aa0d11810c7f5c5a6efeb0688500df37bab3e2fd6a683d9e22c966a8bada5567ec3bf76e25e5ad6320078af9aca3c1f98f739a353dac0d96
 
 # VMX86_64: VM where voxin-installer is built for x86_64 architecture
 # This VM is currently used to build libvoxin on a Debian 8 environment
@@ -100,7 +75,7 @@ DWLDIR=$BASE/build/download
 SRCDIR=$BASE/src
 BR_PKG="$PKGDIR/buildroot_${BR_VER}.txz"
 RFSDIR=$TMPDIR/rfs
-INSTALLDIR=$TMPDIR/voxin-installer_$VOXIN_VER
+INSTALLDIR=$TMPDIR/voxin-installer_$VOXIN_VERSION
 VOXINDIR=$RFSDIR/opt/oralux/voxin
 RFS32=$VOXINDIR/rfs32
 BUILDPKG=$TMPDIR/buildPackage
@@ -111,6 +86,40 @@ DOC=$VOXINDIR/usr/share/doc
 
 # gnupg key used to sign packages
 SIGNING_KEY=AED093E5
+
+# versions of the speech-dispatcher voxin module which can be built by this script.
+# the older modules are supplied by an archive (sd_voxin_0.7.1_0.8.8.x86_64.tgz)
+#
+# first version == most recent
+SPEECHD_VOXIN_ALL_VERSIONS="0.9.1 0.9.0"
+
+# set the variables describing the speech-dispatcher voxin archive
+# (filename, sha sum)
+setSpeechdVoxinVar() {
+    local version=$1
+    SPEECHD_VOXIN_ARCHIVE_URL=https://github.com/Oralux/speechd/archive
+    SPEECHD_VOXIN_GIT_URL=https://github.com/Oralux/speechd.git
+    SPEECHD_VOXIN_TAG=voxin3rc4
+    SPEECHD_SD_MODULE_COPYRIGHT_NB_LINES=25
+
+    unset SPEECHD_VOXIN_ARCHIVE SPEECHD_VOXIN_SHA512
+    case $version in
+	0.9.1)	    
+	    SPEECHD_VOXIN_ARCHIVE=$version-$SPEECHD_VOXIN_TAG.tar.gz
+	    SPEECHD_VOXIN_SHA512=6afd8be70c38854e7f950a17d5fc51cf0746990a9927637c70e3a046a628769d98c00851eac50829b237890730765f34b1a22418570c9914560ef814536a0186
+	    ;;
+	0.9.0)	    
+	    SPEECHD_VOXIN_ARCHIVE=$version-$SPEECHD_VOXIN_TAG.tar.gz
+	    SPEECHD_VOXIN_SHA512=72dd5b0976bae425db0beb324777bd24a684ee0c957210e5bf22d41345ca5deff4a587574ab734056bf46ae267b90b6dd81db690551a2f89b5fe088e53133bf0
+	    ;;
+	master)
+	    SPEECHD_VOXIN_ARCHIVE=master.zip
+	    ;;
+	*)
+	    leave "unexpected speechd voxin version ($version) 1"
+	    ;;
+    esac
+}
 
 leave() {
 	echo -e "$1" && exit $2
@@ -271,7 +280,6 @@ getDebArch() {
 getLibvoxin() {
 	[ "$#" = 0 ] && return 1
 	local arch=$1
-	local keepDownloadedSources=$2
 	local archive
 	local archivep
 	local dev
@@ -291,7 +299,7 @@ getLibvoxin() {
 		version=1.x.x
 		dev=1
 		archive=master.zip
-		[ -e "$DWLDIR"/$archive ] && [ -z "$keepDownloadedSources" ] && mv "$DWLDIR"/$archive "$DWLDIR"/$archive.old
+		[ -e "$DWLDIR"/$archive ] && mv "$DWLDIR"/$archive "$DWLDIR"/$archive.old
 	fi
 	archivep="$DWLDIR/$archive"
 	
@@ -340,33 +348,25 @@ getLibvoxin() {
 	return 0
 }
 
-# Build speech-dispatcher from github, build and install the resulting
+# Build speech-dispatcher from github, install the resulting binaries
 # into the local rfs, create the symlinks for the voxin package
 getSpeechDispatcherVoxin() {
 	[ "$#" -lt 2 ] && return 1
 	local arch=$1
 	local libvoxinDir=$2
 	local version=$3
-	local sha512=$4
-	local keepDownloadedSources=$4
 	local archive
 	local archivep
-	local dev
+	local dir
 	local pwd=$PWD
 	local workdir=$TMPDIR/speechd_voxin
 	local installDir=$INSTALLDIR/packages/all
 	
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"
 		
-	if [ -n "$version" ]; then
-		unset dev
-		archive=$version.tar.gz		
-	else
-		version=$SPEECHD_VOXIN_VERSION_DEV
-		dev=1
-		archive=$SPEECHD_VOXIN_BRANCH.zip
-		[ -e "$DWLDIR"/$archive ] && [ -z "$keepDownloadedSources" ] && mv "$DWLDIR"/$archive "$DWLDIR"/$archive.old
-	fi
+	setSpeechdVoxinVar "$version"
+	archive=$SPEECHD_VOXIN_ARCHIVE
+	sha512=$SPEECHD_VOXIN_SHA512
 	archivep="$DWLDIR/$archive"
 	
 	rm -rf "$workdir"
@@ -374,44 +374,52 @@ getSpeechDispatcherVoxin() {
 	cd "$workdir/build"
 	
 	# download
-	if [ ! -e "$archivep" ]; then
-		wget -P "$DWLDIR" "$SPEECHD_VOXIN_URL/$archive"
-		if [ ! -e "$archivep" ]; then
-			leave "$archivep not found" 1
-		fi
+	if [ "$version" = master ]; then
+	    [ -e "$DWLDIR"/$archive ] && mv "$DWLDIR"/$archive "$DWLDIR"/$archive.old
 	fi
-
-	if [ -n "$dev" ]; then
-		[ ! -d speechd_voxin-$SPEECHD_VOXIN_BRANCH ] && unzip "$archivep" || true
-	else
-		local a=$(sha512sum "$archivep" | cut -f1 -d" ")
-		if [ "$a" != "$sha512" ]; then
-			echo "$archivep: sha512 mismatch !"
-			exit 1
-		fi
-		[ ! -d speechd_voxin-$version ] && tar -zxf "$archivep" || true
-	fi	
-	##
 	
-	if [ -n "$dev" ]; then
-		cd speechd-$SPEECHD_VOXIN_BRANCH || leave "Can't cd to speechd-$SPEECHD_VOXIN_BRANCH" 1
-	else
-		cd speechd-$version || leave "Can't cd to speechd-$version" 1
+	if [ ! -e "$archivep" ]; then
+	    wget -P "$DWLDIR" "$SPEECHD_VOXIN_ARCHIVE_URL/$archive"
+	    if [ ! -e "$archivep" ]; then
+		leave "$archivep not found" 1
+	    fi
 	fi
 
-	# Patches needed to Build sd 0.9 on Debian 8
-	case "$version" in
-	    "$SPEECHD_VOXIN_VERSION_0_9_1")
-		# patch -p1 < $SRCDIR/patch/sd-0.9-gettext-version.patch
-		# patch -p1 < $SRCDIR/patch/sd-0.9-force-modif-acceptance.patch
-		;;
-	    "$SPEECHD_VOXIN_VERSION_0_8")	
-		patch -p1 < $SRCDIR/patch/sd-0.8-fix-doc-from-debian-8-src.patch	    
-		;;
-	    "$SPEECHD_VOXIN_VERSION_0_7_1")	
-		patch -p1 < $SRCDIR/patch/sd-0.7.1-fix-doc-from-debian-8-src.patch	    
-		;;
-	esac
+	if [ -n "$sha512" ]; then
+	    local a=$(sha512sum "$archivep" | cut -f1 -d" ")
+	    [ "$a" != "$sha512" ] && leave "$archivep: sha512 mismatch !" 1
+	fi
+
+	if [ ! -d speechd_voxin-$version ]; then
+	    if [ "${archivep##*.}" = zip ]; then
+		unzip "$archivep" || true
+		dir=speechd-${archive%%.zip}
+	    else
+		pwd
+		tar -xf "$archivep" || true
+		dir=speechd-${archive%%.tar.gz}
+	    fi
+	fi	
+	
+	cd $dir || leave "Can't cd to speechd-$version" 1
+	   
+	# # Patches needed to build speech-dispatcher on Debian 8
+	# case "$version" in
+	#     "$SPEECHD_VOXIN_VERSION_0_9_1")
+	# 	patch -p1 < $SRCDIR/patch/sd-0.9-gettext-version.patch
+	# 	patch -p1 < $SRCDIR/patch/sd-0.9-force-modif-acceptance.patch
+	# 	;;
+	#     "$SPEECHD_VOXIN_VERSION_0_9_0")
+	# 	patch -p1 < $SRCDIR/patch/sd-0.9-gettext-version.patch
+	# 	patch -p1 < $SRCDIR/patch/sd-0.9-force-modif-acceptance.patch
+	# 	;;
+	#     "$SPEECHD_VOXIN_VERSION_0_8")	
+	# 	patch -p1 < $SRCDIR/patch/sd-0.8-fix-doc-from-debian-8-src.patch	    
+	# 	;;
+	#     "$SPEECHD_VOXIN_VERSION_0_7_1")	
+	# 	patch -p1 < $SRCDIR/patch/sd-0.7.1-fix-doc-from-debian-8-src.patch	    
+	# 	;;
+	# esac
 	./build.sh
 	# if [ "$SPEECHD_VOXIN_VERSION_0_8" = "$version" ]; then
 	#     unset GTHREAD_LIBS
@@ -424,19 +432,28 @@ getSpeechDispatcherVoxin() {
 	make || return 1
 	
 	# install
-	local modulesDir="$VOXINDIR"/lib/speech-dispatcher-modules
-	local confDir="$VOXINDIR"/share/speech-dispatcher/conf
-	local docDir="$VOXINDIR"/share/doc/speech-dispatcher-voxin
+	local modulesDir="$VOXINDIR"/lib/speech-dispatcher-modules/$version
+	local confDir="$VOXINDIR"/share/speech-dispatcher/$version
+	local docDir="$VOXINDIR"/share/doc/speech-dispatcher-voxin/$version
 	mkdir -p "$modulesDir" "$confDir" "$docDir"
 	local module=src/modules/sd_voxin
 	[ -e src/modules/.libs/sd_voxin ] && module=src/modules/.libs/sd_voxin
-	if [ "$SPEECHD_VOXIN_VERSION_0_7_1" = "$version" ]; then
-	    # CentOS7: rpath to libsdaudio
-	    patchelf --set-rpath /usr/lib64/speech-dispatcher "$module"
-	fi	    
-	cp "$module" "$modulesDir"/sd_voxin.$version || return 1
-	cp ./config/modules/voxin.conf "$confDir"/voxin.conf.$version || return 1
-	head -n $SPEECHD_SD_MODULE_COPYRIGHT_NB_LINES src/modules/voxin.c > "$docDir"/copyright.$version
+	# if [ "$SPEECHD_VOXIN_VERSION_0_7_1" = "$version" ]; then
+	#     # CentOS7: rpath to libsdaudio
+	#     patchelf --set-rpath /usr/lib64/speech-dispatcher "$module"
+	# fi	    
+	cp "$module" "$modulesDir" || return 1
+	cp ./config/modules/voxin.conf "$confDir" || return 1
+	head -n $SPEECHD_SD_MODULE_COPYRIGHT_NB_LINES src/modules/voxin.c > "$docDir"/copyright
+	cat<<EOF>"$docDir"/sources.ini
+[archive]
+url=$SPEECHD_VOXIN_ARCHIVE_URL/$SPEECHD_VOXIN_ARCHIVE
+sha512=$SPEECHD_VOXIN_SHA512
+
+[git]
+url=$SPEECHD_VOXIN_GIT_URL
+tag=$SPEECHD_VOXIN_TAG
+EOF
 	
 	cd "$pwd"
 	return 0
@@ -447,16 +464,44 @@ buildVoxinModule() {
 	local modulesDir="$VOXINDIR"/lib/speech-dispatcher-modules
 	cd "$SRCDIR"/speechd-voxin
 	make clean
-	SD7_1=$SPEECHD_VOXIN_VERSION_0_7_1 SD8=$SPEECHD_VOXIN_VERSION_0_8 SD8_8=$SPEECHD_VOXIN_VERSION_0_8_8 SD9_0=$SPEECHD_VOXIN_VERSION_0_9_1 SDMAX=$SPEECHD_VOXIN_VERSION_0_9_1 make
-	SDMAX=
+	make
 	DESTDIR="$modulesDir" make install
 
 	# create symlinks
 	cd "$BUILDPKG/rfs"
 	mkdir -p usr/{lib/speech-dispatcher-modules,share/speech-dispatcher/conf/modules} etc/speech-dispatcher/modules
+
+	# Voxin module:
+	# The speech-dispatcher module installed by the voxin package is just a
+	# symbolic link to a module selector:
+	# /usr/lib/speech-dispatcher-modules/sd_voxin
+	# points to
+	# /opt/oralux/voxin/lib/speech-dispatcher-modules/sd_voxin
+	#
+	# This module selector determines the version of speech-dispatcher using:
+	# /usr/bin/speech-dispatcher -v
+	# and launches the corresponding voxin module available under:
+	# /opt/oralux/voxin/lib/speech-dispatcher-modules:
+	#   0.9.1/sd_voxin
+	#   0.9.0/sd_voxin
+	#
+	# If the module selector can't determine the speech-dispatcher
+	# version (e.g. if speech-dispatcher has been built from git)
+	# it will attempt to launch the most recent version of sd_voxin.
+	#
+	# The current module configuration is a symlink from:
+	# /etc/speech-dispatcher/modules/voxin.conf
+	# to 
+	# /opt/oralux/voxin/share/speech-dispatcher/conf/voxin.conf
+	# 
+	# The default configuration files are stored under
+	# /opt/oralux/voxin/share/speech-dispatcher/conf/
+	#   0.9.1/voxin.conf
+	#   0.9.0/voxin.conf
+	#
 	ln -s /opt/oralux/voxin/lib/speech-dispatcher-modules/sd_voxin usr/lib/speech-dispatcher-modules/sd_voxin
-	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/voxin.conf.$SPEECHD_VOXIN_VERSION_0_9_1 usr/share/speech-dispatcher/conf/modules/voxin.conf
-	ln -s /opt/oralux/voxin/share/speech-dispatcher/conf/voxin.conf.$SPEECHD_VOXIN_VERSION_0_9_1 etc/speech-dispatcher/modules/voxin.conf
+	ln -s /opt/oralux/voxin/share/speech-dispatcher/voxin.conf usr/share/speech-dispatcher/conf/modules/voxin.conf
+	ln -s /opt/oralux/voxin/share/speech-dispatcher/voxin.conf etc/speech-dispatcher/modules/voxin.conf
 
 	cd "$pwd"
 }
@@ -480,7 +525,7 @@ getVoxinDoc() {
 buildPackage() {
 	[ $# != 1 ] && return 1
 	local arch=$1
-	local tarball="$BUILDPKG"/build/voxin_$VOXIN_VER.all.txz
+	local tarball="$BUILDPKG"/build/voxin_$VOXIN_VERSION.all.txz
 	local rfsdir=$BUILDPKG/rfs
 	fakeroot bash -c "\
 tar -C \"$rfsdir\" \
@@ -498,28 +543,28 @@ tar -C \"$rfsdir\" \
 	local debArch=$(getDebArch "$arch")
 	replaces="libvoxin1, libvoxin1-dev, voxind, speech-dispatcher-voxin, speech-dispatcher-ibmtts"
 	installDir=$INSTALLDIR/packages/deb
-	buildDebPackage "$tarball" "$installDir" "$name" "$VOXIN_VER" "$debArch" "$depends" "$title" "$description" "$replaces"
+	buildDebPackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$debArch" "$depends" "$title" "$description" "$replaces"
 
 	# gentoo
 	local depends=glibc
 	replaces="libvoxin, voxind, speech-dispatcher-voxin, speech-dispatcher-ibmtts"
 	installDir=$INSTALLDIR/packages/gentoo
-	buildGentooPackage "$tarball" "$installDir" "$name" "$VOXIN_VER" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" "$replaces" 
+	buildGentooPackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" "$replaces" 
 	
 	# pacman
 	local depends=glibc
 	replaces="libvoxin, voxind, speech-dispatcher-voxin, speech-dispatcher-ibmtts"
 	installDir=$INSTALLDIR/packages/archlinux
-	buildPacmanPackage "$tarball" "$installDir" "$name" "$VOXIN_VER" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" "$replaces" 
+	buildPacmanPackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" "$replaces" 
 	
 	# rpm
 	replaces="libvoxin, libvoxin-debuginfo, libvoxin-devel, voxind, voxind-debuginfo, speech-dispatcher-voxin, speech-dispatcher-ibmtts"
 	installDir=$INSTALLDIR/packages/rpm
-	buildRpmPackage "$tarball" "$installDir" "$name" "$VOXIN_VER" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" "$replaces"
+	buildRpmPackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" "$replaces"
 	
 	# slackware
 	installDir=$INSTALLDIR/packages/slackware
-	buildSlackwarePackage "$tarball" "$installDir" "$name" "$VOXIN_VER" "$arch" "$depends" "$title" "$description" "LGPL-2.1+"
+	buildSlackwarePackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$arch" "$depends" "$title" "$description" "LGPL-2.1+"
 }
 
 getLangFromViavoiceTarball() {
@@ -535,16 +580,16 @@ buildVoiceTarball() {
 	local voice=$1
 	local tarball=$2
 	local all=$3
-	local releaseDir=$PKGDIR/voxin-$VOXIN_VER
+	local releaseDir=$PKGDIR/voxin-$VOXIN_VERSION
 	local installDir=$INSTALLDIR/packages/all
-	local installerDir="$releaseDir/voxin-$VOXIN_VER/voxin-$voice-$VOXIN_VER"
-	local installerTar="$releaseDir/voxin-$voice-$VOXIN_VER.tgz"
+	local installerDir="$releaseDir/voxin-$VOXIN_VERSION/voxin-$voice-$VOXIN_VERSION"
+	local installerTar="$releaseDir/voxin-$voice-$VOXIN_VERSION.tgz"
 
 	mkdir -p "$installerDir" || return 1
 	rsync -a "$INSTALLDIR"/ "$installerDir"
 	cp -a "$tarball" "$all" "$installerDir"/packages/all
-	fakeroot bash -c "tar -C \"$releaseDir\" -zcf \"$installerTar\" voxin-$VOXIN_VER" || return 1
-	rm -rf "$releaseDir/voxin-$VOXIN_VER"
+	fakeroot bash -c "tar -C \"$releaseDir\" -zcf \"$installerTar\" voxin-$VOXIN_VERSION" || return 1
+	rm -rf "$releaseDir/voxin-$VOXIN_VERSION"
 	echo "$installerTar"	
 }
 
@@ -553,52 +598,59 @@ buildReleaseTarball() {
 	local files=$1
 	local arch=$2
 	local withTTS=$3
-	local releaseDir=$PKGDIR/voxin-$VOXIN_VER
+	local releaseDir=$PKGDIR/voxin-$VOXIN_VERSION
 	# prefixed by withTTS to prevent deletion by next init() call
-	local releaseTarball=$PKGDIR/${withTTS}_voxin-$VOXIN_VER.tgz
+	local releaseTarball=$PKGDIR/${withTTS}_voxin-$VOXIN_VERSION.tgz
 	local installerDir
 	local installerTar
 	local installDir
 	local tarball
 	local pwd=$PWD
 	local exclude
+	local docDir="$VOXINDIR"/share/doc/voxin-installer
+	[ ! -d "$docDir" ] && mkdir -p "$docDir"
+	cat<<EOF>"$docDir"/sources.ini
+[git]
+url=$VOXIN_INSTALLER_GIT_URL
+tag=$VOXIN_INSTALLER_TAG
+EOF
 
 	# build the final rfsdir tarball and install it in the installer tree
 	installDir=$INSTALLDIR/packages/all
-	tarball=$installDir/rfs_$VOXIN_VER.all.txz
-	[ ! -d "$installDir" ] && mkdir -p "$installDir"
+	tarball=$installDir/rfs_$VOXIN_VERSION.all.txz
+	[ ! -d "$installDir" ] && mkdir -p "$installDir"	
 	fakeroot bash -c "tar -C \"$RFSDIR\" --exclude ./opt/oralux/voxin/bin --exclude ./opt/oralux/voxin/lib -Jcf $tarball ."	
 	# make more visible the minimal rfs tarball, used by the external libvoxin project
 	cp $tarball $PKGDIR
 
 	installDir=$INSTALLDIR/packages/all
-	tarball=$installDir/rfs_$VOXIN_VER.$arch.txz
+	tarball=$installDir/rfs_$VOXIN_VERSION.$arch.txz
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"
 	fakeroot bash -c "tar -C \"$RFSDIR\" --exclude ./opt/oralux/voxin/share --exclude ./opt/oralux/voxin/rfs32 --exclude ./opt/oralux/voxin/include -Jcf $tarball ."		
 	rm -rf "$releaseDir"
 	mkdir -p "$releaseDir"
 
 	# released tarballs:
-	# voxin-$VOXIN_VER.tgz: voxin-$VOXIN_VER/voxin-$LANG-$VOXIN_VER.tgz
-	# voxin-$LANG-$VOXIN_VER.tgz: voxin-$VOXIN_VER/voxin-$LANG-$VOXIN_VER/
+	# voxin-$VOXIN_VERSION.tgz: voxin-$VOXIN_VERSION/voxin-$LANG-$VOXIN_VERSION.tgz
+	# voxin-$LANG-$VOXIN_VERSION.tgz: voxin-$VOXIN_VERSION/voxin-$LANG-$VOXIN_VERSION/
 	#
 	# release dir:
-	# $PKGDIR/voxin-$VOXIN_VER/
-	#                          voxin-$VOXIN_VER/voxin-$LANG-$VOXIN_VER
+	# $PKGDIR/voxin-$VOXIN_VERSION/
+	#                          voxin-$VOXIN_VERSION/voxin-$LANG-$VOXIN_VERSION
 	#
 	# voxin-update
 	# TODO nve: specific name + update installer...
 	if [ "$withTTS" != nve ]; then
-		installerDir="$releaseDir"/voxin-$VOXIN_VER/voxin-update-$VOXIN_VER
-		installerTar="$releaseDir"/voxin-update-$VOXIN_VER.tgz
+		installerDir="$releaseDir"/voxin-$VOXIN_VERSION/voxin-update-$VOXIN_VERSION
+		installerTar="$releaseDir"/voxin-update-$VOXIN_VERSION.tgz
 		mkdir -p "$installerDir" || return 1
 		rsync -a "$INSTALLDIR"/ "$installerDir"
 	
-		fakeroot bash -c "tar -C \"$releaseDir\" -zcf \"$installerTar\" voxin-$VOXIN_VER" || return 1
-		rm -rf "$releaseDir/voxin-$VOXIN_VER"
+		fakeroot bash -c "tar -C \"$releaseDir\" -zcf \"$installerTar\" voxin-$VOXIN_VERSION" || return 1
+		rm -rf "$releaseDir/voxin-$VOXIN_VERSION"
 		echo "$installerTar"
 	fi
-	rm -rf "$releaseDir/voxin-$VOXIN_VER"
+	rm -rf "$releaseDir/voxin-$VOXIN_VERSION"
 
 	if [ -f "$files" ]; then
 		local all
@@ -628,7 +680,7 @@ buildReleaseTarball() {
 			buildVoiceTarball update-ve $voxind $all
 		fi
 		
-		local sha512=$BASE/check/$VOXIN_VER/voxin-$VOXIN_VER.sha512
+		local sha512=$BASE/check/$VOXIN_VERSION/voxin-$VOXIN_VERSION.sha512
 		if [ -e "$sha512" ]; then
 			rm "$sha512"
 		else
@@ -653,10 +705,10 @@ buildInstallerDir() {
 	cd "$INSTALLDIR"
 
 	emacs README.org --batch -f org-ascii-export-to-ascii --kill
-	sed -e "s/%VERSION%/$VOXIN_VER/g" -e '/^[[:space:]]*[=~_]\+$/d' README.txt > README
+	sed -e "s/%VERSION%/$VOXIN_VERSION/g" -e '/^[[:space:]]*[=~_]\+$/d' README.txt > README
 	rm README.org README.txt README.txt~
 
-	sed -i "s/%VERSION%/$VOXIN_VER/g" common/init.inc
+	sed -i "s/%VERSION%/$VOXIN_VERSION/g" common/init.inc
 	
 	cd po
 	for i in de es fr; do
@@ -895,8 +947,8 @@ buildSlackwarePackage() {
 	mkdir -p "$pacdir/data"
 	cd "$pacdir/data"
 	tar -xf "$tarball"
-	mkdir -p usr/doc/"$name"-$VOXIN_VER
-	mv usr/share/doc/"$name"/LICENSE usr/share/doc/"$name"/README usr/doc/"$name"-$VOXIN_VER
+	mkdir -p usr/doc/"$name"-$VOXIN_VERSION
+	mv usr/share/doc/"$name"/LICENSE usr/share/doc/"$name"/README usr/doc/"$name"-$VOXIN_VERSION
 	rm -rf usr/share/doc/"$name"
 	
 	# inspired by xz2txz.sh
@@ -948,7 +1000,7 @@ getMajMinVersion() {
 }
 
 downloadVoxinUpdateFromX86VM() {
-	local TARBALL="voxin-installer/build/packages/voxin-$VOXIN_VER/voxin-update-$VOXIN_VER.tgz"
+	local TARBALL="voxin-installer/build/packages/voxin-$VOXIN_VERSION/voxin-update-$VOXIN_VERSION.tgz"
 	mkdir -p "$DWLX86"
 	scp "$VMX86:$TARBALL" "$DWLX86"	
 }
@@ -977,8 +1029,8 @@ uploadToX86VM() {
 }
 
 getOtherArch() {
-	local TARBALL="$DWLX86/voxin-update-$VOXIN_VER.tgz"
+	local TARBALL="$DWLX86/voxin-update-$VOXIN_VERSION.tgz"
 	if [ -e "$TARBALL" ]; then
-		tar -C "$INSTALLDIR" --exclude rfs_$VOXIN_VER.all.txz --strip-components=2 -xf "$TARBALL" voxin-$VOXIN_VER/voxin-update-$VOXIN_VER/packages		
+		tar -C "$INSTALLDIR" --exclude rfs_$VOXIN_VERSION.all.txz --strip-components=2 -xf "$TARBALL" voxin-$VOXIN_VERSION/voxin-update-$VOXIN_VERSION/packages		
 	fi
 }

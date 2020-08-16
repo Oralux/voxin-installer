@@ -1,3 +1,4 @@
+#include <errno.h>
 #include <limits.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -5,6 +6,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/utsname.h>
 #include "debug.h"
 
 
@@ -12,19 +14,30 @@
 #define VOXIND_DBG "/tmp/test_voxind"
 #endif
 
-// .../sd_voxin.0.7.1-voxin1
-// .../sd_voxin.0.9.1-voxin3rc4
-#define MODULE_MAX PATH_MAX+40 
-static char path[MODULE_MAX];  
+#define STR_MAX 128
 
+// .../0.9.1/x86_64/sd_voxin
+#define MODULE_MAX (PATH_MAX + STR_MAX)
 
-static int get_version(char *buf, int max_buf, char **version) {
-  int err = 0;
-  char *ver = NULL;
+typedef enum {
+  SD_VOX_OK=0,
+  SD_VOX_ARGS_ERROR,
+  SD_VOX_SYS_ERROR,
+  SD_VOX_UNEXPECTED_DATA,
+  SD_VOX_INTERNAL_ERROR,  
+} sd_vox_error;
+
+static int get_speech_dispatcher_version(const char **version) {
+  int err = SD_VOX_OK;
+  char *s = NULL;
   FILE *fd = NULL;
+  static char buf[STR_MAX];
 
-  if (!buf || !version) {
-    err = 10;
+  ENTER();
+  
+  if (!version) {
+    err = SD_VOX_ARGS_ERROR;
+    dbg("args error");
     goto exit0;
   }
 
@@ -32,75 +45,90 @@ static int get_version(char *buf, int max_buf, char **version) {
 
   fd = popen("/usr/bin/speech-dispatcher -v", "r");    
   if (fd == NULL) {
-    err = 11;
+    err = SD_VOX_SYS_ERROR;
+    dbg("sys error");
     goto exit0;
   }
 
-  if (!fgets(buf, max_buf, fd)) {
-    err = 12;
+  if (!fgets(buf, sizeof(buf), fd)) {
+    err = SD_VOX_UNEXPECTED_DATA;
+    dbg("unexpected version");
     goto exit0;
   }
 
-  ver = strrchr(buf, ' ');
-  if (!ver || (strlen(ver) < 4)) {
-    err = 13;
+  s = strrchr(buf, ' ');
+  if (!s || (strlen(s) < 4)) {
+    err = SD_VOX_UNEXPECTED_DATA;
+    dbg("unexpected version");
     goto exit0;
   }
-  ver++;
-  ver[strlen(ver)-1] = 0;
-
-  *version = ver;
+  s++;
+  s[strlen(s)-1] = 0;
+  *version = s;
   
  exit0:
   if (fd)
     pclose(fd);  	
 
-  if (err) {
-    dbg("Error %d", err);    
-  }
-
   return err;
 }
 
-static int get_module(const char *version, char **module) {
-  int err = 0;
-  char *m = NULL;
+// obtain the absolute path of the voxin module compatible with the
+// current speech-dispatcher version
+static int get_voxin_module(const char *version, char **module) {
+  int err = SD_VOX_OK;
+  struct utsname buf;
+  static char path[MODULE_MAX];
+  size_t len;
   
-  if (!module || !version) {
-    err = 20;
-    goto exit0;
+  ENTER();
+
+  if (!version || !module) {
+    err = SD_VOX_ARGS_ERROR;
+    dbg("args error");
+    return err;
   }
 
-  m = *module;
-
-  #define SDMAX SD9_0
-  if (!strncmp(version, "0.9", 3)) {
-    m = "sd_voxin." SD9_0;
-  } else if (!strncmp(version, "0.8", 3)) {
-    m = (!version[3]) ? "sd_voxin." SD8 : "sd_voxin." SD8_8;
-  } else if (!strncmp(version, "0.7", 3)) {
-    m = "sd_voxin." SD7_1;
-  } else {
-    err = 21;
-    dbg("unexpected version %s", version);
-    goto exit0;
+  if (!strncmp(version, "0.7", 3))
+    version = "0.7.1";
+  else if (!strncmp(version, "0.8", 3) && version[3]) {
+    version = "0.8.8";
   }
-
-  *module = m;
   
- exit0:
-  if (err) {
-    dbg("Error %d", err);    
+  *path = 0;
+  if (!realpath("/proc/self/exe", path)) {
+    int res = errno;
+    err = SD_VOX_SYS_ERROR;
+    dbg("realpath error: %s", strerror(res));
+    return err;
   }
+
+  dbg("path=%s", path);
+
+  {
+    char *basename = strrchr(path, '/');
+    if (!basename) {
+      dbg("/ not found!");
+      return SD_VOX_UNEXPECTED_DATA;
+    }
+    *basename = 0;
+  }
+  len = strlen(path);
+  len += snprintf(path+len, sizeof(path)-len, "/%s/sd_voxin", version);
+  if (len >= sizeof(path)) {
+    dbg("error: path length=%u", (unsigned int)len);
+    return SD_VOX_INTERNAL_ERROR;
+  }
+  
+  *module = path;  
+  dbg("module=%s", path);
   return err;
 }
 
 int main(int argc, char *argv[])
 {
   ENTER();
-#define MAX_BUF 30
-  char buf[MAX_BUF];
-  char *version = NULL;
+  const char *version = NULL;
   char *module = NULL;
   int err = 0;
 
@@ -113,48 +141,27 @@ int main(int argc, char *argv[])
   }
 #endif
 
-  err = get_version(buf, MAX_BUF, &version);
+  err = get_speech_dispatcher_version(&version);
   if (err) {
-    // unknown version, built from git?
-    // suppose compatibility with the max known version
-    strncpy(buf, SDMAX, MAX_BUF);
-    version = buf;
-    err = 0;
+    // version identification failed.
+    // try the last supported version
+    version = "last";
+    err = SD_VOX_OK;
   }
   
-  err = get_module(version, &module);
+  err = get_voxin_module(version, &module);
   if (err)
     return err;
   
-  *path = 0;
-  if (!realpath("/proc/self/exe", path)) {
-    err = 1;
-    goto exit0;
-  }
-
-  dbg("path=%s", path);
-  char *basename = strrchr(path, '/');
-  if (!basename) {
-    err = 2;
-    dbg("path=%s", path);
-    goto exit0;
-  }
-  
-  strncpy(basename+1, module, MODULE_MAX - strlen(path));
-  dbg("execve %s", path);
-
-  {
+  { // pass all arguments to the voxin module
     void **arg = calloc(1, (argc+1)*sizeof(*argv));
     if (arg) {
       memcpy(arg, argv, argc*sizeof(*argv));
-      execv(path, (char* const *)arg);
+      dbg("execve %s", module);
+      execv(module, (char* const *)arg);
     }
     free(arg);
   }
-
- exit0:
-  if (err) {
-    dbg("Error %d", err);    
-  }
-  return err;
+  
+  return SD_VOX_UNEXPECTED_DATA;
 }

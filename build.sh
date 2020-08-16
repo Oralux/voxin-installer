@@ -37,9 +37,8 @@ Options:
                        <arch> = x86
                        remote address = variable VMX86 in src/conf.inc
                        (current value = $VMX86)
---old_sd 	       build the older speech-dispatcher modules.
-       		       By default, without this option, only the last
-       		       supported module is built.
+--allsd 	       build each speech-dispatcher voxin module.
+       		       By default, only one supported module is built.
  
 Examples:
 # build all
@@ -62,9 +61,9 @@ Examples:
 
 }
 
-unset CLEAN DOWNLOAD HELP BUILDROOT TARBALLS UPLOAD WITH_TTS OLD_SD
+unset CLEAN DOWNLOAD HELP BUILDROOT TARBALLS UPLOAD WITH_TTS ALLSD
 
-OPTIONS=`getopt -o cd:hbt:u: --long clean,download:,help,buildroot,old_sd,tarballs:,upload: \
+OPTIONS=`getopt -o cd:hbt:u: --long clean,download:,help,buildroot,allsd,tarballs:,upload: \
              -n "$NAME" -- "$@"`
 [ $? != 0 ] && usage && exit 1
 eval set -- "$OPTIONS"
@@ -77,7 +76,7 @@ while true; do
     -h|--help) HELP=1; shift;;
     -t|--tarballs) TARBALLS=$2; shift 2;;
     -u|--upload) UPLOAD=$2; shift 2;;
-    --old_sd) OLD_SD=1; shift;;
+    --allsd) ALLSD=1; shift;;
     --) shift; break;;
     *) break;;
   esac
@@ -127,19 +126,20 @@ getMinimalRFS32FromBuildroot
 getOldLibstdc++
 buildInstallerDir
 
-unset keepDownloadedSources
 ARCH=$(uname -m)
-getLibvoxin "$ARCH" "$keepDownloadedSources" || leave "Error: can't build libvoxin" 1
-getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION_0_9_1" "$SPEECHD_VOXIN_SHA512_0_9_1" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
-if [ -n "$OLD_SD" ]; then
-	getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION_0_8" "$SPEECHD_VOXIN_SHA512_0_8" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
-	getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION_0_8_8" "$SPEECHD_VOXIN_SHA512_0_8_8" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
-	getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$SPEECHD_VOXIN_VERSION_0_7_1" "$SPEECHD_VOXIN_SHA512_0_7_1" "$keepDownloadedSources" || leave "Error: can't build sd_voxin" 1
+getLibvoxin "$ARCH" || leave "Error: can't build libvoxin" 1
+#getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" master || leave "Error: can't build sd_voxin" 1
+version=$(echo $SPEECHD_VOXIN_ALL_VERSIONS | cut -f1 -d" ")
+getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$version" || leave "Error: can't build sd_voxin" 1
+if [ -n "$ALLSD" ]; then
+    version=$(echo $SPEECHD_VOXIN_ALL_VERSIONS| cut -f2- -d" ")
+    for i in $version; do
+	getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" $i || leave "Error: can't build sd_voxin" 1
+    done
 fi
 buildVoxinModule
 getVoxinDoc
 buildPackage "$ARCH" || leave "Error: can't build packages" 1
-keepDownloadedSources=1
 
 [ "$ARCH" = x86_64 ] && getOtherArch
 
