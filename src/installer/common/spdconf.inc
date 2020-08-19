@@ -81,9 +81,9 @@ function spd_conf_set() {
     done
 }
 
-# Check if the voxin must be added to the speechd.conf file
+# Check if voxin.conf must be added to the speechd.conf file
 # Condition implemented: speechd.conf has at least one module added to
-# the speechd.conf file and distinct from default or voxin module
+# the speechd.conf file and distinct from the default or voxin modules
 function spd_conf_is_update_required() {
 	local filename="$1"
 	[ ! -e "$filename" ] && return
@@ -98,3 +98,19 @@ function spd_conf_is_update_required() {
 	[ "$count" -gt 0 ]		
 }
 
+# Install voxin.conf from the system or otherwise from the new archive
+function spd_conf_install_voxin_conf() {
+    local arch_voxin_conf="$1"
+    local conf_dir=/opt/oralux/voxin/share/speech-dispatcher
+    local new_voxin_conf=$conf_dir/voxin.conf
+    local prev_voxin_conf=/opt/oralux/voxin.old/share/speech-dispatcher/voxin.conf
+    local src
+
+    if [ -e "$prev_voxin_conf" ]; then
+	src="$prev_voxin_conf"
+    else
+	src="$arch_voxin_conf"
+    fi
+    cp -a "$src" "$conf_dir"
+    [ -h "$src" ] && cp $(realpath "$src") "$conf_dir"
+}

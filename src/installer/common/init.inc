@@ -3,7 +3,6 @@ TEMPLATE=voxin-installer.XXXXXXXXXX
 TMPDIR=/tmp
 # Only version > 0.7 are compatible
 SPEECHD_MIN_VERSION=0.7
-SPEECHD_MAX_VERSION=0.9
 VOXIN_VERSION=%VERSION%
 
 unset WITH_TTS
@@ -134,6 +133,17 @@ getRootfilesystemArchTarball() {
 
     if [ -z "$tarball" ]; then
 	_gettext "rfs all tarball not found!" >> "$LOG"
+	return 1
+    fi
+    echo "$tarball"
+}
+
+getPrevSpeechdModulesTarball() {
+    local arch=$(uname -m)
+    local tarball=$(find packages/all -name "sd_voxin_*.$arch.txz")
+
+    if [ -z "$tarball" ]; then
+	_gettext "prev speechd modules tarball not found!" >> "$LOG"
 	return 1
     fi
     echo "$tarball"
@@ -300,6 +310,7 @@ installSystem() {
 	local voxinPackage=$(getVoxinPackage)
 	local rfsAllTarball=$(getRootfilesystemAllTarball) || return 1
 	local rfsArchTarball=$(getRootfilesystemArchTarball) || return 1
+	local prevSpeechdModulesTarball=$(getPrevSpeechdModulesTarball) || return 1
 	
 	if [ ! -d "$rfsdir" ]; then
 		_gettext "Install directory not found: $rfsdir" >> "$LOG"
@@ -314,7 +325,7 @@ installSystem() {
 	uninstallPackage voxin || true
 
 	local i
-	for i in "$rfsAllTarball" "$rfsArchTarball"; do
+	for i in "$rfsAllTarball" "$rfsArchTarball" "$prevSpeechdModulesTarball"; do
 	    tar -C "$rfsdir" -xf "$i" 
 	    status=$?
 	    if [ "$status" != 0 ]; then
@@ -322,7 +333,16 @@ installSystem() {
 		return "$status"
 	    fi	
 	done
-	
+
+	# install voxin.conf
+	local conf_dir=/opt/oralux/voxin/share/speech-dispatcher
+	local conf="$conf_dir/last/voxin.conf"
+	local ver=$(/usr/bin/speech-dispatcher -v | head -1 | cut -f2 -d" ")
+
+	[ -n "$ver" ] && [ -e "$conf_dir/$ver/voxin.conf" ] && conf="$conf_dir/$ver/voxin.conf"
+	spd_conf_install_voxin_conf "$conf"
+
+	#
 	installLocalPackage "$voxinPackage"
 	status=$?
 	if [ "$status" != 0 ]; then

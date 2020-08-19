@@ -28,6 +28,13 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 LIBVOXIN_VERSION=1.5.0
 LIBVOXIN_SHA512=d6956221e454239c6c610f965e2456a4009a6f81c5320660555f4b89204fcb4a93d891fa47a0ff8fd8eebfce8e153867eada649633f48ed183af2a478713b172
 
+# Previous speech-dispatcher voxin modules
+# These binaries have been built with a previous release of
+# voxin-installer (git tag stored in sources.ini inside the tarball)
+PREV_SPEECHD_VOXIN_URL=http://soft.oralux.org/speech-dispatcher/bin
+PREV_SPEECHD_VOXIN_ARCHIVE=sd_voxin_0.7.1_0.8.8.x86_64.txz
+PREV_SPEECHD_VOXIN_SHA512=9080513ca9e2387dbebba6b45bf9a7c43932e4cc7042601658f516e9eefd9d9317b34424cff22eff83bf85fa7d116293116556ff26b9e094f653edb6869a020b
+
 # VMX86_64: VM where voxin-installer is built for x86_64 architecture
 # This VM is currently used to build libvoxin on a Debian 8 environment
 # (mostly due to puncfilter and its libstdc++ dependency)
@@ -264,6 +271,27 @@ getOldLibstdc++() {
 	cd "$pwd"
 }
 
+getPreviousSpeechdModules() {
+	local dwldir="$DWLDIR/previous_speechd_voxin"
+	local archivep="$dwldir/$PREV_SPEECHD_VOXIN_ARCHIVE"
+	local installDir=$INSTALLDIR/packages/all
+	local a
+	
+	if [ ! -e "$archivep" ]; then
+	    mkdir -p "$dwldir"
+	    wget -P "$dwldir" "$PREV_SPEECHD_VOXIN_URL/$PREV_SPEECHD_VOXIN_ARCHIVE"
+	    if [ ! -e "$archivep" ]; then
+		leave "$archivep not found" 1
+	    fi
+	fi
+
+	a=$(sha512sum "$archivep" | cut -f1 -d" ")
+	[ "$a" != "$PREV_SPEECHD_VOXIN_SHA512" ] && leave "$archivep: sha512 mismatch !" 1
+	
+	[ ! -d "$installDir" ] && mkdir -p "$installDir"	
+	cp -a "$archivep" "$installDir"
+}
+
 getDebArch() {
 	local arch=$1
 	case "$arch" in
@@ -361,9 +389,12 @@ getSpeechDispatcherVoxin() {
 	local pwd=$PWD
 	local workdir=$TMPDIR/speechd_voxin
 	local installDir=$INSTALLDIR/packages/all
+	local last=0
 	
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"
-		
+
+	[ "$#" = "4" ] && ["$4" = "last" ] && last=1
+
 	setSpeechdVoxinVar "$version"
 	archive=$SPEECHD_VOXIN_ARCHIVE
 	sha512=$SPEECHD_VOXIN_SHA512
@@ -444,6 +475,7 @@ getSpeechDispatcherVoxin() {
 	# fi	    
 	cp "$module" "$modulesDir" || return 1
 	cp ./config/modules/voxin.conf "$confDir" || return 1
+	[ "$last" = "1" ] && ln -s "$version/sd_voxin" ${modulesDir%[/]*}}/"last"
 	head -n $SPEECHD_SD_MODULE_COPYRIGHT_NB_LINES src/modules/voxin.c > "$docDir"/copyright
 	cat<<EOF>"$docDir"/sources.ini
 [archive]
@@ -630,6 +662,8 @@ EOF
 	rm -rf "$releaseDir"
 	mkdir -p "$releaseDir"
 
+	getPreviousSpeechdModules
+	
 	# released tarballs:
 	# voxin-$VOXIN_VERSION.tgz: voxin-$VOXIN_VERSION/voxin-$LANG-$VOXIN_VERSION.tgz
 	# voxin-$LANG-$VOXIN_VERSION.tgz: voxin-$VOXIN_VERSION/voxin-$LANG-$VOXIN_VERSION/

@@ -130,7 +130,7 @@ ARCH=$(uname -m)
 getLibvoxin "$ARCH" || leave "Error: can't build libvoxin" 1
 #getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" master || leave "Error: can't build sd_voxin" 1
 version=$(echo $SPEECHD_VOXIN_ALL_VERSIONS | cut -f1 -d" ")
-getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$version" || leave "Error: can't build sd_voxin" 1
+getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$version" last || leave "Error: can't build sd_voxin" 1
 if [ -n "$ALLSD" ]; then
     version=$(echo $SPEECHD_VOXIN_ALL_VERSIONS| cut -f2- -d" ")
     for i in $version; do
