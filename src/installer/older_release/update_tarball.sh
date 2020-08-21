@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 leave() {
 	echo -e "$1" && exit $2
@@ -12,9 +12,11 @@ Update an older voxin tarball using a new update.
 Store the resulting tarball into the destination directory.
 
 Example
-# Create build_dir/voxin-enu-3.1rc3.tgz
-update_tarball.sh voxin-update-3.1rc3.tgz voxin-enu-3.0.tgz build_dir
+# Update to 3.1 the 'English US' archive:
+update_tarball.sh voxin-update-3.1rc3.tgz voxin-enu-3.0.tgz build_dir/
 
+# Update to 3.1 the 'Tom Compact' voice 
+update_tarball.sh voxin-update-ve-3.1rc3.tgz voxin-american-english-tom-compact-3.0.tgz build_dir/
 "
     exit 1
 }
@@ -26,7 +28,7 @@ update_tarball.sh voxin-update-3.1rc3.tgz voxin-enu-3.0.tgz build_dir
 
 UPDATE_NEW=$(realpath $1)
 VOICE_OLD=$(realpath $2)
-BUILD=$3
+BUILD=$(mktemp -p $3 -d)
 
 is_ve() {
     local a=$(echo "$1" | sed -E "s/.*voxin-update(-ve-).*tgz/\1/")
