@@ -97,7 +97,7 @@ SIGNING_KEY=AED093E5
 # versions of the speech-dispatcher voxin module which can be built by this script.
 # the older modules are supplied by an archive (sd_voxin_0.7.1_0.8.8.x86_64.tgz)
 #
-# first version == most recent
+# first version == last version
 SPEECHD_VOXIN_ALL_VERSIONS="0.9.1 0.9.0"
 
 # set the variables describing the speech-dispatcher voxin archive
@@ -113,11 +113,11 @@ setSpeechdVoxinVar() {
     case $version in
 	0.9.1)	    
 	    SPEECHD_VOXIN_ARCHIVE=$version-$SPEECHD_VOXIN_TAG.tar.gz
-	    SPEECHD_VOXIN_SHA512=6afd8be70c38854e7f950a17d5fc51cf0746990a9927637c70e3a046a628769d98c00851eac50829b237890730765f34b1a22418570c9914560ef814536a0186
+	    SPEECHD_VOXIN_SHA512=45985544ca0632f28e7828183f987c258a755766f096aa262ffa03615448102f06b2475cbb2502eb2d848feb0b1896e3eb7b9fb42a4f2c0892be894872f6fba8
 	    ;;
 	0.9.0)	    
 	    SPEECHD_VOXIN_ARCHIVE=$version-$SPEECHD_VOXIN_TAG.tar.gz
-	    SPEECHD_VOXIN_SHA512=72dd5b0976bae425db0beb324777bd24a684ee0c957210e5bf22d41345ca5deff4a587574ab734056bf46ae267b90b6dd81db690551a2f89b5fe088e53133bf0
+	    SPEECHD_VOXIN_SHA512=d095e53ceaf29771be7166e164f22815177fdbc1638e6cd1ef4a5fcb95b8cc24f1f69a5bf2b38586c77b43784f7a788224361adb10eb8d296b7366bf4d4d7ebd
 	    ;;
 	master)
 	    SPEECHD_VOXIN_ARCHIVE=master.zip
@@ -393,7 +393,7 @@ getSpeechDispatcherVoxin() {
 	
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"
 
-	[ "$#" = "4" ] && ["$4" = "last" ] && last=1
+	[ "$#" = "4" ] && [ "$4" = "last" ] && last=1
 
 	setSpeechdVoxinVar "$version"
 	archive=$SPEECHD_VOXIN_ARCHIVE
@@ -424,11 +424,11 @@ getSpeechDispatcherVoxin() {
 	if [ ! -d speechd_voxin-$version ]; then
 	    if [ "${archivep##*.}" = zip ]; then
 		unzip "$archivep" || true
-		dir=speechd-${archive%%.zip}
+		dir=speechd-${archive%.zip}
 	    else
 		pwd
 		tar -xf "$archivep" || true
-		dir=speechd-${archive%%.tar.gz}
+		dir=speechd-${archive%.tar.gz}
 	    fi
 	fi	
 	
@@ -475,7 +475,10 @@ getSpeechDispatcherVoxin() {
 	# fi	    
 	cp "$module" "$modulesDir" || return 1
 	cp ./config/modules/voxin.conf "$confDir" || return 1
-	[ "$last" = "1" ] && ln -s "$version/sd_voxin" ${modulesDir%[/]*}}/"last"
+	if [ "$last" = "1" ]; then
+	    ln -s "$version" ${modulesDir%[/]*}/last
+	    ln -s "$version" ${confDir%[/]*}/last
+	fi
 	head -n $SPEECHD_SD_MODULE_COPYRIGHT_NB_LINES src/modules/voxin.c > "$docDir"/copyright
 	cat<<EOF>"$docDir"/sources.ini
 [archive]
