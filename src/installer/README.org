@@ -98,22 +98,35 @@ Please note that the text-to-speech files will be removed too (under /opt/IBM/ib
 From version 2.0, voxin is compatible with much more distributions (and their family: derivatives, parent distro).
 The included speech dispatcher modules work with speech-dispatcher version >= 0.8 .
 
-The tested distributions are displayed below. Much more should be compatible.
+The distributions which have been tested are displayed below. 
+Much more should be compatible.
+
 For support or feedback, please send a mail to contact@oralux.org with possibly the log file (log/voxin.log).
 
-|----------------------------+---------------|
-| Tested distributions       | Architectures |
-|----------------------------+---------------|
-| Arch Linux (August 2020)   | x86_64        |
-| CentOS 7                   | x86_64        |
-| Debian 8, 9, 10            | x86_64, i686  |
-| Fedora 29, 30              | x86_64        |
-| Gentoo                     | x86_64        |
-| openSUSE Leap 15.0         | x86_64        |
-| openSUSE Tumbleweed-i586   | i686          |
-| Slint64-14.2.1.1, 14.2.1.2 | x86_64        |
-| Ubuntu 18.04, 19.04, 20.04 | x86_64        |
-|----------------------------+---------------|
+|----------------------------------------+---------------|
+| Distributions tested with voxin 3.1rc3 | Architectures |
+|----------------------------------------+---------------|
+| Arch Linux (August 2020)               | x86_64        |
+| Debian 10                              | x86_64        |
+| Slint64-14.2.1.2 (August 2020)         | x86_64        |
+| Ubuntu 18.04, 20.04                    | x86_64        |
+|----------------------------------------+---------------|
+
+The distributions which have been previously tested with voxin 3.0 are displayed below. 
+They are supposed to be still compatible with the last version of voxin.
+
+|-------------------------------------+---------------|
+| Distributions tested with voxin 3.0 | Architectures |
+|-------------------------------------+---------------|
+| CentOS 7                            | x86_64        |
+| Debian 8, 9                         | x86_64, i686  |
+| Fedora 29, 30                       | x86_64        |
+| Gentoo                              | x86_64        |
+| openSUSE Leap 15.0                  | x86_64        |
+| openSUSE Tumbleweed-i586            | i686          |
+| Slint64-14.2.1.1, 14.2.1.2          | x86_64        |
+| Ubuntu 19.04                        | x86_64        |
+|-------------------------------------+---------------|
 
 ** voxin 1.15
 |-----------------+------------------------|

@@ -37,8 +37,8 @@ Options:
                        <arch> = x86
                        remote address = variable VMX86 in src/conf.inc
                        (current value = $VMX86)
---allsd 	       build each speech-dispatcher voxin module.
-       		       By default, only one supported module is built.
+--allsd 	       build each supported versions of the speech-dispatcher voxin module.
+       		       Without this option, build only the module of the last supported version.
  
 Examples:
 # build all
@@ -47,8 +47,8 @@ Examples:
 # build all, extract and merge the tarballs in list.txt
 # the common tarballs (*all*, *voxind*) are expected to be placed at
 # the beginning of the list
- $0 -t src/list.vv
- $0 -t src/list.ve
+ $0 --allsd -t src/list.vv
+ $0 --allsd -t src/list.ve
 
 # upload voxin-installer to the X86 VM ($VMX86) and build it
  $0 -u x86
