@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 BASE=$(dirname $(realpath "$0"))
 NAME=$(basename "$0")
@@ -122,11 +122,15 @@ checkDep
 init
 [ -n "$BUILDROOT" ] && buildBuildroot
 
-getMinimalRFS32FromBuildroot
-getOldLibstdc++
-buildInstallerDir
+getArch
+case "$ARCH" in
+    arm*) ;;
+    *) getMinimalRFS32FromBuildroot
+       getOldLibstdc++
+       ;;
+esac
 
-ARCH=$(uname -m)
+buildInstallerDir
 getLibvoxin "$ARCH" || leave "Error: can't build libvoxin" 1
 #getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" master || leave "Error: can't build sd_voxin" 1
 version=$(echo $SPEECHD_VOXIN_ALL_VERSIONS | cut -f1 -d" ")
@@ -141,7 +145,7 @@ buildVoxinModule
 getVoxinDoc
 buildPackage "$ARCH" || leave "Error: can't build packages" 1
 
-[ "$ARCH" = x86_64 ] && getOtherArch
+[ "$ARCH" = x86_64 ] && getx86Arch
 
 if [ -n "$TARBALLS" ]; then
 	buildReleaseTarball "$TARBALLS" "$ARCH" "$WITH_TTS" || leave "Error: can't build release tarball" 1

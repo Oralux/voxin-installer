@@ -68,8 +68,16 @@ orca -s
 
 ** Speech Dispatcher
 
-The voxin-installer installs the voxin module for speech-dispatcher, and will update your configuration after your authorization. Otherwise, modify the speechd.conf file of speech-dispatcher (using for example spd-conf, choose the voxin module, not the old ibmtts module ).
+The voxin-installer installs the voxin module for speech-dispatcher, and will update your configuration after your authorization. Otherwise, modify the speechd.conf file of speech-dispatcher (using for example spd-conf as normal user (not superuser), choose the voxin module, not the old ibmtts module ), and the current soud system installed (alsa, pulse,...).
+
 Please note that the Speech Dispatcher server will take in account the new configuration after its restart, for example at next reboot.
+
+On debian based system, spd-conf is supplied by the python3-speechd package.
+
+If needed the local or system-wide speechd.conf can be edited manually: 
+- either comment each 'AddModule' line, then speech-dispatcher will load each present module, 
+- or add this line to select explicitly the voxin module:
+AddModule "voxin" "sd_voxin" "voxin.conf"
 
 ** Emacspeak
 
@@ -108,6 +116,7 @@ For support or feedback, please send a mail to contact@oralux.org with possibly 
 |----------------------------------------+---------------|
 | Arch Linux (August 2020)               | x86_64        |
 | Debian 10                              | x86_64        |
+| Raspberry Pi OS (2020-05-27)           | armv7l/armhf  |
 | Slint64-14.2.1.2 (August 2020)         | x86_64        |
 | Ubuntu 18.04, 20.04                    | x86_64        |
 |----------------------------------------+---------------|

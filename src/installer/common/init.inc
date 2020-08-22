@@ -128,8 +128,7 @@ getRootfilesystemAllTarball() {
 }
 
 getRootfilesystemArchTarball() {
-    local arch=$(uname -m)
-    local tarball=$(find packages/all -name "rfs*.$arch.txz")
+    local tarball=$(find packages/all -name "rfs*.$ARCH.txz")
 
     if [ -z "$tarball" ]; then
 	_gettext "rfs all tarball not found!" >> "$LOG"
@@ -139,8 +138,7 @@ getRootfilesystemArchTarball() {
 }
 
 getPrevSpeechdModulesTarball() {
-    local arch=$(uname -m)
-    local tarball=$(find packages/all -name "sd_voxin_*.$arch.txz")
+    local tarball=$(find packages/all -name "sd_voxin_*.$ARCH.txz")
 
     if [ -z "$tarball" ]; then
 	_gettext "prev speechd modules tarball not found!" >> "$LOG"
@@ -267,13 +265,17 @@ installLang() {
 }
 
 getArch() {
-	ARCH=$(uname -m)
+    ARCH=$(uname -m)
     case "$ARCH" in
-		x86_64|ia64)
-			DEBIAN_ARCH=amd64
+	x86_64|ia64)
+	    DEBIAN_ARCH=amd64
     	    ;;
-		*)
-			DEBIAN_ARCH=i386
+	arm*)
+	    ARCH=armhf
+	    DEBIAN_ARCH=armhf
+	    ;;
+	*)
+	    DEBIAN_ARCH=i386
     	    ;;
     esac
 }
@@ -310,7 +312,7 @@ installSystem() {
 	local voxinPackage=$(getVoxinPackage)
 	local rfsAllTarball=$(getRootfilesystemAllTarball) || return 1
 	local rfsArchTarball=$(getRootfilesystemArchTarball) || return 1
-	local prevSpeechdModulesTarball=$(getPrevSpeechdModulesTarball) || return 1
+	local prevSpeechdModulesTarball=$(getPrevSpeechdModulesTarball) || unset prevSpeechdModulesTarball
 	
 	if [ ! -d "$rfsdir" ]; then
 		_gettext "Install directory not found: $rfsdir" >> "$LOG"
@@ -326,6 +328,7 @@ installSystem() {
 
 	local i
 	for i in "$rfsAllTarball" "$rfsArchTarball" "$prevSpeechdModulesTarball"; do
+	    [ -z "$i" ] && continue
 	    tar -C "$rfsdir" -xf "$i" 
 	    status=$?
 	    if [ "$status" != 0 ]; then

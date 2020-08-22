@@ -26,7 +26,7 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 #LIBVOXIN_VERSION=
 # - from the last tag instead (+sha512)
 LIBVOXIN_VERSION=1.5.0
-LIBVOXIN_SHA512=d6956221e454239c6c610f965e2456a4009a6f81c5320660555f4b89204fcb4a93d891fa47a0ff8fd8eebfce8e153867eada649633f48ed183af2a478713b172
+LIBVOXIN_SHA512=b527f5bc467a169eccc9d2561fba6ee8aefd2f1eaf196b0914c0b1142916afc12ae1e1d04edc77d4687255479af27d6e80f8d1d5a1ef95415de0f3fe9385bb99
 
 # Previous speech-dispatcher voxin modules
 # These binaries have been built with a previous release of
@@ -100,6 +100,14 @@ SIGNING_KEY=AED093E5
 # first version == last version
 SPEECHD_VOXIN_ALL_VERSIONS="0.9.1 0.9.0"
 
+getArch() {
+    ARCH=$(uname -m)
+    case "$ARCH" in
+        x86|i386|i586|i686) ARCH=i686;;
+        armv7l) ARCH=armhf;;
+    esac
+}
+
 # set the variables describing the speech-dispatcher voxin archive
 # (filename, sha sum)
 setSpeechdVoxinVar() {
@@ -113,11 +121,11 @@ setSpeechdVoxinVar() {
     case $version in
 	0.9.1)	    
 	    SPEECHD_VOXIN_ARCHIVE=$version-$SPEECHD_VOXIN_TAG.tar.gz
-	    SPEECHD_VOXIN_SHA512=45985544ca0632f28e7828183f987c258a755766f096aa262ffa03615448102f06b2475cbb2502eb2d848feb0b1896e3eb7b9fb42a4f2c0892be894872f6fba8
+	    SPEECHD_VOXIN_SHA512=a0c46c8bed6244cf6c7a0577ab4f479944f5cd7d96e304aa0f0415c2b2e3f0131831d18c60013432e069035132d29118f76d1416e3d0b44d1d1a4cd94b14cbd0
 	    ;;
 	0.9.0)	    
 	    SPEECHD_VOXIN_ARCHIVE=$version-$SPEECHD_VOXIN_TAG.tar.gz
-	    SPEECHD_VOXIN_SHA512=d095e53ceaf29771be7166e164f22815177fdbc1638e6cd1ef4a5fcb95b8cc24f1f69a5bf2b38586c77b43784f7a788224361adb10eb8d296b7366bf4d4d7ebd
+	    SPEECHD_VOXIN_SHA512=7a64ee3940a720aa35cb3b1bc066f1b49ba328693342d6eb24c1183fb64a1a7786798e54a786a2813e6136d6df8a5c50887f4d08b4d3fcca4906cd20942868b3
 	    ;;
 	master)
 	    SPEECHD_VOXIN_ARCHIVE=master.zip
@@ -296,6 +304,7 @@ getDebArch() {
 	local arch=$1
 	case "$arch" in
 		x86_64) arch=amd64;;
+		arm*) ;;
 		*) arch=i386;;
 	esac
 	echo $arch
@@ -363,6 +372,7 @@ getLibvoxin() {
 	./build.sh -m "$arch" -r
 
 	# install the resulting build/$arch/release/libvoxin_$version.$archx.txz in the rfsdir
+	[ -d "$RFSDIR" ] || mkdir -p "$RFSDIR"
 	local tarball=$(ls "$PWD"/build/"$arch"/release/libvoxin_*."$arch".txz)
 	tar -C "$RFSDIR" -xf "$tarball" || leave "Can't uncompress libvoxin tarball ($tarball)" 1
 
@@ -1065,7 +1075,7 @@ uploadToX86VM() {
 	cd "$pwd"
 }
 
-getOtherArch() {
+getx86Arch() {
 	local TARBALL="$DWLX86/voxin-update-$VOXIN_VERSION.tgz"
 	if [ -e "$TARBALL" ]; then
 		tar -C "$INSTALLDIR" --exclude rfs_$VOXIN_VERSION.all.txz --strip-components=2 -xf "$TARBALL" voxin-$VOXIN_VERSION/voxin-update-$VOXIN_VERSION/packages		
