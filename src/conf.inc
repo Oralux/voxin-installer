@@ -26,7 +26,7 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 #LIBVOXIN_VERSION=
 # - from the last tag instead (+sha512)
 LIBVOXIN_VERSION=1.5.0
-LIBVOXIN_SHA512=d45906806ed59c3af9769fcff7b2945937e65c2105318db1ff03bbd78f4279b397d7d5812c6f68c9b88db8fa02365175342de725f8359699c23b016949fa3af2
+LIBVOXIN_SHA512=0c3558bee712e86e0922271b80a8a0ac986eab3d05faf3455c175e2dc701be0bb2a20e248be932cb53f3d06cda161c1adf2f9c6212f5975b8940bc8e6fe38279
 
 # Previous speech-dispatcher voxin modules
 # These binaries have been built with a previous release of
@@ -104,7 +104,8 @@ getArch() {
     ARCH=$(uname -m)
     case "$ARCH" in
         x86|i386|i586|i686) ARCH=i686;;
-        armv7l) ARCH=armhf;;
+#        armv7l) ;;
+#        aarch64) ;;
     esac
 }
 
@@ -304,7 +305,8 @@ getDebArch() {
 	local arch=$1
 	case "$arch" in
 		x86_64) arch=amd64;;
-		arm*) ;;
+		arm*) arch=armhf;;
+		aarch64) arch=arm64;;
 		*) arch=i386;;
 	esac
 	echo $arch

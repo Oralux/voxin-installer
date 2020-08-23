@@ -271,8 +271,10 @@ getArch() {
 	    DEBIAN_ARCH=amd64
     	    ;;
 	arm*)
-	    ARCH=armhf
 	    DEBIAN_ARCH=armhf
+	    ;;
+	aarch64)	
+	    DEBIAN_ARCH=arm64
 	    ;;
 	*)
 	    DEBIAN_ARCH=i386

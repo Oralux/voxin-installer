@@ -125,6 +125,7 @@ init
 getArch
 case "$ARCH" in
     arm*) ;;
+    aarch64) ;;
     *) getMinimalRFS32FromBuildroot
        getOldLibstdc++
        ;;
