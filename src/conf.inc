@@ -26,7 +26,7 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 #LIBVOXIN_VERSION=
 # - from the last tag instead (+sha512)
 LIBVOXIN_VERSION=1.5.0
-LIBVOXIN_SHA512=b527f5bc467a169eccc9d2561fba6ee8aefd2f1eaf196b0914c0b1142916afc12ae1e1d04edc77d4687255479af27d6e80f8d1d5a1ef95415de0f3fe9385bb99
+LIBVOXIN_SHA512=d45906806ed59c3af9769fcff7b2945937e65c2105318db1ff03bbd78f4279b397d7d5812c6f68c9b88db8fa02365175342de725f8359699c23b016949fa3af2
 
 # Previous speech-dispatcher voxin modules
 # These binaries have been built with a previous release of
@@ -51,12 +51,12 @@ VMX86=user1@192.168.122.174
 
 # Dependencies
 # # libstdc++-4.9-dev:i386 (hard coded in function below)
-#DEP_PACKAGES="alien bsdtar build-essential fakeroot rpm rsync build-essential binutils-multiarch libc6-dev-i386 gcc-multilib g++-multilib patchelf"
-DEP_PACKAGES="alien bsdtar build-essential fakeroot rpm rsync"
+#DEP_PACKAGES="alien libarchive-tools build-essential fakeroot rpm rsync build-essential binutils-multiarch libc6-dev-i386 gcc-multilib g++-multilib patchelf"
+DEP_PACKAGES="alien libarchive-tools build-essential fakeroot rpm rsync"
 # Debian9: speech-dispatcher dependencies
 # obtained with apt-get build-dep speech-dispatcher
 
-DEP_PACKAGES_X86="alien bsdtar rpm build-essential flite1-dev intltool libao-dev libasound2-dev libaudio-dev libdotconf-dev libespeak-dev libflac-dev libglib2.0-dev libogg-dev libpulse-dev libsndfile1-dev libvorbis-dev libxau-dev pkg-config tex-common x11proto-core-dev xorg-sgml-doctools zlib1g-dev dh-autoreconf libltdl-dev libtool"
+DEP_PACKAGES_X86="alien libarchive-tools rpm build-essential flite1-dev intltool libao-dev libasound2-dev libaudio-dev libdotconf-dev libespeak-dev libflac-dev libglib2.0-dev libogg-dev libpulse-dev libsndfile1-dev libvorbis-dev libxau-dev pkg-config tex-common x11proto-core-dev xorg-sgml-doctools zlib1g-dev dh-autoreconf libltdl-dev libtool"
 
 # DEP_PACKAGES_SPEECHD="espeak-data flite1-dev intltool libao-dev libasound2-dev libaudio-dev \
 #   libdotconf-dev libespeak-dev libespeak1 libflac-dev \
@@ -121,11 +121,11 @@ setSpeechdVoxinVar() {
     case $version in
 	0.9.1)	    
 	    SPEECHD_VOXIN_ARCHIVE=$version-$SPEECHD_VOXIN_TAG.tar.gz
-	    SPEECHD_VOXIN_SHA512=a0c46c8bed6244cf6c7a0577ab4f479944f5cd7d96e304aa0f0415c2b2e3f0131831d18c60013432e069035132d29118f76d1416e3d0b44d1d1a4cd94b14cbd0
+	    SPEECHD_VOXIN_SHA512=ded5dd971562bc12dd3b73f448c8e6f508c19bf103d5aed754b2a5269e6b0d28b670239981dac3fc252696d6c1d05578bc9c2dc870864173a16bf1e4eb67165e
 	    ;;
 	0.9.0)	    
 	    SPEECHD_VOXIN_ARCHIVE=$version-$SPEECHD_VOXIN_TAG.tar.gz
-	    SPEECHD_VOXIN_SHA512=7a64ee3940a720aa35cb3b1bc066f1b49ba328693342d6eb24c1183fb64a1a7786798e54a786a2813e6136d6df8a5c50887f4d08b4d3fcca4906cd20942868b3
+	    SPEECHD_VOXIN_SHA512=58176a1b322d8fe2b1483bdc0602fdc56385b35534c782f5d4b28beed37ed4af1e8e4a3e4f9ef72aad0ec3b2abfb63c064ce434409e7d7c4aa4acca088c6e7b4
 	    ;;
 	master)
 	    SPEECHD_VOXIN_ARCHIVE=master.zip
