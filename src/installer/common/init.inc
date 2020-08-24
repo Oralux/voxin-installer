@@ -266,12 +266,14 @@ installLang() {
 
 getArch() {
     ARCH=$(uname -m)
+    PACMAN_ARCH=$ARCH
     case "$ARCH" in
 	x86_64|ia64)
 	    DEBIAN_ARCH=amd64
     	    ;;
 	arm*)
 	    DEBIAN_ARCH=armhf
+	    PACMAN_ARCH=armv7h
 	    ;;
 	aarch64)	
 	    DEBIAN_ARCH=arm64

@@ -1,6 +1,6 @@
 # The BASE variable should be set before including this file
 #
-VOXIN_VERSION=3.1rc3
+VOXIN_VERSION=3.1
 
 VOXIN_INSTALLER_GIT_URL=https://github.com/Oralux/voxin-installer.git
 VOXIN_INSTALLER_TAG=$VOXIN_VERSION
@@ -308,6 +308,14 @@ getDebArch() {
 		arm*) arch=armhf;;
 		aarch64) arch=arm64;;
 		*) arch=i386;;
+	esac
+	echo $arch
+}
+
+getPacmanArch() {
+	local arch=$1
+	case "$arch" in
+		armv7*) arch=armv7h;; # armv7 hardfloat
 	esac
 	echo $arch
 }
@@ -837,6 +845,8 @@ buildPacmanPackage() {
 	local pwd=$PWD
 
 	version=$version-1
+
+	getPacmanArch	
 	
 	local pacdir="$TMPDIR"/buildPacmanPackage
 	[ -e "$pacdir" ] && rm -rf "$pacdir"

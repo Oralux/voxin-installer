@@ -1,6 +1,6 @@
 getVoxinPackage() {
-	[ -z "$ARCH" ] && return 1
-	find packages/archlinux -name "voxin*$ARCH.pkg.tar.xz"
+	[ -z "$PACMAN_ARCH" ] && return 1
+	find packages/archlinux -name "voxin*$PACMAN_ARCH.pkg.tar.xz"
 }
 
 getPackageVersion() {
@@ -23,7 +23,7 @@ getPackageFileVersion() {
 	unset output
 	[ $# != 1 ] || [ -z "$1" ] && return
 	local package=$1
-	output=$(echo "$package" | sed -E -e "s/-$ARCH.pkg.tar.xz//" -e "s/.*-([[:digit:]]+.[[:digit:]]+).*/\1/")
+	output=$(echo "$package" | sed -E -e "s/-$PACMAN_ARCH.pkg.tar.xz//" -e "s/.*-([[:digit:]]+.[[:digit:]]+).*/\1/")
 }
 
 installLocalPackage() {

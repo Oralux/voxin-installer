@@ -103,31 +103,33 @@ Please note that the text-to-speech files will be removed too (under /opt/IBM/ib
 
 * Compatible GNU/Linux Distributions
 ** Voxin %VERSION%
-From version 2.0, voxin is compatible with much more distributions (and their family: derivatives, parent distro).
-The included speech dispatcher modules work with speech-dispatcher version >= 0.8 .
 
 The distributions which have been tested are displayed below. 
 Much more should be compatible.
 
 For support or feedback, please send a mail to contact@oralux.org with possibly the log file (log/voxin.log).
 
-|-----------------------------------------+---------------|
-| Distributions tested with voxin 3.1rc3  | Architectures |
-|-----------------------------------------+---------------|
-| Arch Linux (August 2020)                | x86_64        |
-| Debian 10                               | x86_64        |
-| Raspberry Pi OS (2020-05-27)            | armv7l        |
-| Slint64-14.2.1.2 (August 2020)          | x86_64        |
-| Ubuntu 18.04, 20.04                     | x86_64        |
-| Ubuntu ARM Mate 20.04 (Raspberry Pi 4B) | armv7l        |
-|-----------------------------------------+---------------|
+Note: Voxin on ARM is now available for the Vocalizer Embedded voices.
+
+|--------------------------------+-----------------|
+| Distributions                  | Architectures   |
+|--------------------------------+-----------------|
+| Arch Linux (August 2020)       | x86_64          |
+| Arch Linux ARM (August 2020)   | armv7h          |
+| Debian 10                      | x86_64          |
+| Slint64-14.2.1.2 (August 2020) | x86_64          |
+| Ubuntu 18.04, 20.04            | x86_64          |
+| Ubuntu ARM Mate 20.04          | armv7l, aarch64 |                                 |                 |
+|--------------------------------+-----------------|
 
 ** voxin 3.0
 The distributions which have been previously tested with voxin 3.0 are displayed below. 
 They are supposed to be still compatible with the last version of voxin.
 
+Voxin on i686: only for IBM TTS.
+
 |----------------------------+---------------|
-| Tested distributions       | Architectures |
+| Distributions              | Architectures |
 |----------------------------+---------------|
 | Arch Linux                 | x86_64        |
 | CentOS 7                   | x86_64        |
