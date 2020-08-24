@@ -115,11 +115,11 @@ Note: Voxin on ARM is now available for the Vocalizer Embedded voices.
 | Distributions                  | Architectures   |
 |--------------------------------+-----------------|
 | Arch Linux (August 2020)       | x86_64          |
-| Arch Linux ARM (August 2020)   | armv7h          |
+| Arch Linux ARM (August 2020)   | armv7l          |
 | Debian 10                      | x86_64          |
 | Slint64-14.2.1.2 (August 2020) | x86_64          |
 | Ubuntu 18.04, 20.04            | x86_64          |
-| Ubuntu ARM Mate 20.04          | armv7l, aarch64 |                                 |                 |
+| Ubuntu ARM Mate 20.04          | armv7l, aarch64 |
 |--------------------------------+-----------------|
 
 ** voxin 3.0
