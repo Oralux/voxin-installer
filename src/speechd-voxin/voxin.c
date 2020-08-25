@@ -93,6 +93,8 @@ static int get_voxin_module(const char *version, char **module) {
     version = "0.7.1";
   else if (!strncmp(version, "0.8", 3) && version[3]) {
     version = "0.8.8";
+  } else if (!strncmp(version, "0.10", 4)) {
+    version = "0.10.1";
   }
   
   *path = 0;

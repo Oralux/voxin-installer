@@ -98,7 +98,7 @@ SIGNING_KEY=AED093E5
 # the older modules are supplied by an archive (sd_voxin_0.7.1_0.8.8.x86_64.tgz)
 #
 # first version == last version
-SPEECHD_VOXIN_ALL_VERSIONS="0.9.1 0.9.0"
+SPEECHD_VOXIN_ALL_VERSIONS="0.10.1 0.9.1 0.9.0"
 
 getArch() {
     ARCH=$(uname -m)
@@ -120,6 +120,10 @@ setSpeechdVoxinVar() {
 
     unset SPEECHD_VOXIN_ARCHIVE SPEECHD_VOXIN_SHA512
     case $version in
+	0.10.1)	    
+	    SPEECHD_VOXIN_ARCHIVE=$version-$SPEECHD_VOXIN_TAG.tar.gz
+	    SPEECHD_VOXIN_SHA512=3327a8aa6ec29b3dd1bf48f8867ffabe6d92a65f49c09c104b991ef34abab5f744ec0e90742bfd5a69e4f6fd53af9f12d7f6e526fcd3d86a0ccf26086b169c9c
+	    ;;
 	0.9.1)	    
 	    SPEECHD_VOXIN_ARCHIVE=$version-$SPEECHD_VOXIN_TAG.tar.gz
 	    SPEECHD_VOXIN_SHA512=ded5dd971562bc12dd3b73f448c8e6f508c19bf103d5aed754b2a5269e6b0d28b670239981dac3fc252696d6c1d05578bc9c2dc870864173a16bf1e4eb67165e
