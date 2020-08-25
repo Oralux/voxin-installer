@@ -719,7 +719,7 @@ EOF
 		    tarball=$(eval echo $t)
 			[ -e "$tarball" ] || leave "Tarball not found: $tarball" 1 
 		    case "$tarball" in
-				*voxind-*txz) voxind=$tarball;;
+				*voxind-*.$arch.txz) voxind=$tarball;;
 				*voxin-nve-all*txz) all=$tarball;;
 				*voxin-viavoice*txz)
 					lang=$(getLangFromViavoiceTarball)
@@ -846,7 +846,7 @@ buildPacmanPackage() {
 
 	version=$version-1
 
-	getPacmanArch	
+	arch=$(getPacmanArch "$arch")
 	
 	local pacdir="$TMPDIR"/buildPacmanPackage
 	[ -e "$pacdir" ] && rm -rf "$pacdir"
