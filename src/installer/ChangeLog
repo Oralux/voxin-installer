@@ -1,7 +1,7 @@
-2020-08-25 Gilles Casse <gcasse@oralux.org>
+2020-08-26 Gilles Casse <gcasse@oralux.org>
 	release 3.1 for Vocalizer Embedded (x86_64, armv7l, armv8), IBM TTS (x86_64):
-	- ARM: checked on Raspberry PI 4B (Ubuntu or Arch Linux for ARM)
-	- sd_voxin and voxin.conf: dedicated speechd dispatcher module for versions 0.9.0 and 0.9.1
+	- ARM: checked on Raspberry PI 4B (Ubuntu Mate and Arch Linux ARM)
+	- sd_voxin and voxin.conf: new speechd dispatcher module (compatible 0.10.1, 0.9.1, 0.9.0)
 	- fix old issue: take in account the speech-dispatcher configuration (IbmttsUseAbbreviation,...)
 
 2020-01-06 Gilles Casse <gcasse@oralux.org>
