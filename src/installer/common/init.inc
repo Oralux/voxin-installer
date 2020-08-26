@@ -141,7 +141,7 @@ getPrevSpeechdModulesTarball() {
     local tarball=$(find packages/all -name "sd_voxin_*.$ARCH.txz")
 
     if [ -z "$tarball" ]; then
-	_gettext "prev speechd modules tarball not found!" >> "$LOG"
+#	_gettext "prev speechd modules tarball not found!" >> "$LOG"
 	return 1
     fi
     echo "$tarball"
@@ -160,7 +160,7 @@ getVoiceTarball() {
 }
 
 getVoxindTarball() {
-	find packages/all -name "voxind-*txz"
+	find packages/all -name "voxind-*.$ARCH.txz"
 }
 
 postInstViavoiceTarball() {
