@@ -331,7 +331,7 @@ installSystem() {
 	uninstallPackage voxin || true
 
 	local i
-	for i in "$rfsAllTarball" "$rfsArchTarball" "$prevSpeechdModulesTarball"; do
+	for i in $rfsAllTarball $rfsArchTarball $prevSpeechdModulesTarball; do
 	    [ -z "$i" ] && continue
 	    tar -C "$rfsdir" -xf "$i" 
 	    status=$?
