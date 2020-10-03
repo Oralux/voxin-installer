@@ -7,7 +7,7 @@ sd_voxin: $(BIN)
 all: sd_voxin
 
 install:
-	install -m 755 sd_voxin $(DESTDIR)
+	install --target-directory=$(DESTDIR) -D sd_voxin
 
 clean:
 	rm -f sd_voxin *o

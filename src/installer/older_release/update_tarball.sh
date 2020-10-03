@@ -12,11 +12,11 @@ Update an older voxin tarball using a new update.
 Store the resulting tarball into the destination directory.
 
 Example
-# Update to 3.1 the 'English US' archive:
-update_tarball.sh voxin-update-3.1.tgz voxin-enu-3.0.tgz build_dir/
+# Update to 3.2 the 'English US' archive:
+update_tarball.sh voxin-update-3.2.tgz voxin-enu-3.1.tgz build_dir/
 
-# Update to 3.1 the 'Tom Compact' voice 
-update_tarball.sh voxin-update-ve-3.1.tgz voxin-american-english-tom-compact-3.0.tgz build_dir/
+# Update to 3.2 the 'Tom Compact' voice 
+update_tarball.sh voxin-update-ve-3.2.tgz voxin-american-english-tom-compact-3.1.tgz build_dir/
 "
     exit 1
 }
@@ -29,6 +29,14 @@ update_tarball.sh voxin-update-ve-3.1.tgz voxin-american-english-tom-compact-3.0
 UPDATE_NEW=$(realpath $1)
 VOICE_OLD=$(realpath $2)
 BUILD=$(mktemp -p $3 -d)
+
+if [ "$3" = "." ]; then                                                                                                                           
+    BUILD=$(mktemp -p $3 -d)                                                                                                                       
+else                                                                                                                                             
+    BUILD=$3                                                                                                                                       
+fi                                                                                                                                               
+
+
 
 is_ve() {
     local a=$(echo "$1" | sed -E "s/.*voxin-update(-ve-).*tgz/\1/")

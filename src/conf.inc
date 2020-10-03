@@ -1,6 +1,6 @@
 # The BASE variable should be set before including this file
 #
-VOXIN_VERSION=3.1
+VOXIN_VERSION=3.2rc1
 
 VOXIN_INSTALLER_GIT_URL=https://github.com/Oralux/voxin-installer.git
 VOXIN_INSTALLER_TAG=$VOXIN_VERSION
@@ -25,15 +25,14 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 # - development (master branch)
 #LIBVOXIN_VERSION=
 # - from the last tag instead (+sha512)
-LIBVOXIN_VERSION=1.5.0
-LIBVOXIN_SHA512=6c530c5675df17a3418dba672d5625c4c5aa5231b3c524932ec426bc2daedf6c05fb076a17aeda18cd1ce7e511ba5d10d736390a63e455a35a3facc30fb5c8ca
+LIBVOXIN_VERSION=1.5.2
+LIBVOXIN_SHA512=04c00e4944f26e95046b461f2f1ef8ced8400ea256e1f20fa6441785c54c700cd09481d20b0378c606a82d0ebe9998a6d53534e377347ebcade3abeed9e04c8e
 
 # Previous speech-dispatcher voxin modules
 # These binaries have been built with a previous release of
 # voxin-installer (git tag stored in sources.ini inside the tarball)
 PREV_SPEECHD_VOXIN_URL=http://soft.oralux.org/speech-dispatcher/bin
-PREV_SPEECHD_VOXIN_ARCHIVE=sd_voxin_0.7.1_0.8.8.x86_64.txz
-PREV_SPEECHD_VOXIN_SHA512=9080513ca9e2387dbebba6b45bf9a7c43932e4cc7042601658f516e9eefd9d9317b34424cff22eff83bf85fa7d116293116556ff26b9e094f653edb6869a020b
+PREV_SPEECHD_CHECK_FILE=$HOME/VOXIN/voxin-installer/check/3.2/sd_voxin.sha512
 
 # VMX86_64: VM where voxin-installer is built for x86_64 architecture
 # This VM is currently used to build libvoxin on a Debian 8 environment
@@ -124,9 +123,10 @@ setSpeechdVoxinVar() {
 	    SPEECHD_VOXIN_ARCHIVE=$version-$SPEECHD_VOXIN_TAG.tar.gz
 	    SPEECHD_VOXIN_SHA512=3327a8aa6ec29b3dd1bf48f8867ffabe6d92a65f49c09c104b991ef34abab5f744ec0e90742bfd5a69e4f6fd53af9f12d7f6e526fcd3d86a0ccf26086b169c9c
 	    ;;
-	0.9.1)	    
+	0.9.1)
+	    SPEECHD_VOXIN_TAG=voxin3
 	    SPEECHD_VOXIN_ARCHIVE=$version-$SPEECHD_VOXIN_TAG.tar.gz
-	    SPEECHD_VOXIN_SHA512=ded5dd971562bc12dd3b73f448c8e6f508c19bf103d5aed754b2a5269e6b0d28b670239981dac3fc252696d6c1d05578bc9c2dc870864173a16bf1e4eb67165e
+	    SPEECHD_VOXIN_SHA512=ebf3df046225dd54c2745330ba8fb8ffd9b151a1f1109a39011ff3b974a8418813e0c6fb7bb9f4778f5b643c86d8310a2a48dc9376c923200cdba540145beb1d
 	    ;;
 	0.9.0)	    
 	    SPEECHD_VOXIN_ARCHIVE=$version-$SPEECHD_VOXIN_TAG.tar.gz
@@ -286,23 +286,25 @@ getOldLibstdc++() {
 
 getPreviousSpeechdModules() {
 	local dwldir="$DWLDIR/previous_speechd_voxin"
-	local archivep="$dwldir/$PREV_SPEECHD_VOXIN_ARCHIVE"
+#	local archivep="$dwldir/$PREV_SPEECHD_VOXIN_ARCHIVE"
 	local installDir=$INSTALLDIR/packages/all
-	local a
-	
-	if [ ! -e "$archivep" ]; then
-	    mkdir -p "$dwldir"
-	    wget -P "$dwldir" "$PREV_SPEECHD_VOXIN_URL/$PREV_SPEECHD_VOXIN_ARCHIVE"
-	    if [ ! -e "$archivep" ]; then
-		leave "$archivep not found" 1
-	    fi
-	fi
+	local pwd=$PWD
 
-	a=$(sha512sum "$archivep" | cut -f1 -d" ")
-	[ "$a" != "$PREV_SPEECHD_VOXIN_SHA512" ] && leave "$archivep: sha512 mismatch !" 1
-	
-	[ ! -d "$installDir" ] && mkdir -p "$installDir"	
-	cp -a "$archivep" "$installDir"
+	[ ! -d "$dwldir" ] && mkdir -p "$dwldir"
+
+	cd "$dwldir"
+	cat "$PREV_SPEECHD_CHECK_FILE" | while read sha file; do
+	    if [ ! -e "$file" ]; then
+		wget "$PREV_SPEECHD_VOXIN_URL/$file"
+	    fi
+	done
+	sha512sum --ignore-missing -c "$PREV_SPEECHD_CHECK_FILE" || leave "speechd_voxin: sha512 mismatch!" 1
+
+	cat "$PREV_SPEECHD_CHECK_FILE" | while read sha file; do
+	    cp -a "$file" "$installDir"
+	done
+
+	cd "$pwd"	
 }
 
 getDebArch() {
@@ -498,6 +500,7 @@ getSpeechDispatcherVoxin() {
 	#     patchelf --set-rpath /usr/lib64/speech-dispatcher "$module"
 	# fi	    
 	cp "$module" "$modulesDir" || return 1
+	strip -s "$modulesDir/sd_voxin"
 	cp ./config/modules/voxin.conf "$confDir" || return 1
 	if [ "$last" = "1" ]; then
 	    ln -s "$version" ${modulesDir%[/]*}/last
@@ -689,7 +692,7 @@ EOF
 	rm -rf "$releaseDir"
 	mkdir -p "$releaseDir"
 
-	getPreviousSpeechdModules
+#	getPreviousSpeechdModules
 	
 	# released tarballs:
 	# voxin-$VOXIN_VERSION.tgz: voxin-$VOXIN_VERSION/voxin-$LANG-$VOXIN_VERSION.tgz

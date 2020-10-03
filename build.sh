@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 BASE=$(dirname $(realpath "$0"))
 NAME=$(basename "$0")
@@ -47,8 +47,8 @@ Examples:
 # build all, extract and merge the tarballs in list.txt
 # the common tarballs (*all*, *voxind*) are expected to be placed at
 # the beginning of the list
- $0 --allsd -t src/list.vv
- $0 --allsd -t src/list.ve
+ $0 -t src/list.vv
+ $0 -t src/list.ve
 
 # upload voxin-installer to the X86 VM ($VMX86) and build it
  $0 -u x86
@@ -133,15 +133,20 @@ esac
 
 buildInstallerDir
 getLibvoxin "$ARCH" || leave "Error: can't build libvoxin" 1
-#getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" master || leave "Error: can't build sd_voxin" 1
-version=$(echo $SPEECHD_VOXIN_ALL_VERSIONS | cut -f1 -d" ")
-getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$version" last || leave "Error: can't build sd_voxin" 1
-if [ -n "$ALLSD" ]; then
-    version=$(echo $SPEECHD_VOXIN_ALL_VERSIONS| cut -f2- -d" ")
-    for i in $version; do
-	getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" $i || leave "Error: can't build sd_voxin" 1
-    done
-fi
+
+# sd_voxin (up to 0.10.1) currently retrieved from previous release
+# #getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" master || leave "Error: can't build sd_voxin" 1
+# version=$(echo $SPEECHD_VOXIN_ALL_VERSIONS | cut -f1 -d" ")
+version=0.9.1
+getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$version" || leave "Error: can't build sd_voxin" 1
+# getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$version" last || leave "Error: can't build sd_voxin" 1
+# if [ -n "$ALLSD" ]; then
+#     version=$(echo $SPEECHD_VOXIN_ALL_VERSIONS| cut -f2- -d" ")
+#     for i in $version; do
+# 	getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" $i || leave "Error: can't build sd_voxin" 1
+#     done
+# fi
+
 buildVoxinModule
 getVoxinDoc
 buildPackage "$ARCH" || leave "Error: can't build packages" 1

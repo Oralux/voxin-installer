@@ -38,17 +38,15 @@ cd voxin-enu-%VERSION%
 On other distributions, use "su --login" instead of "sudo --login"  .
 
 ** Voxin updates
-Your download url is usually permanent and points on the last voxin release.
+Your download link is usually permanent and points on the last voxin release.
 
 The releases are announced in the [[http://voxin.oralux.net/rss.xml][Voxin RSS feed]].
-
-Please note that a release does not yet automatically backup your previous Voxin installation.
 
 Voxin is released several times a year: 
 - to complete the list of compatible distros (usually after user request),
 - to add new features and fixes (libvoxin offers paths of improvement). 
 
-The [[http://voxin.oralux.net/update/][voxin updates]] includes free softwares and does not include the text-to-speech packages.
+Besides the voxin release, a lighter tarball, the voxin update is available and does not include the text-to-speech package.
 
 ** Orca
 
@@ -109,7 +107,19 @@ Much more should be compatible.
 
 For support or feedback, please send a mail to contact@oralux.org with possibly the log file (log/voxin.log).
 
-Note: Voxin on ARM is now available for the Vocalizer Embedded voices.
+|------------------------------+-----------------|
+| Distributions                | Architectures   |
+|------------------------------+-----------------|
+| Arch Linux (August 2020)     | x86_64          |
+| Arch Linux ARM (August 2020) | armv7l, aarch64 |
+| Debian 10                    | x86_64          |
+| Ubuntu 20.04                 | x86_64          |
+| Ubuntu ARM Mate 20.04        | armv7l, aarch64 |
+|------------------------------+-----------------|
+
+** voxin 3.1
+The distributions which have been previously tested with voxin 3.1 are displayed below. 
+They are supposed to be still compatible with the last version of voxin.
 
 |--------------------------------+-----------------|
 | Distributions                  | Architectures   |
