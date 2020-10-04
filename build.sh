@@ -37,8 +37,6 @@ Options:
                        <arch> = x86
                        remote address = variable VMX86 in src/conf.inc
                        (current value = $VMX86)
---allsd 	       build each supported versions of the speech-dispatcher voxin module.
-       		       Without this option, build only the module of the last supported version.
  
 Examples:
 # build all
@@ -61,9 +59,9 @@ Examples:
 
 }
 
-unset CLEAN DOWNLOAD HELP BUILDROOT TARBALLS UPLOAD WITH_TTS ALLSD
+unset CLEAN DOWNLOAD HELP BUILDROOT TARBALLS UPLOAD WITH_TTS
 
-OPTIONS=`getopt -o cd:hbt:u: --long clean,download:,help,buildroot,allsd,tarballs:,upload: \
+OPTIONS=`getopt -o cd:hbt:u: --long clean,download:,help,buildroot,tarballs:,upload: \
              -n "$NAME" -- "$@"`
 [ $? != 0 ] && usage && exit 1
 eval set -- "$OPTIONS"
@@ -76,7 +74,6 @@ while true; do
     -h|--help) HELP=1; shift;;
     -t|--tarballs) TARBALLS=$2; shift 2;;
     -u|--upload) UPLOAD=$2; shift 2;;
-    --allsd) ALLSD=1; shift;;
     --) shift; break;;
     *) break;;
   esac
@@ -134,20 +131,13 @@ esac
 buildInstallerDir
 getLibvoxin "$ARCH" || leave "Error: can't build libvoxin" 1
 
-# sd_voxin (up to 0.10.1) currently retrieved from previous release
-# #getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" master || leave "Error: can't build sd_voxin" 1
-# version=$(echo $SPEECHD_VOXIN_ALL_VERSIONS | cut -f1 -d" ")
-version=0.9.1
-getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$version" || leave "Error: can't build sd_voxin" 1
-# getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" "$version" last || leave "Error: can't build sd_voxin" 1
-# if [ -n "$ALLSD" ]; then
-#     version=$(echo $SPEECHD_VOXIN_ALL_VERSIONS| cut -f2- -d" ")
-#     for i in $version; do
-# 	getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" $i || leave "Error: can't build sd_voxin" 1
-#     done
-# fi
+if [ -n "$SPEECHD_VOXIN_ALL_VERSIONS" ]; then
+    for i in $SPEECHD_VOXIN_ALL_VERSIONS; do
+	getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" $i || leave "Error: can't build sd_voxin" 1
+    done
+fi
 
-buildVoxinModule
+buildVoxinModuleLauncher
 getVoxinDoc
 buildPackage "$ARCH" || leave "Error: can't build packages" 1
 
