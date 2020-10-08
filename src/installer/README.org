@@ -40,6 +40,9 @@ On other distributions, use "su --login" instead of "sudo --login"  .
 ** Voxin updates
 Your download link is usually permanent and points on the last voxin release.
 
+To update Voxin, use one of your download links to get the last version. 
+If you have Vocalizer Embedded and IBM TTS voices, just use one of your Vocalizer Embedded link to update Voxin.
+
 The releases are announced in the [[http://voxin.oralux.net/rss.xml][Voxin RSS feed]].
 
 Voxin is released several times a year: 
@@ -107,61 +110,32 @@ Much more should be compatible.
 
 For support or feedback, please send a mail to contact@oralux.org with possibly the log file (log/voxin.log).
 
-|------------------------------+-----------------|
-| Distributions                | Architectures   |
-|------------------------------+-----------------|
-| Arch Linux (August 2020)     | x86_64          |
-| Arch Linux ARM (August 2020) | armv7l, aarch64 |
-| Debian 10                    | x86_64          |
-| Ubuntu 20.04                 | x86_64          |
-| Ubuntu ARM Mate 20.04        | armv7l, aarch64 |
-|------------------------------+-----------------|
+|---------------------------------+-----------------|
+| Distributions                   | Architectures   |
+|---------------------------------+-----------------|
+| Arch Linux ARM (August 2020)    | armv7l, aarch64 |
+| Debian 10, 11 (sid)             | x86_64          |
+| Slint64-14.2.1.2 (October 2020) | x86_64          |
+| Ubuntu 20.04                    | x86_64          |
+| Ubuntu Mate 20.04               | armv7l, aarch64 |
+|---------------------------------+-----------------|
 
-** voxin 3.1
-The distributions which have been previously tested with voxin 3.1 are displayed below. 
-They are supposed to be still compatible with the last version of voxin.
+** Previous releases 
+The distributions which have been previously tested are displayed below. 
+They are supposed to be still compatible with the last version of Voxin.
 
-|--------------------------------+-----------------|
-| Distributions                  | Architectures   |
-|--------------------------------+-----------------|
-| Arch Linux (August 2020)       | x86_64          |
-| Arch Linux ARM (August 2020)   | armv7l, aarch64 |
-| Debian 10                      | x86_64          |
-| Slint64-14.2.1.2 (August 2020) | x86_64          |
-| Ubuntu 18.04, 20.04            | x86_64          |
-| Ubuntu ARM Mate 20.04          | armv7l, aarch64 |
-|--------------------------------+-----------------|
-
-** voxin 3.0
-The distributions which have been previously tested with voxin 3.0 are displayed below. 
-They are supposed to be still compatible with the last version of voxin.
-
-Voxin on i686: only for IBM TTS.
-
-|----------------------------+---------------|
-| Distributions              | Architectures |
-|----------------------------+---------------|
-| Arch Linux                 | x86_64        |
-| CentOS 7                   | x86_64        |
-| Debian 8, 9, 10            | x86_64, i686  |
-| Fedora 29, 30              | x86_64        |
-| Gentoo                     | x86_64        |
-| openSUSE Leap 15.0         | x86_64        |
-| openSUSE Tumbleweed-i586   | i686          |
-| Slint64-14.2.1.1, 14.2.1.2 | x86_64        |
-| Ubuntu 18.04, 19.04        | x86_64        |
-|----------------------------+---------------|
-
-
-* Future Updates
-
-Voxin comes with binary packages for Orca and Speech Dispatcher compatible with various GNU/Linux distributions.
-
-However, these binaries will have to be rebuilt to match forthcoming releases of your distro. 
-
-Please note, that the user can rebuilt them.
-
-If you prefer to download [[http://voxin.oralux.net/update/][forthcoming voxin updates]], please visit the update page or subscribe to the [[http://voxin.oralux.net/rss.xml][Voxin RSS feed]].
+|-------+--------------------------------+---------------|
+| Voxin | Distributions                  | Architectures |
+|-------+--------------------------------+---------------|
+|   3.1 | Arch Linux (August 2020)       | x86_64        |
+|   3.0 | Centos 7                       | x86_64        |
+|   3.0 | Debian 8, 9, 10                | x86_64, i686  |
+|   3.0 | Fedora 29, 30                  | x86_64        |
+|   3.0 | Gentoo                         | x86_64        |
+|   3.0 | openSUSE Leap 15.0             | x86_64        |
+|   3.0 | openSUSE Tumbleweed-i586       | i686          |
+|   3.1 | Ubuntu 18.04                   | x86_64        |
+|-------+--------------------------------+---------------|
 
 * voxin-say command
 

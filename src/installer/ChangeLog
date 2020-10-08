@@ -1,7 +1,9 @@
-2020-10-03 Gilles Casse <gcasse@oralux.org>
-	release 3.2rc1 for Vocalizer Embedded (x86_64, armv7l, armv8), IBM TTS (x86_64):
+2020-10-08 Gilles Casse <gcasse@oralux.org>
+	release 3.2 for Vocalizer Embedded (x86_64, armv7l, armv8) and IBM TTS (x86_64):
 	- Capital mode: emits a brief sound to point out a word with a capital letter, doubled this sound if all caps.
-	  This mode can be currently activated through Orca and Speech-Dispatcher (compatible 0.10.1, 0.9.1, 0.9.0)
+	  This mode can be currently activated through Orca and Speech-Dispatcher (compatible 0.10.1, 0.9.1, 0.9.0).
+	- Backport the speech-dispatcher ibmtts module from upstream/master to version 0.10.1 .
+	- voxind-nve (x86_64) built on Debian 8 to depend on glibc 2.2.5 instead of glibc 2.27 (logf).
 
 2020-08-26 Gilles Casse <gcasse@oralux.org>
 	release 3.1 for Vocalizer Embedded (x86_64, armv7l, armv8), IBM TTS (x86_64):

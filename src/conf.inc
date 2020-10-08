@@ -1,6 +1,6 @@
 # THE BASE variable should be set before including this file
 #
-VOXIN_VERSION=3.2rc1
+VOXIN_VERSION=3.2
 
 VOXIN_INSTALLER_GIT_URL=https://github.com/Oralux/voxin-installer.git
 VOXIN_INSTALLER_TAG=$VOXIN_VERSION
@@ -38,22 +38,24 @@ SPEECHD_VOXIN_ALL_VERSIONS=
 SPEECHD_VOXIN_ARCHIVE_URL=https://github.com/Oralux/speechd/archive
 SPEECHD_VOXIN_GIT_URL=https://github.com/Oralux/speechd.git
 SPEECHD_VOXIN_TAG=voxin3
-SPEECHD_SD_MODULE_COPYRIGHT_NB_LINES=25
+SPEECHD_VOXIN_TAG_0_10_1=voxin3_backport_upstream
+SPEECHD_SD_MODULE_COPYRIGHT_NB_LINES=24
 
 # pre-built binaries of the speech-dispatcher voxin module(s) to download.
 # Built from sources identified by the sources.ini file inside the tarball.
 SPEECHD_VOXIN_BIN_URL=http://soft.oralux.org/speech-dispatcher/bin
 SPEECHD_VOXIN_BIN_ARCHIVES=" \
-sd_voxin_0.10.1-voxin3.aarch64.txz \
-sd_voxin_0.10.1-voxin3.armv7l.txz \
-sd_voxin_0.10.1-voxin3.x86_64.txz \
 sd_voxin_0.9.0-voxin3.aarch64.txz \
 sd_voxin_0.9.0-voxin3.armv7l.txz \
 sd_voxin_0.9.0-voxin3.x86_64.txz \
 sd_voxin_0.9.1-voxin3.aarch64.txz \
 sd_voxin_0.9.1-voxin3.armv7l.txz \
 sd_voxin_0.9.1-voxin3.x86_64.txz \
+sd_voxin_0.10.1-voxin3_backport_upstream.aarch64.txz \
+sd_voxin_0.10.1-voxin3_backport_upstream.armv7l.txz \
+sd_voxin_0.10.1-voxin3_backport_upstream.x86_64.txz \
 "
+
 #"sd_voxin_0.7.1_0.8.8.x86_64.txz sd_voxin_0.9.1-voxin3.x86_64.txz"
 SPEECHD_VOXIN_BIN_SHA512=$BASE/check/$VOXIN_VERSION/sd_voxin.sha512
 
@@ -132,8 +134,9 @@ setSpeechdVoxinVar() {
     unset SPEECHD_VOXIN_ARCHIVE SPEECHD_VOXIN_SHA512
     case $version in
 	0.10.1)	    
-	    SPEECHD_VOXIN_ARCHIVE=$version-$SPEECHD_VOXIN_TAG.tar.gz
-	    SPEECHD_VOXIN_SHA512=aaf5a066b299a33b1dce8fe9b62533962bbaeaf62bf874c337c142b4c4b66516dbb5bfa7e560d16770e83cfbf3e1e243551527296c0b53abcefc7cab349ed4db
+#	    SPEECHD_VOXIN_ARCHIVE=$version-$SPEECHD_VOXIN_TAG.tar.gz
+	    SPEECHD_VOXIN_ARCHIVE=$version-$SPEECHD_VOXIN_TAG_0_10_1.tar.gz
+	    SPEECHD_VOXIN_SHA512=9a5f849fa92042913ee0401912fe4c0e3836ac2428e016aebd3e587e5c6f93ff14b53337a525fa51f1d866d35f44ef09f748741b4863522a70b9deaf2ef9eaf0
 	    ;;
 	0.9.1)
 	    SPEECHD_VOXIN_ARCHIVE=$version-$SPEECHD_VOXIN_TAG.tar.gz
@@ -470,7 +473,7 @@ getSpeechDispatcherVoxin() {
 	fi	
 	
 	cd $dir || leave "Can't cd to speechd-$version" 1
-	   
+
 	./build.sh
 	CFLAGS="-I$libvoxinDir/../include/voxin" LDFLAGS="-L$libvoxinDir" ./configure --prefix="/usr"
 	make || return 1
@@ -481,7 +484,8 @@ getSpeechDispatcherVoxin() {
 	local confDir="$rfsdir"/opt/oralux/voxin/share/speech-dispatcher/$version
 	local docDir="$rfsdir"/opt/oralux/voxin/share/doc/speech-dispatcher-voxin/$version
 	local module=src/modules/sd_voxin
-	local sd_tag=$version-$SPEECHD_VOXIN_TAG
+#	local sd_tag=$version-$SPEECHD_VOXIN_TAG
+	local sd_tag=${SPEECHD_VOXIN_ARCHIVE%.tar.gz}
 	local tarball="$installDir"/sd_voxin_$sd_tag.$arch.txz
 
 	rm -rf $rfsdir
@@ -490,7 +494,10 @@ getSpeechDispatcherVoxin() {
 	cp "$module" "$modulesDir" || return 1
 	strip -s "$modulesDir/sd_voxin"
 	cp ./config/modules/voxin.conf "$confDir" || return 1
-	head -n $SPEECHD_SD_MODULE_COPYRIGHT_NB_LINES src/modules/voxin.c > "$docDir"/copyright
+	local file=src/modules/voxin.c
+	[ ! -e "$file" ] && file=src/modules/ibmtts.c
+	[ ! -e "$file" ] && return 1
+	head -n $SPEECHD_SD_MODULE_COPYRIGHT_NB_LINES $file > "$docDir"/copyright
 	cat<<EOF>"$docDir"/sources.ini
 [archive]
 url=$SPEECHD_VOXIN_ARCHIVE_URL/$SPEECHD_VOXIN_ARCHIVE
@@ -498,7 +505,7 @@ sha512=$SPEECHD_VOXIN_SHA512
 
 [git]
 url=$SPEECHD_VOXIN_GIT_URL
-tag=$SPEECHD_VOXIN_TAG
+tag=$sd_tag
 EOF
 
 	fakeroot bash -c "\
@@ -506,7 +513,6 @@ tar -C \"$rfsdir\" \
 	   -Jcf \"$tarball\" opt/oralux/voxin/share/doc/speech-dispatcher-voxin/$version opt/oralux/voxin/lib/speech-dispatcher-modules/$version opt/oralux/voxin/share/speech-dispatcher/$version" leave "can't create tarball into ${tarball%/*}" 1
 
 	rm -rf $modulesDir $confDir $docDir
-	
 	cd "$pwd"
 	return 0
 }
@@ -633,10 +639,11 @@ buildVoiceTarball() {
 	local voice=$1
 	local tarball=$2
 	local all=$3
+	local arch=$4
 	local releaseDir=$PKGDIR/voxin-$VOXIN_VERSION
 	local installDir=$INSTALLDIR/packages/all
 	local installerDir="$releaseDir/voxin-$VOXIN_VERSION/voxin-$voice-$VOXIN_VERSION"
-	local installerTar="$releaseDir/voxin-$voice-$VOXIN_VERSION.tgz"
+	local installerTar="$releaseDir/voxin-$voice-$VOXIN_VERSION.$arch.tgz"
 
 	mkdir -p "$installerDir" || return 1
 	rsync -a "$INSTALLDIR"/ "$installerDir"
@@ -653,7 +660,7 @@ buildReleaseTarball() {
 	local withTTS=$3
 	local releaseDir=$PKGDIR/voxin-$VOXIN_VERSION
 	# prefixed by withTTS to prevent deletion by next init() call
-	local releaseTarball=$PKGDIR/${withTTS}_voxin-$VOXIN_VERSION.tgz
+	local releaseTarball=$PKGDIR/${withTTS}_voxin-$VOXIN_VERSION.$arch.tgz
 	local installerDir
 	local installerTar
 	local installDir
@@ -724,7 +731,7 @@ EOF
 					if [ "$lang" = "all" ]; then
 						all=$tarball
 					else
-						buildVoiceTarball $lang $tarball $all
+						buildVoiceTarball $lang $tarball $all $arch
 					fi
 					;;
 				*) ;;
@@ -732,7 +739,7 @@ EOF
 		done
 
 		if [ "$withTTS" = nve ]; then
-			buildVoiceTarball update-ve $voxind $all
+			buildVoiceTarball update-ve $voxind $all $arch
 		fi
 		
 		local sha512=$BASE/check/$VOXIN_VERSION/voxin-$VOXIN_VERSION.sha512
