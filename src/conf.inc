@@ -1,6 +1,6 @@
 # THE BASE variable should be set before including this file
 #
-VOXIN_VERSION=3.2
+VOXIN_VERSION=3.3rc1
 
 VOXIN_INSTALLER_GIT_URL=https://github.com/Oralux/voxin-installer.git
 VOXIN_INSTALLER_TAG=$VOXIN_VERSION
@@ -45,6 +45,7 @@ SPEECHD_SD_MODULE_COPYRIGHT_NB_LINES=24
 # Built from sources identified by the sources.ini file inside the tarball.
 SPEECHD_VOXIN_BIN_URL=http://soft.oralux.org/speech-dispatcher/bin
 SPEECHD_VOXIN_BIN_ARCHIVES=" \
+sd_voxin_0.7.1_0.8.8.x86_64.txz \
 sd_voxin_0.9.0-voxin3.aarch64.txz \
 sd_voxin_0.9.0-voxin3.armv7l.txz \
 sd_voxin_0.9.0-voxin3.x86_64.txz \

@@ -1,3 +1,6 @@
+2020-10-09 Gilles Casse <gcasse@oralux.org>
+	release 3.3rc1: restore compatibility with speech-dispatcher 0.7, 0.8 and 0.8.8 .
+
 2020-10-08 Gilles Casse <gcasse@oralux.org>
 	release 3.2 for Vocalizer Embedded (x86_64, armv7l, armv8) and IBM TTS (x86_64):
 	- Capital mode: emits a brief sound to point out a word with a capital letter, doubled this sound if all caps.
