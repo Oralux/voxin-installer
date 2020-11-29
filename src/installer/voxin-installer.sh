@@ -125,8 +125,17 @@ for i in speech-dispatcher-ibmtts speech-dispatcher-voxin voxind libvoxin libvox
 	isPackageInstalled $i && uninstallPackage $i
 done
 
+isSystemInstallEnabled
+if [ $? != 0 ]; then
+    _gettext "Your system refuses at the moment to install a package. You may want to try a bit later"
+    exit 1
+fi
 uninstallOldVoxin "$installDir"
-installSystem "$installDir" || exit 1
+installSystem "$installDir"
+if [ $? != 0 ]; then
+    installOldVoxin "$installDir"
+    exit 1
+fi
 
 installed=0
 askInstallLang && {

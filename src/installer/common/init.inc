@@ -296,6 +296,32 @@ uninstallOldVoxin()
 	fi
 }
 
+installOldVoxin()
+{	
+    [ $# != 1 ] || [ -z "$1" ] && return 1
+    local rfsdir="$1"
+    local status=0
+    installPackage voxin || return 1
+    DIR_NEW="$rfsdir/opt/oralux/voxin"
+    DIR_OLD="$DIR_NEW.old"
+    if [ -e "$DIR_OLD" ]; then
+	[ -e "$DIR_NEW" ] && rm -rf "$DIR_NEW"
+	mv "$DIR_OLD" "$DIR_NEW"
+    fi
+    return $status
+}
+
+isSystemInstallEnabled()
+{
+    local status=0
+    which gettext >> "$LOG"
+    if [ "$?" = "0" ]; then
+	uninstallPackage gettext || return 1
+    fi
+    installPackage gettext || status=1
+    return $status
+}
+
 uninstallSystem()
 {	
 	[ $# != 1 ] || [ -z "$1" ] && return 1
@@ -340,6 +366,11 @@ installSystem() {
 		return "$status"
 	    fi	
 	done
+
+	# install voxin.ini globally
+	local ref_voxin_ini=/opt/oralux/voxin/share/conf/voxin.ini
+	local global_voxin_ini=/var/opt/oralux/voxin/voxin.ini	
+	[ ! -e $global_voxin_ini ] && install -m 644 -D $ref_voxin_ini $global_voxin_ini
 
 	# install voxin.conf
 	local conf_dir=/opt/oralux/voxin/share/speech-dispatcher

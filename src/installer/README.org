@@ -36,7 +36,6 @@ cd voxin-enu-%VERSION%
 #+END_ASCII 
 
 On other distributions, use "su --login" instead of "sudo --login"  .
-
 ** Voxin updates
 Your download link is usually permanent and points on the last voxin release.
 
@@ -110,32 +109,73 @@ Much more should be compatible.
 
 For support or feedback, please send a mail to contact@oralux.org with possibly the log file (log/voxin.log).
 
-|---------------------------------+-----------------|
-| Distributions                   | Architectures   |
-|---------------------------------+-----------------|
-| Arch Linux ARM (August 2020)    | armv7l, aarch64 |
-| Debian 10, 11 (sid)             | x86_64          |
-| Slint64-14.2.1.2 (October 2020) | x86_64          |
-| Ubuntu 20.04                    | x86_64          |
-| Ubuntu Mate 20.04               | armv7l, aarch64 |
-|---------------------------------+-----------------|
+|------------------------------+-----------------|
+| Distributions                | Architectures   |
+|------------------------------+-----------------|
+| Arch Linux ARM (August 2020) | armv7l, aarch64 |
+| Raspberry Pi OS              | armv7l          |
+| Ubuntu Mate 20.04            | armv7l, aarch64 |
+| Ubuntu 18.04                 | x86_64          |
+|------------------------------+-----------------|
 
 ** Previous releases 
 The distributions which have been previously tested are displayed below. 
 They are supposed to be still compatible with the last version of Voxin.
 
-|-------+--------------------------------+---------------|
-| Voxin | Distributions                  | Architectures |
-|-------+--------------------------------+---------------|
-|   3.1 | Arch Linux (August 2020)       | x86_64        |
-|   3.0 | Centos 7                       | x86_64        |
-|   3.0 | Debian 8, 9, 10                | x86_64, i686  |
-|   3.0 | Fedora 29, 30                  | x86_64        |
-|   3.0 | Gentoo                         | x86_64        |
-|   3.0 | openSUSE Leap 15.0             | x86_64        |
-|   3.0 | openSUSE Tumbleweed-i586       | i686          |
-|   3.1 | Ubuntu 18.04                   | x86_64        |
-|-------+--------------------------------+---------------|
+|--------+---------------------------------+---------------|
+|  Voxin | Distributions                   | Architectures |
+|--------+---------------------------------+---------------|
+|    3.1 | Arch Linux (August 2020)        | x86_64        |
+|    3.0 | Centos 7                        | x86_64        |
+|    3.0 | Debian 8, 9, 10                 | x86_64, i686  |
+| 3.3rc1 | Debian 10, 11 (sid)             | x86_64        |
+|    3.0 | Fedora 29, 30                   | x86_64        |
+|    3.0 | Gentoo                          | x86_64        |
+|    3.0 | openSUSE Leap 15.0              | x86_64        |
+|    3.0 | openSUSE Tumbleweed-i586        | i686          |
+| 3.3rc1 | Slint64-14.2.1.2 (October 2020) | x86_64        |
+|    3.1 | Ubuntu 18.04                    | x86_64        |
+| 3.3rc1 | Ubuntu 20.04                    | x86_64        |
+|--------+---------------------------------+---------------|
+
+* voxin.ini configuration file
+The user may now define the default value of several parameters.
+- capitalization 
+- punctuation
+
+and only for IBM TTS: 
+- dictionaryDir
+- useAbbreviation
+
+These values will be overwritten by the calling software
+(e.g. speech-dispatcher, emacspeak,...).  The voxin.ini file is
+consequently interesting when a parameter is not yet managed by the
+calling software.
+
+voxin.ini is expected to be present locally at:
+$HOME/.config/voxin/voxin.ini 
+or if not found, available globally at:
+/var/opt/oralux/voxin/voxin.ini
+
+The installer creates a writable default file in
+/var/opt/oralux/voxin/voxin.ini if none exists.
+
+Brief Example:
+
+[general]
+capitalization=icon
+#punctuation=none
+
+[viavoice]
+dictionaryDir=/var/opt/IBM/ibmtts/dict
+useAbbreviation=no
+
+* Dictionaries
+User dictionaries are currently only available for IBM TTS.
+They are enabled by default by speech-dispatcher: in voxin.conf (or ibmtts.conf), the IbmttsDictionaryFolder variable is set to /var/opt/IBM/ibmtts/dict.
+
+Examples of dictionaries are included in this archive under:
+dictionary/var/opt/IBM/ibmtts/dict 
 
 * voxin-say command
 

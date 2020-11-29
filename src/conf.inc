@@ -1,6 +1,6 @@
 # THE BASE variable should be set before including this file
 #
-VOXIN_VERSION=3.3rc1
+VOXIN_VERSION=3.3rc2
 
 VOXIN_INSTALLER_GIT_URL=https://github.com/Oralux/voxin-installer.git
 VOXIN_INSTALLER_TAG=$VOXIN_VERSION
@@ -25,8 +25,8 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 # - development (master branch)
 #LIBVOXIN_VERSION=
 # - from the last tag instead (+sha512)
-LIBVOXIN_VERSION=1.5.2
-LIBVOXIN_SHA512=04c00e4944f26e95046b461f2f1ef8ced8400ea256e1f20fa6441785c54c700cd09481d20b0378c606a82d0ebe9998a6d53534e377347ebcade3abeed9e04c8e
+LIBVOXIN_VERSION=1.5.7
+LIBVOXIN_SHA512=e2f77208305b0dee39898c71240c7f280e57ae91d0009a1140bd77dadbe0a6fff03254e756527d8e17e25a329b47990629aa43cde5b1b61467e734e86a4049cb
 
 # versions of the speech-dispatcher voxin module(s) which must be
 # built by this script.
@@ -64,7 +64,7 @@ SPEECHD_VOXIN_BIN_SHA512=$BASE/check/$VOXIN_VERSION/sd_voxin.sha512
 # This VM was previously needed for voxin 3.0 to build libvoxin on a Debian 8 environment
 # (mostly due to puncfilter and its libstdc++ dependency)
 # 
-VMX86_64=user1@192.168.122.218
+VMX86_64=user1@192.168.122.118
 VMVOXDIR=/home/user1/VOXIN
 VMLIBVOXDIR=$VMVOXDIR/LIBVOXIN
 
@@ -76,9 +76,12 @@ VMX86=user1@192.168.122.174
 
 # Dependencies
 # # libstdc++-4.9-dev:i386 (hard coded in function below)
-#DEP_PACKAGES="alien libarchive-tools build-essential fakeroot rpm rsync build-essential binutils-multiarch libc6-dev-i386 gcc-multilib g++-multilib patchelf"
- DEP_PACKAGES="alien libarchive-tools build-essential fakeroot rpm rsync"
-# Debian9: speech-dispatcher dependencies
+# DEP_PACKAGES="alien libarchive-tools build-essential fakeroot rpm rsync build-essential binutils-multiarch libc6-dev-i386 gcc-multilib g++-multilib patchelf"
+# DEP_PACKAGES="alien libarchive-tools build-essential fakeroot rpm rsync"
+# Debian8: speech-dispatcher dependencies
+  DEP_PACKAGES="alien bsdtar build-essential fakeroot rpm rsync"
+[ "$(uname -m)" == x86_64 ] && DEP_PACKAGES="$DEP_PACKAGES gcc-multilib"
+  # Debian9: speech-dispatcher dependencies
 # obtained with apt-get build-dep speech-dispatcher
 
 DEP_PACKAGES_X86="alien libarchive-tools rpm build-essential flite1-dev intltool libao-dev libasound2-dev libaudio-dev libdotconf-dev libespeak-dev libflac-dev libglib2.0-dev libogg-dev libpulse-dev libsndfile1-dev libvorbis-dev libxau-dev pkg-config tex-common x11proto-core-dev xorg-sgml-doctools zlib1g-dev dh-autoreconf libltdl-dev libtool"
@@ -316,7 +319,7 @@ getSpeechdVoxinBinTarballs() {
 		fi
 	    fi
 	done
-	sha512sum --ignore-missing -c "$SPEECHD_VOXIN_BIN_SHA512" || leave "speechd_voxin: sha512 mismatch!" 1
+	sha512sum -c "$SPEECHD_VOXIN_BIN_SHA512" || leave "speechd_voxin: sha512 mismatch!" 1
 
 	for file in $SPEECHD_VOXIN_BIN_ARCHIVES; do
 	    cp -a "$file" "$installDir"

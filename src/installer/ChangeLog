@@ -1,3 +1,24 @@
+2020-11-29 Gilles Casse <gcasse@oralux.org>
+	release 3.3rc2 for Vocalizer Embedded (x86_64, armv7l, armv8) and IBM TTS (x86_64):
+
+	- Compatibility with Raspberry Pi OS.
+
+	- Add voxin.ini, configuration file
+	The user may now define the default value of several parameters:
+	capitalization, punctuation, and only for viavoice: dictionaryDir,
+	useAbbreviation.
+	More details in the README file (in paragraph: "voxin.ini configuration file").
+
+	- Only for Vocalizer Embedded: fix erroneous speed and pitch changes:
+	the speed and pitch parameters were erroneously modified when a
+	secondary speech-dispatcher client (e.g. spd-say) was called.
+
+	- Installer: before installing a new version of voxin, the
+	previously installed version has to be uninstalled.
+	More checks are now added: check first that the system enables
+	package installation, and if the installation fails, try to
+	restore the previous version.
+
 2020-10-09 Gilles Casse <gcasse@oralux.org>
 	release 3.3rc1: restore compatibility with speech-dispatcher 0.7, 0.8 and 0.8.8 .
 

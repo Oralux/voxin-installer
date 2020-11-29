@@ -56,7 +56,7 @@ else
 	if [ -n "$a" ]; then
 		upload_to_server
 		ssh $SERVER "cd $VMVOXDIR/voxin-installer && ./build.sh -t src/list.vv"
-		ssh $SERVER "cd $VMVOXDIR/voxin-installer && ./build.sh -t src/list.ve"
+		ssh $SERVER "cd $VMVOXDIR/voxin-installer && ./build.sh -t src/list.ve.$ARCH"
 	fi
 fi
 
