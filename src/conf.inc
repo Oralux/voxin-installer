@@ -1,6 +1,6 @@
 # THE BASE variable should be set before including this file
 #
-VOXIN_VERSION=3.3rc2
+VOXIN_VERSION=3.3rc3
 
 VOXIN_INSTALLER_GIT_URL=https://github.com/Oralux/voxin-installer.git
 VOXIN_INSTALLER_TAG=$VOXIN_VERSION
@@ -79,10 +79,15 @@ VMX86=user1@192.168.122.174
 # DEP_PACKAGES="alien libarchive-tools build-essential fakeroot rpm rsync build-essential binutils-multiarch libc6-dev-i386 gcc-multilib g++-multilib patchelf"
 # DEP_PACKAGES="alien libarchive-tools build-essential fakeroot rpm rsync"
 # Debian8: speech-dispatcher dependencies
-  DEP_PACKAGES="alien bsdtar build-essential fakeroot rpm rsync"
-[ "$(uname -m)" == x86_64 ] && DEP_PACKAGES="$DEP_PACKAGES gcc-multilib"
-  # Debian9: speech-dispatcher dependencies
 # obtained with apt-get build-dep speech-dispatcher
+
+DEP_PACKAGES="alien build-essential fakeroot rpm rsync"
+[ "$(uname -m)" == x86_64 ] && DEP_PACKAGES="$DEP_PACKAGES gcc-multilib"
+
+# bsdtar (for Arch/Gentoo package)
+for i in libarchive-tools bsdtar; do
+    { apt-cache search "$i"| grep -o "^$i "; } && DEP_PACKAGES="$DEP_PACKAGES $i"
+done
 
 DEP_PACKAGES_X86="alien libarchive-tools rpm build-essential flite1-dev intltool libao-dev libasound2-dev libaudio-dev libdotconf-dev libespeak-dev libflac-dev libglib2.0-dev libogg-dev libpulse-dev libsndfile1-dev libvorbis-dev libxau-dev pkg-config tex-common x11proto-core-dev xorg-sgml-doctools zlib1g-dev dh-autoreconf libltdl-dev libtool"
 

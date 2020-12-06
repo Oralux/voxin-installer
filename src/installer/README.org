@@ -109,14 +109,17 @@ Much more should be compatible.
 
 For support or feedback, please send a mail to contact@oralux.org with possibly the log file (log/voxin.log).
 
-|------------------------------+-----------------|
-| Distributions                | Architectures   |
-|------------------------------+-----------------|
-| Arch Linux ARM (August 2020) | armv7l, aarch64 |
-| Raspberry Pi OS              | armv7l          |
-| Ubuntu Mate 20.04            | armv7l, aarch64 |
-| Ubuntu 18.04                 | x86_64          |
-|------------------------------+-----------------|
+|----------------------------------+-----------------|
+| Distributions                    | Architectures   |
+|----------------------------------+-----------------|
+| Arch Linux ARM (August 2020)     | armv7l, aarch64 |
+| Debian 10, 11 (sid)              | x86_64          |
+| Slint64-14.2.1.2 (December 2020) | x86_64          |
+| Ubuntu 20.04                     | x86_64          |
+| Raspberry Pi OS                  | armv7l          |
+| Ubuntu Mate 20.04                | armv7l, aarch64 |
+| Ubuntu 18.04                     | x86_64          |
+|----------------------------------+-----------------|
 
 ** Previous releases 
 The distributions which have been previously tested are displayed below. 

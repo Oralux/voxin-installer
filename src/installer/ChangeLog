@@ -1,3 +1,8 @@
+2020-12-06 Gilles Casse <gcasse@oralux.org>
+	release 3.3rc3 for Vocalizer Embedded (x86_64, armv7l, armv8) and IBM TTS (x86_64):
+
+	- Installer: fix for ArchLinux.
+
 2020-11-29 Gilles Casse <gcasse@oralux.org>
 	release 3.3rc2 for Vocalizer Embedded (x86_64, armv7l, armv8) and IBM TTS (x86_64):
 
