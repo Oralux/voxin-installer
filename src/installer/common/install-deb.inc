@@ -39,7 +39,7 @@ installPackage() {
 }
 
 uninstallPackage() {
-	[ $# != 1 ] || [ -z "$1" ] && return
-	local package=$1
-	apt-get remove --yes --purge "$package" &>> "$LOG" || true
+    [ $# != 1 ] || [ -z "$1" ] && return 1
+    local package=$1
+    apt-get remove --yes --purge "$package" &>> "$LOG"
 }

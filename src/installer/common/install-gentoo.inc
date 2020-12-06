@@ -44,7 +44,7 @@ installPackage() {
 }
 
 uninstallPackage() {
-	[ $# != 1 ] || [ -z "$1" ] && return
+	[ $# != 1 ] || [ -z "$1" ] && return 1
 	local package=$1
 	local tarball
 	local i

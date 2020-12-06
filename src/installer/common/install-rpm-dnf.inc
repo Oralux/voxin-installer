@@ -39,7 +39,7 @@ installPackage() {
 }
 
 uninstallPackage() {
-	[ $# != 1 ] || [ -z "$1" ] && return
-	local package=$1
+    [ $# != 1 ] || [ -z "$1" ] && return 1
+    local package=$1
     dnf remove -y "$package" &>> "$LOG"	
 }

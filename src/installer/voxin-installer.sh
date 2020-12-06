@@ -17,6 +17,11 @@ _gettext() {
     fi
 }
 
+display_error_msg() {
+    _gettext "Error: more details in $LOG"
+    _gettext "For support, email to contact at oralux.org "
+}
+
 getArch
 
 unset GETTEXT
@@ -125,21 +130,12 @@ for i in speech-dispatcher-ibmtts speech-dispatcher-voxin voxind libvoxin libvox
 	isPackageInstalled $i && uninstallPackage $i
 done
 
-isSystemInstallEnabled
-if [ $? != 0 ]; then
-    _gettext "Your system refuses at the moment to install a package. You may want to try a bit later"
-    exit 1
-fi
-uninstallOldVoxin "$installDir"
-installSystem "$installDir"
-if [ $? != 0 ]; then
-    installOldVoxin "$installDir"
-    exit 1
-fi
+uninstallOldVoxin "$installDir" || { installOldVoxin "$installDir"; display_error_msg; exit 1; }
+installSystem "$installDir" || { installOldVoxin "$installDir"; display_error_msg; exit 1; }
 
 installed=0
 askInstallLang && {
-    installLang "$installDir" || exit 1
+    installLang "$installDir" || { display_error_msg; exit 1; }
     installed=1
 
     unset PLAY OPT
@@ -158,7 +154,7 @@ askInstallLang && {
 
 if [ "$installed" = "0" ]; then
     askUninstall && {
-		uninstall "$installDir"
+		uninstall "$installDir" || { display_error_msg; exit 1; }
 		exit 0
     }
 fi

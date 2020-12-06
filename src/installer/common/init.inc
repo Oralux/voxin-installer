@@ -66,29 +66,30 @@ END
 uninstall() {
     [ $# != 1 ] || [ -z "$1" ] && return 1
     local rfsdir="$1"
-	spd_conf_unset voxin	
+    spd_conf_unset voxin	
     uninstallSystem "$rfsdir"
-    _gettext "Operation completed. "    
+    _gettext "Operation completed. "
+    return 0
 }
 
 check_distro() {
     local status=0
-	local ID=$(awk -F= '/^ID_LIKE=/{print $2}' /etc/os-release | tr -d '"')
-	[ -z "$ID" ] && ID=$(awk -F= '/^ID=/{print $2}' /etc/os-release | tr -d '"')
-	[ -z "$ID" ] && return 1
-
-	status=0
-	case "$ID" in
-		arch*) source common/install-arch-linux.inc;;
-		debian*|ubuntu*) source common/install-deb.inc;;
-		fedora*) source common/install-rpm-dnf.inc;;
-		gentoo*) source common/install-gentoo.inc;;
-		opensuse*|suse*) source common/install-rpm-zypper.inc;;
-		rhel*) source common/install-rpm-yum.inc;;
-		slackware*|slint*) source common/install-slackware.inc;;
-		*) status=1;;
-	esac
-	
+    local ID=$(awk -F= '/^ID_LIKE=/{print $2}' /etc/os-release | tr -d '"')
+    [ -z "$ID" ] && ID=$(awk -F= '/^ID=/{print $2}' /etc/os-release | tr -d '"')
+    [ -z "$ID" ] && return 1
+    
+    status=0
+    case "$ID" in
+	arch*) source common/install-arch-linux.inc;;
+	debian*|ubuntu*) source common/install-deb.inc;;
+	fedora*) source common/install-rpm-dnf.inc;;
+	gentoo*) source common/install-gentoo.inc;;
+	opensuse*|suse*) source common/install-rpm-zypper.inc;;
+	rhel*) source common/install-rpm-yum.inc;;
+	slackware*|slint*) source common/install-slackware.inc;;
+	*) status=1;;
+    esac
+    
     return $status
 }
 
@@ -125,6 +126,7 @@ getRootfilesystemAllTarball() {
 	return 1
     fi
     echo "$tarball"
+    return 0
 }
 
 getRootfilesystemArchTarball() {
@@ -135,6 +137,7 @@ getRootfilesystemArchTarball() {
 	return 1
     fi
     echo "$tarball"
+    return 0
 }
 
 getPrevSpeechdModulesTarball() {
@@ -145,6 +148,7 @@ getPrevSpeechdModulesTarball() {
 	return 1
     fi
     echo "$tarball"
+    return 0
 }
 
 noOp() {
@@ -217,6 +221,7 @@ postInstViavoiceTarball() {
 }
 
 installLang() {
+	echo installLang >> "$LOG"
 	[ $# != 1 ] || [ -z "$1" ] && return 1
 	local rfsdir="$1"
 	local status
@@ -286,56 +291,53 @@ getArch() {
 
 uninstallOldVoxin()
 {	
-	[ $# != 1 ] || [ -z "$1" ] && return 1
-	local rfsdir="$1"
-	uninstallPackage voxin
-	DIR="$rfsdir/opt/oralux/voxin"
-	if [ -e "$DIR" ]; then
-		[ -e "$DIR.old" ] && rm -rf "$DIR.old"
-		mv "$DIR" "$DIR.old"
-	fi
+    echo uninstallOldVoxin >> "$LOG"
+    [ $# != 1 ] || [ -z "$1" ] && return 1
+    local rfsdir="$1"
+    
+    local DIR="$rfsdir/opt/oralux/voxin"
+    if [ -e "$DIR" ]; then
+	rm -rf "$DIR.old"
+	[ -e "$DIR.old" ] && { echo "error: DIR.old=$DIR.old" >> "$LOG"; return 1; }
+	mv "$DIR" "$DIR.old" || { echo "error: DIR=$DIR" >> "$LOG"; return 1; }
+    fi
+    isPackageInstalled voxin && { uninstallPackage voxin || return 1; }
+    return 0
 }
 
 installOldVoxin()
 {	
+    echo installOldVoxin >> "$LOG"
     [ $# != 1 ] || [ -z "$1" ] && return 1
     local rfsdir="$1"
-    local status=0
-    installPackage voxin || return 1
-    DIR_NEW="$rfsdir/opt/oralux/voxin"
-    DIR_OLD="$DIR_NEW.old"
+    isPackageInstalled voxin || { installPackage voxin || return 1; }
+    local DIR_NEW="$rfsdir/opt/oralux/voxin"
+    local DIR_OLD="$DIR_NEW.old"
     if [ -e "$DIR_OLD" ]; then
-	[ -e "$DIR_NEW" ] && rm -rf "$DIR_NEW"
+	rm -rf "$DIR_NEW"
+	[ -e "$DIR_NEW" ] && { echo "error: DIR_NEW=$DIR_NEW" >> "$LOG"; return 1; }
 	mv "$DIR_OLD" "$DIR_NEW"
     fi
-    return $status
-}
-
-isSystemInstallEnabled()
-{
-    local status=0
-    which gettext >> "$LOG"
-    if [ "$?" = "0" ]; then
-	uninstallPackage gettext || return 1
-    fi
-    installPackage gettext || status=1
-    return $status
+    return 0
 }
 
 uninstallSystem()
 {	
+	echo uninstallSystem >> "$LOG"
 	[ $# != 1 ] || [ -z "$1" ] && return 1
 	local rfsdir="$1"
-	uninstallPackage voxin
+	isPackageInstalled voxin && { uninstallPackage voxin || return 1; }
 	for i in "$rfsdir/opt/oralux/voxin" "$rfsdir/opt/IBM/ibmtts" "$rfsdir/var/opt/IBM/ibmtts" "$rfsdir/opt/oralux/nve" ; do
 		rm -rf $i
 	done
 	for i in "$rfsdir/opt/oralux" "$rfsdir/opt/IBM" "$rfsdir/var/opt/IBM"; do
 		[ -e "$i" ] && [ -z "$(ls -A "$i")" ] && rm -rf "$i"
 	done
+	return 0
 }
 
 installSystem() {	
+	echo installSystem >> "$LOG"
 	[ $# != 1 ] || [ -z "$1" ] && return 1
 	local rfsdir="$1"
 	local status=0
@@ -354,7 +356,7 @@ installSystem() {
 		return 1
 	fi
 	
-	uninstallPackage voxin || true
+	isPackageInstalled voxin && { uninstallPackage voxin || return 1; }
 
 	local i
 	for i in $rfsAllTarball $rfsArchTarball $prevSpeechdModulesTarball; do
@@ -383,11 +385,7 @@ installSystem() {
 	#
 	installLocalPackage "$voxinPackage"
 	status=$?
-	if [ "$status" != 0 ]; then
-		_gettext "Error: package install failure ($voxinPackage)!" >> "$LOG"
-		return "$status"
-	fi
-	
+	[ "$status" != 0 ] && _gettext "Error: package install failure ($voxinPackage)!" >> "$LOG"	
 	return "$status"
 }
 
