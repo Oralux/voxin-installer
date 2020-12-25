@@ -87,6 +87,15 @@ If the sound is choppy under Alsa, please copy the asoundrc file from emacspeak 
 For example:
 cp emacspeak-45.0/share/emacs/site-lisp/emacspeak/servers/linux-outloud/asoundrc $HOME/.asoundrc
 
+** Fenrir
+In settings.conf, the Fenrir configuration file, select the speech-dispatcher driver and the voxin module.
+
+For example in /etc/fenrirscreenreader/settings/settings.conf
+
+driver=speechdDriver                                                                                                                                                  
+
+module=voxin
+
 ** Speakup connector
 You may want to install speechd-up (interface between Speakup and Speech Dispatcher).
 
