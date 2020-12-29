@@ -1,6 +1,20 @@
 getVoxinPackage() {
 	[ -z "$PACMAN_ARCH" ] && return 1
-	find packages/archlinux -name "voxin*$PACMAN_ARCH.pkg.tar.xz"
+	find packages/archlinux -name "voxin-[0-9]*$PACMAN_ARCH.pkg.tar.xz"
+}
+
+getVoxinSpeechdPackage() {
+	[ -z "$PACMAN_ARCH" ] && return 1
+	find packages/archlinux -name "voxin-speechd-[0-9]*$PACMAN_ARCH.pkg.tar.xz"
+}
+
+getVoxinSpeechdConfPackage() {
+	[ -z "$PACMAN_ARCH" ] && return 1
+	find packages/archlinux -name "voxin-speechd-conf-[0-9]*$PACMAN_ARCH.pkg.tar.xz"
+}
+
+is_sd_voxin_installed() {
+    pacman -Ql speech-dispatcher | grep sd_voxin > /dev/null
 }
 
 getPackageVersion() {

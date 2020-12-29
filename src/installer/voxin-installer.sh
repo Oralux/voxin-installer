@@ -126,7 +126,8 @@ _gettext "Logs written in log/voxin.log"
 _gettext "Initialization; please wait... "
 
 # remove packages from voxin < 2.0
-for i in speech-dispatcher-ibmtts speech-dispatcher-voxin voxind libvoxin libvoxin1; do
+#for i in speech-dispatcher-ibmtts speech-dispatcher-voxin voxind libvoxin libvoxin1; do
+for i in voxind libvoxin libvoxin1; do
 	isPackageInstalled $i && uninstallPackage $i
 done
 

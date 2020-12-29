@@ -1,6 +1,21 @@
 getVoxinPackage() {
 	[ -z "$ARCH" ] && return 1
-	find packages/rpm -name "voxin*.$ARCH.rpm"
+	find packages/rpm -name "voxin-[0-9]*.$ARCH.rpm"
+}
+
+getVoxinSpeechdPackage() {
+	[ -z "$ARCH" ] && return 1
+	find packages/rpm -name "voxin-speechd-[0-9]*$ARCH.rpm"
+}
+
+getVoxinSpeechdConfPackage() {
+	[ -z "$ARCH" ] && return 1
+	find packages/rpm -name "voxin-speechd-conf-[0-9]*$ARCH.rpm"
+}
+
+is_sd_voxin_installed() {
+    # sd_voxin not yet supplied by distro 
+    return 1
 }
 
 getPackageVersion() {

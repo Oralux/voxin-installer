@@ -1,6 +1,21 @@
 getVoxinPackage() {
 	[ -z "$DEBIAN_ARCH" ] && return 1
-	find packages/deb -name "voxin*_$DEBIAN_ARCH.deb"
+	find packages/deb -name "voxin_*_$DEBIAN_ARCH.deb"	
+}
+
+getVoxinSpeechdPackage() {
+	[ -z "$DEBIAN_ARCH" ] && return 1
+	find packages/deb -name "voxin-speechd_*$DEBIAN_ARCH.deb"	
+}
+
+getVoxinSpeechdConfPackage() {
+	[ -z "$DEBIAN_ARCH" ] && return 1
+	find packages/deb -name "voxin-speechd-conf_*$DEBIAN_ARCH.deb"	
+}
+
+is_sd_voxin_installed() {
+    { dpkg -L speech-dispatcher-voxin | grep sd_voxin || { dpkg -L speech-dispatcher | grep sd_voxin; }; } &> /dev/null
+    return 1
 }
 
 getPackageVersion() {

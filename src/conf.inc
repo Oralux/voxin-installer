@@ -1,6 +1,6 @@
 # THE BASE variable should be set before including this file
 #
-VOXIN_VERSION=3.3rc3
+VOXIN_VERSION=3.3rc4
 
 VOXIN_INSTALLER_GIT_URL=https://github.com/Oralux/voxin-installer.git
 VOXIN_INSTALLER_TAG=$VOXIN_VERSION
@@ -118,7 +118,9 @@ RFSDIR=$TMPDIR/rfs
 INSTALLDIR=$TMPDIR/voxin-installer_$VOXIN_VERSION
 VOXINDIR=$RFSDIR/opt/oralux/voxin
 RFS32=$VOXINDIR/rfs32
-BUILDPKG=$TMPDIR/buildPackage
+BUILD_VOXIN_PKG=$TMPDIR/buildVoxinPackage
+BUILD_VOXIN_SPEECHD_PKG=$TMPDIR/buildVoxinSpeechdPackage
+BUILD_VOXIN_SPEECHD_CONF_PKG=$TMPDIR/buildVoxinSpeechdConfPackage
 DWLX86=$DWLDIR/x86
 
 DOC=$VOXINDIR/usr/share/doc
@@ -212,10 +214,10 @@ checkDep() {
 
 init() {
 	local i
-	for i in "$TMPDIR" "$BUILDPKG" "$PKGDIR"/voxin* "$PKGDIR"/rfs* "$RFS32"; do
+	for i in "$TMPDIR" "$BUILD_VOXIN_PKG" "$BUILD_VOXIN_SPEECHD_PKG" "$BUILD_VOXIN_SPEECHD_CONF_PKG" "$PKGDIR"/voxin* "$PKGDIR"/rfs* "$RFS32"; do
 		rm -rf "$i"
 	done
-	mkdir -p "$PKGDIR" "$DWLDIR" "$BUILDPKG"/{rfs,build}
+	mkdir -p "$PKGDIR" "$DWLDIR" "$BUILD_VOXIN_PKG"/{rfs,build} "$BUILD_VOXIN_SPEECHD_PKG"/{rfs,build} "$BUILD_VOXIN_SPEECHD_CONF_PKG"/{rfs,build}
 }
 
 buildBuildroot() {
@@ -420,7 +422,7 @@ getLibvoxin() {
 
 	# create symlinks
 	tarball=$(ls "$PWD"/build/"$arch"/release/libvoxin-pkg_*.all.txz)
-	tar -C "$BUILDPKG/rfs" -xf "$tarball" || leave "Can't uncompress libvoxin-pkg tarball ($tarball)" 1
+	tar -C "$BUILD_VOXIN_PKG/rfs" -xf "$tarball" || leave "Can't uncompress libvoxin-pkg tarball ($tarball)" 1
 
 	getLibvoxinRes=$PWD/build/$arch/rfs/usr/lib
 	
@@ -535,15 +537,19 @@ buildVoxinModuleLauncher() {
 	make
 	DESTDIR="$modulesDir" make install
 
-	# create symlinks
-	cd "$BUILDPKG/rfs"
-	mkdir -p usr/{lib/speech-dispatcher-modules,share/speech-dispatcher/conf/modules} etc/speech-dispatcher/modules
-
-	# Voxin module:
-	# The speech-dispatcher module installed by the voxin package is just a
-	# symbolic link to a module selector:
+	# Speech Dispatcher (>= 0.10.2) can build a Voxin module.
+	# For example, this module is already included in Arch Linux
+	# (December 2020, speech-dispatcher package) or in Debian sid
+	# (2020, speech-dispatcher-voxin package).
+	#
+	# If a GNU/Linux distribution does not already provide this
+	# Voxin module, the voxin-speechd and voxin-speechd-conf
+	# packages provided in the tarball will be installed.
+	#
+	# 1. voxin-speechd
+	# voxin-speechd supplies a symbolic link to a module selector:
 	# /usr/lib/speech-dispatcher-modules/sd_voxin
-	# points to
+	# which points to
 	# /opt/oralux/voxin/lib/speech-dispatcher-modules/sd_voxin
 	#
 	# This module selector determines the version of speech-dispatcher using:
@@ -557,20 +563,35 @@ buildVoxinModuleLauncher() {
 	# version (e.g. if speech-dispatcher has been built from git)
 	# it will attempt to launch the most recent version of sd_voxin.
 	#
-	# The current module configuration is a symlink from:
+	# 2. voxin-speechd-conf
+	# voxin_speechd_conf supplies a symbolic link from:
 	# /etc/speech-dispatcher/modules/voxin.conf
 	# to 
 	# /opt/oralux/voxin/share/speech-dispatcher/conf/voxin.conf
-	# 
+	#
+	# which itself points on the configuration matching the current version of speech-ditacher
 	# The default configuration files are stored under
 	# /opt/oralux/voxin/share/speech-dispatcher/conf/
 	#   0.9.1/voxin.conf
 	#   0.9.0/voxin.conf
 	#
+
+	# create symlinks
+	cd "$BUILD_VOXIN_SPEECHD_PKG/rfs"
+	mkdir -p usr/lib/speech-dispatcher-modules
 	ln -s /opt/oralux/voxin/lib/speech-dispatcher-modules/sd_voxin usr/lib/speech-dispatcher-modules/sd_voxin
-	ln -s /opt/oralux/voxin/share/speech-dispatcher/voxin.conf usr/share/speech-dispatcher/conf/modules/voxin.conf
+#	mkdir -p usr/{lib/speech-dispatcher-modules,libexec/speech-dispatcher-modules}
+#	ln -s /opt/oralux/voxin/lib/speech-dispatcher-modules/sd_voxin usr/libexec/speech-dispatcher-modules/sd_voxin
+
+	cd "$BUILD_VOXIN_SPEECHD_CONF_PKG/rfs"
+	mkdir -p etc/speech-dispatcher/modules
 	ln -s /opt/oralux/voxin/share/speech-dispatcher/voxin.conf etc/speech-dispatcher/modules/voxin.conf
 
+	# omitted: to avoid to create of a third package...
+	# cd "$BUILD_VOXIN_SPEECHD_CONF2_PKG/rfs"
+	# mkdir -p usr/share/speech-dispatcher/conf/modules
+	# ln -s /opt/oralux/voxin/share/speech-dispatcher/voxin.conf usr/share/speech-dispatcher/conf/modules/voxin.conf
+	
 	cd "$pwd"
 }
 
@@ -581,7 +602,7 @@ getVoxinDoc() {
 
 	cp $INSTALLDIR/README $INSTALLDIR/LICENSE "$VOXINDIR"
 
-	cd "$BUILDPKG/rfs"
+	cd "$BUILD_VOXIN_PKG/rfs"
 	mkdir -p usr/share/doc/voxin
 	ln -s /opt/oralux/voxin/LICENSE usr/share/doc/voxin/
 	ln -s /opt/oralux/voxin/README usr/share/doc/voxin/
@@ -590,11 +611,11 @@ getVoxinDoc() {
 	return 0
 }
 
-buildPackage() {
+buildVoxinPackage() {
 	[ $# != 1 ] && return 1
 	local arch=$1
-	local tarball="$BUILDPKG"/build/voxin_$VOXIN_VERSION.all.txz
-	local rfsdir=$BUILDPKG/rfs
+	local tarball="$BUILD_VOXIN_PKG"/build/voxin_$VOXIN_VERSION.all.txz
+	local rfsdir=$BUILD_VOXIN_PKG/rfs
 	fakeroot bash -c "\
 tar -C \"$rfsdir\" \
 	   -Jcf \"$tarball\" ." leave "can't create tarball into $rfsdir" 1
@@ -609,24 +630,115 @@ tar -C \"$rfsdir\" \
 
 	# debian
 	local debArch=$(getDebArch "$arch")
-	replaces="libvoxin1, libvoxin1-dev, voxind, speech-dispatcher-voxin, speech-dispatcher-ibmtts"
+	replaces="libvoxin1, libvoxin1-dev, voxind"
 	installDir=$INSTALLDIR/packages/deb
 	buildDebPackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$debArch" "$depends" "$title" "$description" "$replaces"
 
 	# gentoo
 	local depends=glibc
-	replaces="libvoxin, voxind, speech-dispatcher-voxin, speech-dispatcher-ibmtts"
+	replaces="libvoxin, voxind"
 	installDir=$INSTALLDIR/packages/gentoo
 	buildGentooPackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" "$replaces" 
 	
 	# pacman
 	local depends=glibc
-	replaces="libvoxin, voxind, speech-dispatcher-voxin, speech-dispatcher-ibmtts"
+	replaces="libvoxin, voxind"
 	installDir=$INSTALLDIR/packages/archlinux
 	buildPacmanPackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" "$replaces" 
 	
 	# rpm
-	replaces="libvoxin, libvoxin-debuginfo, libvoxin-devel, voxind, voxind-debuginfo, speech-dispatcher-voxin, speech-dispatcher-ibmtts"
+	replaces="libvoxin, libvoxin-debuginfo, libvoxin-devel, voxind, voxind-debuginfo"
+	installDir=$INSTALLDIR/packages/rpm
+	buildRpmPackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" "$replaces"
+	
+	# slackware
+	installDir=$INSTALLDIR/packages/slackware
+	buildSlackwarePackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$arch" "$depends" "$title" "$description" "LGPL-2.1+"
+}
+
+buildVoxinSpeechdPackage() {
+	[ $# != 1 ] && return 1
+	local arch=$1
+	local tarball="$BUILD_VOXIN_SPEECHD_PKG"/build/voxin_speechd_$VOXIN_VERSION.all.txz
+	local rfsdir=$BUILD_VOXIN_SPEECHD_PKG/rfs
+
+	fakeroot bash -c "\
+tar -C \"$rfsdir\" \
+	   -Jcf \"$tarball\" ." leave "can't create tarball into $rfsdir" 1
+
+	# package voxin_speechd for various package managers
+	local title="voxin-speechd pseudo package"
+	local description="Provides symbolic links to the Voxin module for Speech Dispatcher. This package is only needed if the distribution does not already supply sd_voxin."
+
+	local name=voxin-speechd
+	local depends="libc6,voxin"
+	local replaces
+
+	# debian
+	local debArch=$(getDebArch "$arch")
+	replaces="speech-dispatcher-voxin"
+	installDir=$INSTALLDIR/packages/deb
+	buildDebPackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$debArch" "$depends" "$title" "$description" "$replaces"
+
+	# gentoo
+	local depends="glibc,voxin"
+	replaces="speech-dispatcher-voxin"
+	installDir=$INSTALLDIR/packages/gentoo
+	buildGentooPackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" "$replaces" 
+	
+	# pacman
+	local depends="glibc,voxin"
+	replaces="speech-dispatcher-voxin"
+	installDir=$INSTALLDIR/packages/archlinux
+	buildPacmanPackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" "$replaces" 
+	
+	# rpm
+	replaces="speech-dispatcher-voxin"
+	installDir=$INSTALLDIR/packages/rpm
+	buildRpmPackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" "$replaces"
+	
+	# slackware
+	installDir=$INSTALLDIR/packages/slackware
+	buildSlackwarePackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$arch" "$depends" "$title" "$description" "LGPL-2.1+"
+}
+
+buildVoxinSpeechdConfPackage() {
+	[ $# != 1 ] && return 1
+	local arch=$1
+	local tarball="$BUILD_VOXIN_SPEECHD_CONF_PKG"/build/voxin_speechd_conf_$VOXIN_VERSION.all.txz
+	local rfsdir=$BUILD_VOXIN_SPEECHD_CONF_PKG/rfs
+	fakeroot bash -c "\
+tar -C \"$rfsdir\" \
+	   -Jcf \"$tarball\" ." leave "can't create tarball into $rfsdir" 1
+
+	# package voxin_speechd_conf for various package managers
+	local title="voxin-speechd-conf pseudo package"
+	local description="Provides symbolic links to the Voxin module for Speech Dispatcher. This package is only needed if the distribution does not already supply voxin.conf."
+
+	local name=voxin-speechd-conf
+	local depends="libc6,voxin"
+	local replaces=
+
+	# debian
+	local debArch=$(getDebArch "$arch")
+	replaces="speech-dispatcher-voxin"
+	installDir=$INSTALLDIR/packages/deb
+	buildDebPackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$debArch" "$depends" "$title" "$description" "$replaces"
+
+	# gentoo
+	local depends="glibc,voxin"
+	replaces="speech-dispatcher-voxin"
+	installDir=$INSTALLDIR/packages/gentoo
+	buildGentooPackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" "$replaces" 
+	
+	# pacman
+	local depends="glibc,voxin"
+	replaces="speech-dispatcher-voxin"
+	installDir=$INSTALLDIR/packages/archlinux
+	buildPacmanPackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" "$replaces" 
+	
+	# rpm
+	replaces="speech-dispatcher-voxin"
 	installDir=$INSTALLDIR/packages/rpm
 	buildRpmPackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" "$replaces"
 	

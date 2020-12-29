@@ -336,15 +336,23 @@ uninstallSystem()
 	return 0
 }
 
+is_voxin_conf_installed() {
+    ls -lL /etc/speech-dispatcher/modules/voxin.conf &> /dev/null
+}
+
 installSystem() {	
 	echo installSystem >> "$LOG"
 	[ $# != 1 ] || [ -z "$1" ] && return 1
 	local rfsdir="$1"
 	local status=0
 	local voxinPackage=$(getVoxinPackage)
+	local voxinSpeechdPackage=$(getVoxinSpeechdPackage)
+	local voxinSpeechdConfPackage=$(getVoxinSpeechdConfPackage)
 	local rfsAllTarball=$(getRootfilesystemAllTarball) || return 1
 	local rfsArchTarball=$(getRootfilesystemArchTarball) || return 1
 	local prevSpeechdModulesTarball=$(getPrevSpeechdModulesTarball) || unset prevSpeechdModulesTarball
+	local voxin_conf_installed=0
+	local sd_voxin_installed=0
 	
 	if [ ! -d "$rfsdir" ]; then
 		_gettext "Install directory not found: $rfsdir" >> "$LOG"
@@ -356,8 +364,23 @@ installSystem() {
 		return 1
 	fi
 	
-	isPackageInstalled voxin && { uninstallPackage voxin || return 1; }
+	if [ -z "$voxinSpeechdPackage" ]; then
+		_gettext "voxin-speechd package not found!" >> "$LOG"
+		return 1
+	fi
 
+	if [ -z "$voxinSpeechdConfPackage" ]; then
+		_gettext "voxin-speechd-conf package not found!" >> "$LOG"
+		return 1
+	fi
+
+	for i in voxin voxin-speechd voxin-speechd-conf; do
+	    isPackageInstalled $i && { uninstallPackage $i || return 1; }
+	done
+
+	is_sd_voxin_installed && sd_voxin_installed=1
+	is_voxin_conf_installed && voxin_conf_installed=1
+	    
 	local i
 	for i in $rfsAllTarball $rfsArchTarball $prevSpeechdModulesTarball; do
 	    [ -z "$i" ] && continue
@@ -374,18 +397,29 @@ installSystem() {
 	local global_voxin_ini=/var/opt/oralux/voxin/voxin.ini	
 	[ ! -e $global_voxin_ini ] && install -m 644 -D $ref_voxin_ini $global_voxin_ini
 
-	# install voxin.conf
-	local conf_dir=/opt/oralux/voxin/share/speech-dispatcher
-	local conf="$conf_dir/last/voxin.conf"
-	local ver=$(/usr/bin/speech-dispatcher -v | head -1 | cut -f2 -d" ")
-
-	[ -n "$ver" ] && [ -e "$conf_dir/$ver/voxin.conf" ] && conf="$conf_dir/$ver/voxin.conf"
-	spd_conf_install_voxin_conf "$conf"
-
-	#
+	# install voxin package
 	installLocalPackage "$voxinPackage"
 	status=$?
-	[ "$status" != 0 ] && _gettext "Error: package install failure ($voxinPackage)!" >> "$LOG"	
+	[ "$status" != 0 ] && { _gettext "Error: package install failure ($voxinPackage)!" >> "$LOG"; return '$status'; }	
+
+	# install voxin.conf (if not yet installed)
+	if [ "$voxin_conf_installed" = 0 ]; then
+	    local conf_dir=/opt/oralux/voxin/share/speech-dispatcher
+	    local conf="$conf_dir/last/voxin.conf"
+	    local ver=$(/usr/bin/speech-dispatcher -v | head -1 | cut -f2 -d" ")	    
+	    [ -n "$ver" ] && [ -e "$conf_dir/$ver/voxin.conf" ] && conf="$conf_dir/$ver/voxin.conf"
+	    spd_conf_install_voxin_conf "$conf"
+
+	    # install voxin-speechd-conf package
+	    installLocalPackage "$voxinSpeechdConfPackage"
+	fi
+
+	# install sd_voxin (if not yet provided by the distro)
+	if [ "$sd_voxin_installed" = 0 ]; then
+	    # install voxin-speechd package
+	    installLocalPackage "$voxinSpeechdPackage"
+	fi
+
 	return "$status"
 }
 

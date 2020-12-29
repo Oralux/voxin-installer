@@ -2,7 +2,23 @@ gentooTarExclude="--exclude .MTREE --exclude .PKGINFO"
 
 getVoxinPackage() {
 	[ -z "$ARCH" ] && return 1
-	find packages/gentoo -name "voxin*$ARCH.pkg.tar.xz"
+	find packages/gentoo -name "voxin-[0-9]*$ARCH.pkg.tar.xz"
+}
+
+getVoxinSpeechdPackage() {
+	[ -z "$ARCH" ] && return 1
+	find packages/gentoo -name "voxin-speechd-[0-9]*$ARCH.pkg.tar.xz"
+}
+
+getVoxinSpeechdConfPackage() {
+	[ -z "$ARCH" ] && return 1
+	find packages/gentoo -name "voxin-speechd-conf-[0-9]*$ARCH.pkg.tar.xz"
+}
+
+is_sd_voxin_installed() {
+    #TODO
+    #    { dpkg -L speech-dispatcher-voxin | grep sd_voxin || { dpkg -L speech-dispatcher | grep sd_voxin; }; } &> /dev/null
+    return 1
 }
 
 getPackageVersion() {

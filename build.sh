@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 BASE=$(dirname $(realpath "$0"))
 NAME=$(basename "$0")
@@ -139,7 +139,9 @@ fi
 
 buildVoxinModuleLauncher
 getVoxinDoc
-buildPackage "$ARCH" || leave "Error: can't build packages" 1
+buildVoxinPackage "$ARCH" || leave "Error: can't build packages" 1
+buildVoxinSpeechdPackage "$ARCH" || leave "Error: can't build packages" 1
+buildVoxinSpeechdConfPackage "$ARCH" || leave "Error: can't build packages" 1
 
 [ "$ARCH" = x86_64 ] && getx86Arch
 
