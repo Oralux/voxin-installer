@@ -25,8 +25,8 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 # - development (master branch)
 #LIBVOXIN_VERSION=
 # - from the last tag instead (+sha512)
-LIBVOXIN_VERSION=1.5.7
-LIBVOXIN_SHA512=e2f77208305b0dee39898c71240c7f280e57ae91d0009a1140bd77dadbe0a6fff03254e756527d8e17e25a329b47990629aa43cde5b1b61467e734e86a4049cb
+LIBVOXIN_VERSION=1.5.8
+LIBVOXIN_SHA512=7ee544135521d913f646144aa2027b8ada5b1a18e7b257427b81be65779caa24ac5890f9204b210cd592f6adf8509894044aa3e47f582ab3a282c361c14c5a28
 
 # versions of the speech-dispatcher voxin module(s) which must be
 # built by this script.
@@ -1037,6 +1037,12 @@ buildGentooPackage() {
 	mkdir -p usr/share/doc/"$name-$version"
 	mv usr/share/doc/"$name"/{LICENSE,README} usr/share/doc/"$name-$version"/
 	rm -rf usr/share/doc/"$name"
+
+	# according to multilib.eclass
+	case "$arch" in
+	    *64*) mv usr/lib usr/lib64;;
+	esac
+	
 	local size=$(du -scb . | head -n1 | cut -f1)
 
 	cat <<EOF>.PKGINFO
@@ -1096,7 +1102,11 @@ buildRpmPackage() {
 	chmod 755 usr usr/include usr/share usr/share/doc usr/lib/speech-dispatcher-modules 2>/dev/null
 	chmod 755 usr/share/speech-dispatcher usr/share/speech-dispatcher/conf usr/share/speech-dispatcher/conf/modules 2>/dev/null
 	chmod 755 etc etc/speech-dispatcher etc/speech-dispatcher/modules 2>/dev/null
-	[ "$arch" = "x86_64" ] && mv usr/lib usr/lib64
+	# acccording to Fedora Rawhide (jan 2021)
+	case "$arch" in
+	    *64) mv usr/lib usr/lib64;;
+	    arm*) arch=armv7hl;;
+	esac
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"	
 	tar -zcf "$pacdir/$name.tgz" *
 	cd ..
