@@ -1,3 +1,33 @@
+2021-01-02 Gilles Casse <gcasse@oralux.org>
+	release 3.3rc4 for Vocalizer Embedded (x86_64, armv7l, armv8) and IBM TTS (x86_64):
+
+	- Compatibility with distributions supplying Speech Dispatcher 0.10.2.
+	The Speech Dispatcher voxin output module is either already
+	provided by the distribution (starting with speech-dispatcher
+	0.10.2) or otherwise will be installed from the tarball
+	(voxin-speechd-conf and/or voxin-speechd packages).
+	Tested on Arch Linux, Debian sid, openSUSE, Slint... Full list in
+	README.
+
+	- Gentoo & Fedora: install to /usr/lib64 for 64 bits architectures.
+
+	- (Vocalizer Embedded) Fix misplaced sound icon in capital mode.
+	Complete rework of indexes.
+
+	- (IBM TTS) Fix spelling regressions introduced in version 3.2.
+	With punctuation level set to none, the original spelling was
+	altered when a punctuation character preceded a capital
+	letter.
+
+	- installer:
+	After user's authorization, check if the voxin module must be
+	added to the speechd.conf files:
+	/home/*/.config/speech-dispatcher/speechd.conf
+	/etc/speech-dispatcher/speechd.conf
+	Voxin must be added if there are uncommented AddModule lines in
+	speechd.conf and none of them concerns voxin.
+	Checked with speech-dispatcher 0.9.1 (Gentoo)
+
 2020-12-06 Gilles Casse <gcasse@oralux.org>
 	release 3.3rc3 for Vocalizer Embedded (x86_64, armv7l, armv8) and IBM TTS (x86_64):
 

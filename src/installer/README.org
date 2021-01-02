@@ -50,34 +50,109 @@ Voxin is released several times a year:
 
 Besides the voxin release, a lighter tarball, the voxin update is available and does not include the text-to-speech package.
 
+** Speech Dispatcher
+
+The Speech Dispatcher voxin output module is either already provided by your distribution (starting with speech-dispatcher 0.10.2) or otherwise will be installed from the voxin tarball.
+For example, the voxin module is provided in December 2020 by:
+- Arch Linux, speech-dispatcher package
+- Debian Bullseye, speech-dispatcher-voxin package
+
+The voxin-installer will install its own voxin-speechd-conf and/or voxin-speechd packages if the voxin module is not already installed in your system.
+
+After your authorization, the installer may set voxin as default output module. 
+Otherwise just select voxin via your screen reader (e.g. see the Orca or Fenrir paragraphs below).
+
+The installer calls spd-conf to set up voxin as default module.
+You may also prefer to edit the speechd.conf files.
+These two possibilities are detailed below.
+
+*** spd-conf
+
+spd-conf can be launched as normal user (not root user).
+spd-conf asks several questions, the main point is to enter voxin as default output module.
+Here is an example of the replies provided in Ubuntu 18.04.
+We have added ENTER below to clarify that the ENTER key has been pressed.
+
+$ spd-conf
+
+Speech Dispatcher configuration tool
+
+Do you want to setup a completely new configuration? [yes] :
+> ENTER
+Do you want to create/setup a 'user' or 'system' configuration [user] :
+> ENTER
+User configuration already exists.
+Do you want to rewrite it with a new one? [no] :
+>yes
+User configuration created in /home/user/.config/speech-dispatcher
+Configuring user settings for Speech Dispatcher
+Default output module [espeak] :
+>voxin
+The value you have chosen is not among the suggested values.
+You have chosen 'voxin'.
+The suggested values are ['espeak', 'flite', 'festival', 'cicero', 'ibmtts']
+Do you want to correct your answer? [yes] :
+>no
+Default language (two-letter iso language code like "en" or "cs") [en] :
+> ENTER
+Default audio output method [pulse] :
+> ENTER
+Default speech rate (on the scale of -100..100, 0 is default, 50 is faster, -50 is slower) [0] :
+> ENTER
+Default speech pitch (on the scale of -100..100, 0 is default, 50 is higher, -50 is lower) [0] :
+> ENTER
+Do you want to have Speech Dispatcher automatically started from ~/.config/autostart ?
+This is usually not necessary, most applications will start Speech Dispatcher automatically. [no] :
+> ENTER
+Do you want to start/restart Speech Dispatcher now and run some tests? [yes] :
+> ENTER
+Starting Speech Dispatcher in user-mode
+[Sat Dec 26 10:20:47 2020 : 338076] speechd: Speech Dispatcher 0.8.8 starting
+Testing Speech Dispatcher using spd_say
+Did you hear the message about Speech Dispatcher working? [yes] :
+> ENTER
+Speech Dispatcher is installed and working!
+Speech Dispatcher works. Do you want to skip other tests? [yes] :
+> ENTER
+
+
+Diagnostics results:
+Speech Dispatcher is working
+End of diagnostics results
+
+*** Editing speechd.conf
+
+The Speech Dispatcher configuration file can be edited manually: 
+- either comment each 'AddModule' line, then speech-dispatcher should load each present module, 
+- or add this line to select explicitly the voxin module:
+AddModule "voxin" "sd_voxin" "voxin.conf"
+
+Optionally, to set voxin as default module:
+DefaultModule voxin
+
+
+And then restart speech-dispatcher (e.g. logout or reboot).
+
+- global conf: /etc/speech-dispatcher/speechd.conf 
+- local conf (created by spd-conf): $HOME/.config/speech-dispatcher/speechd.conf 
+
 ** Orca
 
 For Orca/Speech Dispatcher users: the newly installed TTS will be taken in account at the next start of Orca/Speech-dispatcher (if you authorized voxin-installer to update your configuration).
 So, you may want to reboot your system.
 Then, if needed, configure Orca as indicated below.
 
-In the Orca Preferences window, Speech tab:
+In the Orca Screen Reader Preferences window, Voice tab:
 - set "Speech system" to "Speech Dispatcher"
 - set "Speech synthesizer" to voxin
 
 then press the Apply button.
 
-On some distros, the Orca preferences window is by default hidden and can be displayed using this command line:
+The Orca preferences window is displayed using this command line:
 
 orca -s
 
-** Speech Dispatcher
-
-The voxin-installer installs the voxin module for speech-dispatcher, and will update your configuration after your authorization. Otherwise, modify the speechd.conf file of speech-dispatcher (using for example spd-conf as normal user (not superuser), choose the voxin module, not the old ibmtts module ), and the current soud system installed (alsa, pulse,...).
-
-Please note that the Speech Dispatcher server will take in account the new configuration after its restart, for example at next reboot.
-
-On debian based system, spd-conf is supplied by the python3-speechd package.
-
-If needed the local or system-wide speechd.conf can be edited manually: 
-- either comment each 'AddModule' line, then speech-dispatcher will load each present module, 
-- or add this line to select explicitly the voxin module:
-AddModule "voxin" "sd_voxin" "voxin.conf"
+or typing the Orca modifier key + SPACE key
 
 ** Emacspeak
 
@@ -88,8 +163,8 @@ For example:
 cp emacspeak-45.0/share/emacs/site-lisp/emacspeak/servers/linux-outloud/asoundrc $HOME/.asoundrc
 
 ** Fenrir
-In settings.conf, the Fenrir configuration file, select the speech-dispatcher driver and the voxin module.
 
+Select the speech-dispatcher driver and the voxin module in settings.conf.
 For example in /etc/fenrirscreenreader/settings/settings.conf
 
 driver=speechdDriver                                                                                                                                                  
@@ -118,17 +193,19 @@ Much more should be compatible.
 
 For support or feedback, please send a mail to contact@oralux.org with possibly the log file (log/voxin.log).
 
-|----------------------------------+-----------------|
-| Distributions                    | Architectures   |
-|----------------------------------+-----------------|
-| Arch Linux ARM (August 2020)     | armv7l, aarch64 |
-| Debian 10, 11 (sid)              | x86_64          |
-| Slint64-14.2.1.2 (December 2020) | x86_64          |
-| Ubuntu 20.04                     | x86_64          |
-| Raspberry Pi OS                  | armv7l          |
-| Ubuntu Mate 20.04                | armv7l, aarch64 |
-| Ubuntu 18.04                     | x86_64          |
-|----------------------------------+-----------------|
+|-------------------------------------+-------------------------|
+| Distributions                       | Architectures           |
+|-------------------------------------+-------------------------|
+| Arch Linux (December 2020)          | x86_64, armv7l, aarch64 |
+| Debian 10, 11 (sid)                 | x86_64                  |
+| Fedora 33                           | x86_64                  |
+| Gentoo (december 2020)              | x86_64                  |
+| openSUSE Tumbleweed (December 2020) | x86_64                  |
+| Raspberry Pi OS                     | armv7l                  |
+| Slint64-14.2.1.2 (December 2020)    | x86_64                  |
+| Ubuntu Mate 20.04                   | armv7l, aarch64         |
+| Ubuntu 18.04, 20.04                 | x86_64                  |
+|-------------------------------------+-------------------------|
 
 ** Previous releases 
 The distributions which have been previously tested are displayed below. 
