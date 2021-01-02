@@ -1,6 +1,6 @@
 # $LOG expected to be set
 
-LIST="/home/*/.config/speech-dispatcher/speechd.conf /etc/speech-dispatcher/speechd.conf /usr/share/speech-dispatcher/conf/speechd.conf"
+LIST="/home/*/.config/speech-dispatcher/speechd.conf /etc/speech-dispatcher/speechd.conf"
 
 getDefault() {
     local filename="$1"
@@ -81,21 +81,29 @@ function spd_conf_set() {
     done
 }
 
-# Check if voxin.conf must be added to the speechd.conf file
-# Condition implemented: speechd.conf has at least one module added to
-# the speechd.conf file and distinct from the default or voxin modules
+# Check if the voxin module must be added to the speechd.conf file
+#
+# Voxin must be added if there are uncommented AddModule lines in
+# speechd.conf and none of them concerns voxin.
+# Checked with speech-dispatcher 0.9.1 (Gentoo)
+#
+# return 0 if voxin must be added
 function spd_conf_is_update_required() {
-	local filename="$1"
-	[ ! -e "$filename" ] && return
-	local default="$(getDefault "$filename")"
-	local added="$(getAdded "$filename")"
-	[ -z "$added" ] && return
-	local count=0
+    local file
+
+    files=$(ls -t $LIST 2>>"$LOG")
+    while read file; do
 	local i
+	local voxin_added=0
+	local added="$(getAdded "$file")"
+	[ -z "$added" ] && continue
 	for i in $added; do
-		[ "$i" != "$default" ] && [ "$i" != "voxin" ] && count=$((count+1))
+	    [ "$i" = "voxin" ] && voxin_added=1 && break
 	done
-	[ "$count" -gt 0 ]		
+	[ $voxin_added = 0 ] && { echo "update file: $file (added module: $added)" >> "$LOG"; return 0; }
+    done <<< "$files"
+
+    return 1
 }
 
 # Install voxin.conf from the system or otherwise from the new archive
