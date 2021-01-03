@@ -607,6 +607,16 @@ getVoxinDoc() {
 	ln -s /opt/oralux/voxin/LICENSE usr/share/doc/voxin/
 	ln -s /opt/oralux/voxin/README usr/share/doc/voxin/
 	
+	cd "$BUILD_VOXIN_SPEECHD_PKG/rfs"
+	mkdir -p usr/share/doc/voxin-speechd
+	ln -s /opt/oralux/voxin/LICENSE usr/share/doc/voxin-speechd/
+	ln -s /opt/oralux/voxin/README usr/share/doc/voxin-speechd/
+	
+	cd "$BUILD_VOXIN_SPEECHD_CONF_PKG/rfs"
+	mkdir -p usr/share/doc/voxin-speechd-conf
+	ln -s /opt/oralux/voxin/LICENSE usr/share/doc/voxin-speechd-conf/
+	ln -s /opt/oralux/voxin/README usr/share/doc/voxin-speechd-conf/
+	
 	cd "$pwd"
 	return 0
 }
@@ -671,7 +681,7 @@ tar -C \"$rfsdir\" \
 	local description="Provides symbolic links to the Voxin module for Speech Dispatcher. This package is only needed if the distribution does not already supply sd_voxin."
 
 	local name=voxin-speechd
-	local depends="libc6,voxin"
+	local depends=libc6
 	local replaces
 
 	# debian
@@ -681,13 +691,14 @@ tar -C \"$rfsdir\" \
 	buildDebPackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$debArch" "$depends" "$title" "$description" "$replaces"
 
 	# gentoo
-	local depends="glibc,voxin"
+	local depends=glibc
 	replaces="speech-dispatcher-voxin"
 	installDir=$INSTALLDIR/packages/gentoo
 	buildGentooPackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" "$replaces" 
 	
 	# pacman
-	local depends="glibc,voxin"
+	# depends: use space as separator
+	local depends=glibc
 	replaces="speech-dispatcher-voxin"
 	installDir=$INSTALLDIR/packages/archlinux
 	buildPacmanPackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" "$replaces" 
@@ -716,7 +727,7 @@ tar -C \"$rfsdir\" \
 	local description="Provides symbolic links to the Voxin module for Speech Dispatcher. This package is only needed if the distribution does not already supply voxin.conf."
 
 	local name=voxin-speechd-conf
-	local depends="libc6,voxin"
+	local depends=libc6
 	local replaces=
 
 	# debian
@@ -726,13 +737,14 @@ tar -C \"$rfsdir\" \
 	buildDebPackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$debArch" "$depends" "$title" "$description" "$replaces"
 
 	# gentoo
-	local depends="glibc,voxin"
+	local depends=glibc
 	replaces="speech-dispatcher-voxin"
 	installDir=$INSTALLDIR/packages/gentoo
 	buildGentooPackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" "$replaces" 
 	
 	# pacman
-	local depends="glibc,voxin"
+	# depends: use space as separator
+	local depends=glibc
 	replaces="speech-dispatcher-voxin"
 	installDir=$INSTALLDIR/packages/archlinux
 	buildPacmanPackage "$tarball" "$installDir" "$name" "$VOXIN_VERSION" "$arch" "$depends" "$title" "$description" "LGPL-2.1+" "$replaces" 
@@ -955,6 +967,7 @@ EOF
 }
 
 # output buildPacmanPackageRes
+# depends: use space as separator
 buildPacmanPackage() {
 	[ "$#" -lt 9 ] && return 1
 	local tarball=$1
@@ -995,9 +1008,11 @@ packager = voxin-installer <contact@oralux.org>
 size = $size
 arch = $arch
 license = $license
-depend = $depends
 EOF
 
+	for i in $depends; do echo "depend = $i" >> .PKGINFO; done
+
+	
 	[ -n "$replaces" ] && echo "replaces = $replaces" >> .PKGINFO
 
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"
@@ -1040,7 +1055,7 @@ buildGentooPackage() {
 
 	# according to multilib.eclass
 	case "$arch" in
-	    *64*) mv usr/lib usr/lib64;;
+	    *64*) [ -e usr/lib ] && mv usr/lib usr/lib64;;
 	esac
 	
 	local size=$(du -scb . | head -n1 | cut -f1)
@@ -1104,7 +1119,7 @@ buildRpmPackage() {
 	chmod 755 etc etc/speech-dispatcher etc/speech-dispatcher/modules 2>/dev/null
 	# acccording to Fedora Rawhide (jan 2021)
 	case "$arch" in
-	    *64) mv usr/lib usr/lib64;;
+	    *64) [ -e usr/lib ] && mv usr/lib usr/lib64;;
 	    arm*) arch=armv7hl;;
 	esac
 	[ ! -d "$installDir" ] && mkdir -p "$installDir"	
