@@ -1,4 +1,4 @@
-2021-01-02 Gilles Casse <gcasse@oralux.org>
+2021-01-03 Gilles Casse <gcasse@oralux.org>
 	release 3.3rc4 for Vocalizer Embedded (x86_64, armv7l, armv8) and IBM TTS (x86_64):
 
 	- Compatibility with distributions supplying Speech Dispatcher 0.10.2.
@@ -27,6 +27,8 @@
 	Voxin must be added if there are uncommented AddModule lines in
 	speechd.conf and none of them concerns voxin.
 	Checked with speech-dispatcher 0.9.1 (Gentoo)
+
+	- uninstall: remove /opt/oralux, /var/opt/oralux
 
 2020-12-06 Gilles Casse <gcasse@oralux.org>
 	release 3.3rc3 for Vocalizer Embedded (x86_64, armv7l, armv8) and IBM TTS (x86_64):

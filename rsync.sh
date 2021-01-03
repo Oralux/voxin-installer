@@ -28,8 +28,8 @@ upload_to_server() {
 	ssh $SERVER "rm -rf $VMVOXDIR/voxin-installer/build"	
 	SRC="voxin-installer voxin-installer/build/packages/buildroot_2017.02.9.txz voxin-installer/build/.gitignore"
 	pushd $HOME/VOXIN
-	rsync --exclude build --exclude tmp -aRvz $SRC $SERVER:$VMVOXDIR/
-	rsync -avR voxin-viavoice/build/packages $SERVER:$VMVOXDIR/
+	rsync --exclude build --exclude tmp --delete -aRvz $SRC $SERVER:$VMVOXDIR/
+	rsync --delete -avR voxin-viavoice/build/packages $SERVER:$VMVOXDIR/
 	popd
 }
 
