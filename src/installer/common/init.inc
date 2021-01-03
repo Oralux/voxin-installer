@@ -327,10 +327,12 @@ uninstallSystem()
 	[ $# != 1 ] || [ -z "$1" ] && return 1
 	local rfsdir="$1"
 	isPackageInstalled voxin && { uninstallPackage voxin || return 1; }
-	for i in "$rfsdir/opt/oralux/voxin" "$rfsdir/opt/IBM/ibmtts" "$rfsdir/var/opt/IBM/ibmtts" "$rfsdir/opt/oralux/nve" ; do
+	isPackageInstalled voxin-speechd && { uninstallPackage voxin-speechd || return 1; }
+	isPackageInstalled voxin-speechd-conf && { uninstallPackage voxin-speechd-conf || return 1; }
+	for i in "$rfsdir/opt/oralux/voxin" "$rfsdir/opt/oralux/voxin.old" "$rfsdir/var/opt/oralux/voxin" "$rfsdir/opt/IBM/ibmtts" "$rfsdir/var/opt/IBM/ibmtts" "$rfsdir/opt/oralux/nve" ; do
 		rm -rf $i
 	done
-	for i in "$rfsdir/opt/oralux" "$rfsdir/opt/IBM" "$rfsdir/var/opt/IBM"; do
+	for i in "$rfsdir/opt/oralux" "$rfsdir/var/opt/oralux" "$rfsdir/opt/IBM" "$rfsdir/var/opt/IBM"; do
 		[ -e "$i" ] && [ -z "$(ls -A "$i")" ] && rm -rf "$i"
 	done
 	return 0
