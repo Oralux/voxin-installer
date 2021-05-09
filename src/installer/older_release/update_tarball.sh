@@ -94,7 +94,7 @@ else
     lang_vv "$VOICE_OLD" || usage
 fi
 
-fakeroot bash -c "tar -cf voxin-${LANG_TARBALL}-${NEW_VER}.tgz voxin-${NEW_VER}"
+fakeroot bash -c "tar -zcf voxin-${LANG_TARBALL}-${NEW_VER}.tgz voxin-${NEW_VER}"
 rm -rf voxin-${NEW_VER}
 rm -rf voxin-${OLD_VER}
 echo $PWD/voxin-${LANG_TARBALL}-${NEW_VER}.tgz
