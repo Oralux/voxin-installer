@@ -31,6 +31,4 @@ sleep 2
 
 sleep 2
 
-rm -rf "$VOXIN_DIR"
-
 exit 0
