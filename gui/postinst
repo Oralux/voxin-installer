@@ -1,0 +1,45 @@
+#! /bin/sh
+# postinst script for voxin
+#
+# see: dh_installdeb(1)
+
+set -e
+
+# summary of how this script can be called:
+#        * <postinst> `configure' <most-recently-configured-version>
+#        * <old-postinst> `abort-upgrade' <new version>
+#        * <conflictor's-postinst> `abort-remove' `in-favour' <package>
+#          <new-version>
+#        * <deconfigured's-postinst> `abort-deconfigure' `in-favour'
+#          <failed-install-package> <version> `removing'
+#          <conflicting-package> <version>
+# for details, see http://www.debian.org/doc/debian-policy/ or
+# the debian-policy package
+#
+
+LOG=/tmp/voxin-installer.log.$$
+touch $LOG
+
+case "$1" in
+    configure)
+    ;;
+
+    abort-upgrade|abort-remove|abort-deconfigure)
+    ;;
+
+    *)
+        echo "postinst called with unknown argument \`$1'" >> $LOG
+        exit 1
+    ;;
+esac
+
+echo "--> Starting postinst $$" >> $LOG
+cd /opt/oralux/"$DPKG_MAINTSCRIPT_PACKAGE"/bin
+./preinstall.sh "$LOG" &
+sleep 10
+
+echo "--> Stopping postinst $$" >> $LOG
+sleep 1
+
+exit 0
+
