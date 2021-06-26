@@ -1,3 +1,26 @@
+2021-06-26 Gilles Casse <gcasse@oralux.org>
+	release 3.3rc5:
+
+	- Compatibility with Raspberry Pi OS 64 bits (and still 32 bits).
+
+	- Expected encoding of the text supplied to eciAddText().
+	By default, this charset is UTF8 in SSML mode, or otherwise the
+	charset associated to the current voice.
+
+	- voxin.ini: add parameter voiceName to indicate the default
+	voice. Use case: two Voxin voices have been installed and the
+	system does not provide a way to select the default voice.
+	More details: README (in paragraph: "voxin.ini
+	configuration file") and voxin.ini .
+
+	- Fix hang when a web page included Emojis. Observed with
+	Voxin+Vocalizer Embedded, Speech Dispatcher 0.9.0 or 0.9.1 .
+
+	- Fix hang on incomplete multi-byte in an UTF8 text.
+
+	- Fix concerning the voxin module of Speech Dispatcher 0.9.0 or
+	0.9.1: the text-to-speech stopped sometimes during 10 seconds.
+
 2021-01-03 Gilles Casse <gcasse@oralux.org>
 	release 3.3rc4 for Vocalizer Embedded (x86_64, armv7l, armv8) and IBM TTS (x86_64):
 

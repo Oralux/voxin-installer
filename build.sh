@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 BASE=$(dirname $(realpath "$0"))
 NAME=$(basename "$0")
@@ -90,7 +90,11 @@ fi
 if [ -n "$TARBALLS" ]; then
 	t=$(readlink -e "$TARBALLS") || leave "Error: the tarballs file does not exist (-t $TARBALLS)" 1
 	grep voxin-viavoice-all "$t" && WITH_TTS=viavoice
-	grep voxin-nve-all "$t" && WITH_TTS=nve
+	grep voxin-nve-all "$t"
+	if [ $? = 0 ]; then
+	    grep -o "voxind-nve_${LIBVOXIN_VERSION}.*txz" "$t" || leave "Error: the tarballs file does not match libvoxin ${LIBVOXIN_VERSION}" 1
+	    WITH_TTS=nve
+	fi
 	[ -n "$WITH_TTS" ] || leave "Error: the tarballs file does not include text-to-speech tarballs (-t $TARBALLS)" 1
 	TARBALLS=$t
 fi
@@ -146,5 +150,5 @@ buildVoxinSpeechdConfPackage "$ARCH" || leave "Error: can't build packages" 1
 [ "$ARCH" = x86_64 ] && getx86Arch
 
 if [ -n "$TARBALLS" ]; then
-	buildReleaseTarball "$TARBALLS" "$ARCH" "$WITH_TTS" || leave "Error: can't build release tarball" 1
+    buildReleaseTarball "$TARBALLS" "$ARCH" "$WITH_TTS" || leave "Error: can't build release tarball" 1
 fi

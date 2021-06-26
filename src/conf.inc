@@ -1,6 +1,6 @@
 # THE BASE variable should be set before including this file
 #
-VOXIN_VERSION=3.3rc4
+VOXIN_VERSION=3.3rc5
 
 VOXIN_INSTALLER_GIT_URL=https://github.com/Oralux/voxin-installer.git
 VOXIN_INSTALLER_TAG=$VOXIN_VERSION
@@ -25,8 +25,8 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 # - development (master branch)
 #LIBVOXIN_VERSION=
 # - from the last tag instead (+sha512)
-LIBVOXIN_VERSION=1.5.8
-LIBVOXIN_SHA512=7ee544135521d913f646144aa2027b8ada5b1a18e7b257427b81be65779caa24ac5890f9204b210cd592f6adf8509894044aa3e47f582ab3a282c361c14c5a28
+LIBVOXIN_VERSION=1.5.11
+LIBVOXIN_SHA512=16ae9d75869771de94a94e7e69eda052738bb444bb4593e06c8834d2c42080a20625e904b8ad3cc58dfa8a028dff1b0623168c759910af98304674e690c75176
 
 # versions of the speech-dispatcher voxin module(s) which must be
 # built by this script.
@@ -39,19 +39,21 @@ SPEECHD_VOXIN_ARCHIVE_URL=https://github.com/Oralux/speechd/archive
 SPEECHD_VOXIN_GIT_URL=https://github.com/Oralux/speechd.git
 SPEECHD_VOXIN_TAG=voxin3
 SPEECHD_VOXIN_TAG_0_10_1=voxin3_backport_upstream
+SPEECHD_VOXIN_TAG_0_9_1=voxin3rc5
+SPEECHD_VOXIN_TAG_0_9_0=voxin3rc5
 SPEECHD_SD_MODULE_COPYRIGHT_NB_LINES=24
 
 # pre-built binaries of the speech-dispatcher voxin module(s) to download.
 # Built from sources identified by the sources.ini file inside the tarball.
-SPEECHD_VOXIN_BIN_URL=http://soft.oralux.org/speech-dispatcher/bin
+SPEECHD_VOXIN_BIN_URL=http://oralux.org/soft/speech-dispatcher/bin
 SPEECHD_VOXIN_BIN_ARCHIVES=" \
 sd_voxin_0.7.1_0.8.8.x86_64.txz \
-sd_voxin_0.9.0-voxin3.aarch64.txz \
-sd_voxin_0.9.0-voxin3.armv7l.txz \
-sd_voxin_0.9.0-voxin3.x86_64.txz \
-sd_voxin_0.9.1-voxin3.aarch64.txz \
-sd_voxin_0.9.1-voxin3.armv7l.txz \
-sd_voxin_0.9.1-voxin3.x86_64.txz \
+sd_voxin_0.9.0-voxin3rc5.aarch64.txz \
+sd_voxin_0.9.0-voxin3rc5.armv7l.txz \
+sd_voxin_0.9.0-voxin3rc5.x86_64.txz \
+sd_voxin_0.9.1-voxin3rc5.aarch64.txz \
+sd_voxin_0.9.1-voxin3rc5.armv7l.txz \
+sd_voxin_0.9.1-voxin3rc5.x86_64.txz \
 sd_voxin_0.10.1-voxin3_backport_upstream.aarch64.txz \
 sd_voxin_0.10.1-voxin3_backport_upstream.armv7l.txz \
 sd_voxin_0.10.1-voxin3_backport_upstream.x86_64.txz \
@@ -61,10 +63,11 @@ sd_voxin_0.10.1-voxin3_backport_upstream.x86_64.txz \
 SPEECHD_VOXIN_BIN_SHA512=$BASE/check/$VOXIN_VERSION/sd_voxin.sha512
 
 # VMX86_64: VM where voxin-installer could be built for x86_64 architecture
-# This VM was previously needed for voxin 3.0 to build libvoxin on a Debian 8 environment
-# (mostly due to puncfilter and its libstdc++ dependency)
+# Debian 8 to build binaries compatible with older distros. 
+# Ubuntu 18.04 for sd_voxin 0.9.0 and 0.9.1
 # 
-VMX86_64=user1@192.168.122.118
+#VMX86_64=user1@192.168.122.150 # Ubuntu 18.04 (sd_voxin 0.9.0 and 0.9.10)
+VMX86_64=user1@192.168.122.118 # Debian 8 (libvoxin, sd 0.7, 0.8)
 VMVOXDIR=/home/user1/VOXIN
 VMLIBVOXDIR=$VMVOXDIR/LIBVOXIN
 
@@ -150,12 +153,12 @@ setSpeechdVoxinVar() {
 	    SPEECHD_VOXIN_SHA512=9a5f849fa92042913ee0401912fe4c0e3836ac2428e016aebd3e587e5c6f93ff14b53337a525fa51f1d866d35f44ef09f748741b4863522a70b9deaf2ef9eaf0
 	    ;;
 	0.9.1)
-	    SPEECHD_VOXIN_ARCHIVE=$version-$SPEECHD_VOXIN_TAG.tar.gz
-	    SPEECHD_VOXIN_SHA512=ebf3df046225dd54c2745330ba8fb8ffd9b151a1f1109a39011ff3b974a8418813e0c6fb7bb9f4778f5b643c86d8310a2a48dc9376c923200cdba540145beb1d
+	    SPEECHD_VOXIN_ARCHIVE=$version-$SPEECHD_VOXIN_TAG_0_9_1.tar.gz
+	    SPEECHD_VOXIN_SHA512=153475db5bc8a8cd838795f18e25e35b6199dc05f7d26cfae79ce719cce181ccee3532446d160f1982962a266c2e13c5aed9bbd3e3613c248171d8ec1fce1aff
 	    ;;
 	0.9.0)	    
-	    SPEECHD_VOXIN_ARCHIVE=$version-$SPEECHD_VOXIN_TAG.tar.gz
-	    SPEECHD_VOXIN_SHA512=f287ebd2ffb3424811d6930690ec7e2da03ebe1212f5438950931c2c0c62ed6bd5c44304293faf33685da700a3816312c04c5add8ce4c7893d77fc62dd155810
+	    SPEECHD_VOXIN_ARCHIVE=$version-$SPEECHD_VOXIN_TAG_0_9_0.tar.gz
+	    SPEECHD_VOXIN_SHA512=b13461421014f328a7f5ac2d3e3acd61e794ceae8cf9f26c577a3107fa4b44ef196e2e5b87407a0153bef4ada9a9e0d9e87584734ff7f37e09d59ca8466cd675
 	    ;;
 	master)
 	    SPEECHD_VOXIN_ARCHIVE=master.zip

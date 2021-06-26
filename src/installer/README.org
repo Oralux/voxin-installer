@@ -3,9 +3,20 @@
 
 For support or feedback, please send a mail to contact@oralux.org with possibly the log file (log/voxin.log).
 
+* Installing Voxin without typing command lines
+This release simply provides a Debian package which should help to
+install Voxin in a graphical desktop.  
+
+Tested on Ubuntu 18.04, via Firefox or the file browser, by selecting
+the Voxin package in the Downloads directory.
+
+This 'graphical installer' can be downloaded with your usual download
+link appended with the two characters & g (that is the ampersand
+character and g for graphical).
+
 * Check the voxin archive
 
-Before any install, check that your voxin archive (the .tgz file) has a correct checksum.
+Before any install, you may want to check that your voxin archive (the .tgz file) has a correct checksum.
 
 The checksum file can be downloaded from [[https://raw.githubusercontent.com/Oralux/voxin-installer/master/check/%VERSION%/voxin-%VERSION%.sha512][GitHub under the Oralux account]] .
 
@@ -79,19 +90,24 @@ spd-conf will accept it even if voxin is not yet in its list of known modules.
 
 Note: ENTER is written below when the ENTER key has been pressed.
 
+#+BEGIN_ASCII
 $ spd-conf
 
 Speech Dispatcher configuration tool
 
 Do you want to setup a completely new configuration? [yes] :
 > ENTER
+
 Do you want to create/setup a 'user' or 'system' configuration [user] :
 > ENTER
+
 User configuration already exists.
+
 Do you want to rewrite it with a new one? [no] :
 >yes
 User configuration created in /home/user/.config/speech-dispatcher
 Configuring user settings for Speech Dispatcher
+
 Default output module [espeak] :
 >voxin
 The value you have chosen is not among the suggested values.
@@ -99,22 +115,29 @@ You have chosen 'voxin'.
 The suggested values are ['espeak', 'flite', 'festival', 'cicero', 'ibmtts']
 Do you want to correct your answer? [yes] :
 >no
+
 Default language (two-letter iso language code like "en" or "cs") [en] :
 > ENTER
+
 Default audio output method [pulse] :
 > ENTER
+
 Default speech rate (on the scale of -100..100, 0 is default, 50 is faster, -50 is slower) [0] :
 > ENTER
+
 Default speech pitch (on the scale of -100..100, 0 is default, 50 is higher, -50 is lower) [0] :
 > ENTER
+
 Do you want to have Speech Dispatcher automatically started from ~/.config/autostart ?
 This is usually not necessary, most applications will start Speech Dispatcher automatically. [no] :
 > ENTER
+
 Do you want to start/restart Speech Dispatcher now and run some tests? [yes] :
 > ENTER
 Starting Speech Dispatcher in user-mode
 [Sat Dec 26 10:20:47 2020 : 338076] speechd: Speech Dispatcher 0.8.8 starting
 Testing Speech Dispatcher using spd_say
+
 Did you hear the message about Speech Dispatcher working? [yes] :
 > ENTER
 Speech Dispatcher is installed and working!
@@ -125,6 +148,7 @@ Speech Dispatcher works. Do you want to skip other tests? [yes] :
 Diagnostics results:
 Speech Dispatcher is working
 End of diagnostics results
+#+END_ASCII
  
 *** Editing speechd.conf
 
@@ -204,25 +228,23 @@ Much more should be compatible.
 
 For support or feedback, please send a mail to contact@oralux.org with possibly the log file (log/voxin.log).
 
-|-------------------------------------+-----------------|
-| Distributions                       | Architectures   |
-|-------------------------------------+-----------------|
-| Arch Linux (January 2021)           | x86_64          |
-| Arch Linux ARM (August 2020)        | armv7l, aarch64 |
-| Debian 10, 11 (sid)                 | x86_64          |
-| Fedora 33                           | x86_64          |
-| Gentoo (december 2020)              | x86_64          |
-| openSUSE Tumbleweed (December 2020) | x86_64          |
-| Raspberry Pi OS                     | armv7l          |
-| Slint64-14.2.1.2 (January 2021)     | x86_64          |
-| Ubuntu 18.04, 20.04                 | x86_64          |
-| Ubuntu ARM Mate 20.04               | aarch64         |
-|-------------------------------------+-----------------|
+|-----------------------------------+-----------------|
+| Distributions                     | Architectures   |
+|-----------------------------------+-----------------|
+| Arch Linux (June 2021)            | x86_64          |
+| Debian 10, 11 (sid)               | x86_64          |
+| Gentoo (December 2020)            | x86_64          |
+| openSUSE Tumbleweed (June 2021)   | x86_64          |
+| Raspberry Pi OS (June 2021)       | armv7l, aarch64 |
+| Slint64-14.2.1.2 (June 2021)      | x86_64          |
+| Ubuntu 18.04, 20.04, 21.04        | x86_64          |
+|-----------------------------------+-----------------|
 
 * voxin.ini configuration file
 The user may now define the default value of several parameters.
 - capitalization
 - punctuation
+- voiceName
 
 and only for IBM TTS:
 - dictionaryDir

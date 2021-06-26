@@ -12,8 +12,8 @@ The standard 32 bits libraries are built by [[https://buildroot.org][Buildroot]]
 * Build
 By default, libvoxin is built, and installed into the local opt/oralux/voxin directory.
 A minimal 32 bits rootfilesystem is supposed to be already available (see paragraph "minimal 32 bits rootfilesystem"). 
-The build.sh script expects a Debian 8 based distro (mostly due to the libstdc++ dependency of puncfilter). 
-See rsync.sh to export voxin-installer to an x86_64 Debian 8 VM (and get.sh to retrieve the built tarballs thereafter).
+The build.sh script expects a Debian 8 based distro (mostly due to the libstdc++ dependency of puncfilter) or Ubuntu 1804 (to build sd_voxin 0.9.x). 
+See rsync.sh to export voxin-installer to an x86_64 VM (and get.sh to retrieve the built tarballs thereafter).
 
 ** Command
 #+BEGIN_SRC shell
