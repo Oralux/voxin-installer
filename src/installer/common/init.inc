@@ -301,7 +301,6 @@ uninstallOldVoxin()
 	[ -e "$DIR.old" ] && { echo "error: DIR.old=$DIR.old" >> "$LOG"; return 1; }
 	mv "$DIR" "$DIR.old" || { echo "error: DIR=$DIR" >> "$LOG"; return 1; }
     fi
-    isPackageInstalled voxin && { uninstallPackage voxin || return 1; }
     return 0
 }
 
@@ -310,7 +309,6 @@ installOldVoxin()
     echo installOldVoxin >> "$LOG"
     [ $# != 1 ] || [ -z "$1" ] && return 1
     local rfsdir="$1"
-    isPackageInstalled voxin || { installPackage voxin || return 1; }
     local DIR_NEW="$rfsdir/opt/oralux/voxin"
     local DIR_OLD="$DIR_NEW.old"
     if [ -e "$DIR_OLD" ]; then
