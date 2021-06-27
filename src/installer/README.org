@@ -11,7 +11,7 @@ Tested on Ubuntu 18.04, via Firefox or the file browser, by selecting
 the Voxin package in the Downloads directory.
 
 This 'graphical installer' can be downloaded with your usual download
-link appended with the two characters & g (that is the ampersand
+link appended with the two characters "&g" (that is the ampersand
 character and g for graphical).
 
 * Check the voxin archive
