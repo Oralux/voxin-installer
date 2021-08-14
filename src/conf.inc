@@ -1,6 +1,6 @@
 # THE BASE variable should be set before including this file
 #
-VOXIN_VERSION=3.3rc5
+VOXIN_VERSION=3.3rc6
 
 VOXIN_INSTALLER_GIT_URL=https://github.com/Oralux/voxin-installer.git
 VOXIN_INSTALLER_TAG=$VOXIN_VERSION
@@ -25,8 +25,8 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 # - development (master branch)
 #LIBVOXIN_VERSION=
 # - from the last tag instead (+sha512)
-LIBVOXIN_VERSION=1.5.11
-LIBVOXIN_SHA512=16ae9d75869771de94a94e7e69eda052738bb444bb4593e06c8834d2c42080a20625e904b8ad3cc58dfa8a028dff1b0623168c759910af98304674e690c75176
+LIBVOXIN_VERSION=1.6.0
+LIBVOXIN_SHA512=157ef39ae9c0b88e48742dc9b9ee8220dcc81b4c24a8971a8f06659bf7c51e6566cf1a1fc7862c2eb19b1717fc58e849ecef2c4f343083931a5b595ad54f996b
 
 # versions of the speech-dispatcher voxin module(s) which must be
 # built by this script.
@@ -874,11 +874,12 @@ EOF
 			esac
 		done
 
-		if [ "$withTTS" = nve ]; then
+		local sha512=$BASE/check/$VOXIN_VERSION/voxin-$VOXIN_VERSION.sha512.vv
+		if [ "$withTTS" = nve ]; then		    
 			buildVoiceTarball update-ve $voxind $all $arch
+			sha512=${sha512%.vv}.ve
 		fi
 		
-		local sha512=$BASE/check/$VOXIN_VERSION/voxin-$VOXIN_VERSION.sha512
 		if [ -e "$sha512" ]; then
 			rm "$sha512"
 		else
