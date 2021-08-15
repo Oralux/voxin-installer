@@ -47,16 +47,17 @@ if [ -n "$a" ]; then
 	ssh $SERVER "cd $VMVOXDIR/voxin-installer && ./build.sh -d x86 -t src/list.vv"
 	ssh $SERVER "cd $VMVOXDIR/voxin-installer && ./build.sh -d x86 -t src/list.ve"
 else
-	echo "Only build on VM64 ($SERVER)? (y|N)"
+	echo "Only build on VM64 ($SERVER)? (Y|n)"
 	read a
 	case "$a" in
-		y|Y) a=ok;;
-		*) unset a;;
+		*) a=ok;;
+		n|N) unset a;;
 	esac	
 	if [ -n "$a" ]; then
 		upload_to_server
 		ssh $SERVER "cd $VMVOXDIR/voxin-installer && ./build.sh -t src/list.vv"
 		ssh $SERVER "cd $VMVOXDIR/voxin-installer && ./build.sh -t src/list.ve.$ARCH"
+		ssh $SERVER "cd $VMVOXDIR/voxin-installer/check/$VOXIN_VERSION && cat *.vv *.ve > voxin-$VOXIN_VERSION.sha512"
 	fi
 fi
 
