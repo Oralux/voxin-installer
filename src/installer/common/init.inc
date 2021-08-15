@@ -57,8 +57,9 @@ usage () {
 Usage: voxin-installer.sh [options]
 Options:
      -h, --help       print this message
-     -l, --lang       install the language
-     -u, --uninstall  uninstall the TTS
+     -l, --lang       install the language automatically
+     -u, --update     update the current install
+     -r, --remove     remove Voxin
      -v, --verbose    verbose
 END
 }
@@ -338,6 +339,39 @@ uninstallSystem()
 
 is_voxin_conf_installed() {
     ls -lL /etc/speech-dispatcher/modules/voxin.conf &> /dev/null
+}
+
+updateSystem() {	
+	echo updateSystem >> "$LOG"
+	[ $# != 1 ] || [ -z "$1" ] && return 1
+	local rfsdir="$1"
+	local status=0
+	local rfsAllTarball=$(getRootfilesystemAllTarball) || return 1
+	local rfsArchTarball=$(getRootfilesystemArchTarball) || return 1
+	local prevSpeechdModulesTarball=$(getPrevSpeechdModulesTarball) || unset prevSpeechdModulesTarball
+	
+	if [ ! -d "$rfsdir" ]; then
+		_gettext "Install directory not found: $rfsdir" >> "$LOG"
+		return 1
+	fi
+	
+	local i
+	for i in $rfsAllTarball $rfsArchTarball $prevSpeechdModulesTarball; do
+	    [ -z "$i" ] && continue
+	    tar -C "$rfsdir" -xf "$i" 
+	    status=$?
+	    if [ "$status" != 0 ]; then
+		_gettext "Error: untar failure ($i)" >> "$LOG"
+		return "$status"
+	    fi	
+	done
+
+	# install voxin.ini globally
+	local ref_voxin_ini=/opt/oralux/voxin/share/conf/voxin.ini
+	local global_voxin_ini=/var/opt/oralux/voxin/voxin.ini	
+	[ ! -e $global_voxin_ini ] && install -m 644 -D $ref_voxin_ini $global_voxin_ini
+
+	return "$status"
 }
 
 installSystem() {	
