@@ -1,35 +1,35 @@
 #!/bin/bash
 
-# this script creates a debug archive in /tmp/voxinDebug.tgz
+# This script collects info in the compressed file /tmp/voxinDebug.tgz
+# about the installation of voxin, the configuration of
+# speech-dispatcher and orca
 #
 
 DIR=/tmp/voxinDebug
+REPORT=$DIR/report.txt
 
 mkdir -p $DIR/{home,etc,usr}
 
-# copy some speech-dispatcher files (configuration, modules)
+voxin-say -L >> "$REPORT"
+
+echo "# check the installation of voxin" >> "$REPORT"
+find /opt/oralux -type f | while read i; do md5sum $i >> "$REPORT"; done
+cp -a /var/opt/IBM $DIR 2>/dev/null
+
+echo "# copy some speech-dispatcher files (configuration, modules)" >> "$REPORT"
 cp -a $HOME/.config/speech-dispatcher $DIR/home 2>/dev/null
 cp -a /etc/speech-dispatcher $DIR/etc 2>/dev/null
 cp -a /usr/share/speech-dispatcher $DIR/usr 2>/dev/null
-cp -a /usr/lib64/speech-dispatcher-modules $DIR/usr 2>/dev/null
+cp -a /usr/lib*/speech-dispatcher-modules/sd_voxin $DIR/usr 2>/dev/null
 
-# copy the IBMTTS configuration
-cp -a /var/opt/IBM $DIR 2>/dev/null
+echo "# check if speech-dispatcher lists voxin" >> "$REPORT"
+spd-say -O >> "$REPORT"
+spd-say -o voxin -L >> "$REPORT"
 
-# trace the access to libvoxin
-touch /tmp/libvoxin.ok $HOME/libvoxin.ok
-spd-say -o voxin hello
-mv /tmp/libvoxin* $DIR/
-rm $HOME/libvoxin.ok
+echo "# software versions" >> "$REPORT"
+speech-dispatcher -v >> "$REPORT"
 
-# orca config
-cp $HOME/.local/share/orca/user-settings.conf $DIR/home 2>/dev/null
-
-# software versions
 cp /etc/os-release $DIR/etc
-speech-dispatcher -v >> $DIR/report.txt
-spd-say -O >> $DIR/report.txt
-spd-say -o voxin -L >> $DIR/report.txt
 
 # build the tgz
 cd /tmp
