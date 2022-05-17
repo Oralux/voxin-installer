@@ -169,7 +169,7 @@ Finally restart speech-dispatcher (e.g. logout or reboot).
 ** Orca
 
 For Orca/Speech Dispatcher users: the newly installed TTS will be taken in account at the next start of Orca/Speech-dispatcher (if you authorized voxin-installer to update your configuration).
-So, you may want to reboot your system.
+So, you may want to logout or reboot your system.
 Then, if needed, configure Orca as indicated below.
 
 In the Orca Screen Reader Preferences window, Voice tab:
@@ -186,7 +186,7 @@ or typing the Orca modifier key + SPACE key
 
 ** Emacspeak
 
-The [[https://github.com/Oralux/emacspeak_voxin_install/releases][emacspeak installer]] helps to install Emacspeak with eSpeak and Voxin.
+The [[https://github.com/Oralux/emacspeak_voxin_install/tags][emacspeak installer]] helps to install Emacspeak with eSpeak and Voxin.
 
 If the sound is choppy under Alsa, please copy the asoundrc file from emacspeak to your home directory as ~/.asoundrc
 For example:
@@ -202,10 +202,6 @@ module=voxin
 
 ** Speakup connector
 You may want to install speechd-up (interface between Speakup and Speech Dispatcher).
-
-We proposed voxinup, the Speakup connector for Voxin; but incompatibilities with the graphical desktop appeared for example in Vinux 5.1.
-The [[https://github.com/Oralux/voxinup_install/releases][voxinup_install]] helped to install "voxinup" in Arch Linux or Debian based distros.
-The original Speakup connector, "spk-connect-ttsynth", was renamed to "voxinup" to ease at least the typing.
 
 ** How to uninstall Voxin?
 Voxin %VERSION% can be uninstalled with this command line:
