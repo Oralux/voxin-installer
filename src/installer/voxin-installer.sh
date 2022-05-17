@@ -1,6 +1,6 @@
 #!/bin/bash
 # This file is under the LGPL license
-# 2007-2020, Gilles Casse <gcasse@oralux.org>
+# 2007-2022, Gilles Casse <gcasse@oralux.org>
 #
 
 BASE=$(dirname $(readlink -f $0))

@@ -1,6 +1,6 @@
 #!/bin/bash -x
 # This file is under LGPL license
-# 2007-2019, Gilles Casse <gcasse@oralux.org>
+# 2007-2022, Gilles Casse <gcasse@oralux.org>
 #
 # new_po.sh : create or update xx.new.po, (xx = fr,...) the file which 
 # includes the translation for the xx language.

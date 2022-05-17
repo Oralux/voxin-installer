@@ -1,6 +1,6 @@
 #!/bin/bash
 # This file is under LGPL license
-# 2007-2019, Gilles Casse <gcasse@oralux.org>
+# 2007-2022, Gilles Casse <gcasse@oralux.org>
 #
 # install_po.sh : install the newly translated messages
 #

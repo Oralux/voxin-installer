@@ -1,4 +1,4 @@
-# 2021, Gilles Casse <gcasse@oralux.org>
+# 2021-2022 Gilles Casse <gcasse@oralux.org>
 #
 
 # This script downloads and installs the last version of Voxin.
