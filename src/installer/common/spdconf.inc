@@ -28,6 +28,7 @@ isAnyAdded() {
 }
 
 addModule() {
+    [ "$SYSTEM_WIDE_INSTALL" != 1 ] && return 1
     local filename="$1"
     local module="$2"
 	[ ! -e "$filename" ] && return
@@ -35,6 +36,7 @@ addModule() {
 }
 
 removeModule() {
+    [ "$SYSTEM_WIDE_INSTALL" != 1 ] && return 1
     local filename="$1"
     local module="$2"
 	[ ! -e "$filename" ] && return
@@ -62,6 +64,7 @@ isDefaultModule() {
 # }
 
 function spd_conf_unset() {
+    [ "$SYSTEM_WIDE_INSTALL" != 1 ] && return 1
     local module="$1"
     ls -t $LIST 2>>"$LOG" | while read file; do		
 		local newModule=$(grep "^[[:space:]]*#[[:space:]]*voxinadded \(.*\)" "$file" | awk '{print $2}')
@@ -70,6 +73,7 @@ function spd_conf_unset() {
 }
 
 function spd_conf_set() {
+    [ "$SYSTEM_WIDE_INSTALL" != 1 ] && return 1
     local module="$1"
     local file
 	
@@ -89,6 +93,7 @@ function spd_conf_set() {
 #
 # return 0 if voxin must be added
 function spd_conf_is_update_required() {
+    [ "$SYSTEM_WIDE_INSTALL" != 1 ] && return 0
     local file
 
     files=$(ls -t $LIST 2>>"$LOG")
@@ -109,9 +114,9 @@ function spd_conf_is_update_required() {
 # Install voxin.conf from the system or otherwise from the new archive
 function spd_conf_install_voxin_conf() {
     local arch_voxin_conf="$1"
-    local conf_dir=/opt/oralux/voxin/share/speech-dispatcher
+    local conf_dir="$TOPDIR"/opt/oralux/voxin/share/speech-dispatcher
     local new_voxin_conf=$conf_dir/voxin.conf
-    local prev_voxin_conf=/opt/oralux/voxin.old/share/speech-dispatcher/voxin.conf
+    local prev_voxin_conf="$TOPDIR"/opt/oralux/voxin.old/share/speech-dispatcher/voxin.conf
     local src
 
     if [ -e "$prev_voxin_conf" ]; then

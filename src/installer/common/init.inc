@@ -1,9 +1,16 @@
 LOG="$BASE/log/voxin.log"
 TEMPLATE=voxin-installer.XXXXXXXXXX
 TMPDIR=/tmp
-# Only version > 0.7 are compatible
-SPEECHD_MIN_VERSION=0.7
-VOXIN_VERSION=%VERSION%
+# SPEECHD_MIN_VERSION: the minimal required version of
+# speech-dispatcher provided by the system
+if [ "$SYSTEM_WIDE_INSTALL" = 1 ]; then 
+    SPEECHD_MIN_VERSION=0.7
+else
+    SPEECHD_MIN_VERSION=0.11
+fi
+#VOXIN_VERSION=%VERSION%
+#TODO
+VOXIN_VERSION=3.3rc6
 
 unset WITH_TTS
 ls $BASE/packages/all/voxin-viavoice-all* &> /dev/null && WITH_TTS=viavoice
@@ -55,11 +62,15 @@ ok() {
 usage () {
     cat >&2 <<END
 Usage: voxin-installer.sh [options]
+Voxin will be installed system-wide if this installer is launched by the superuser, .
+Otherwise it will be installed by default under $DEFAULT_TOPDIR_USER.
+
 Options:
+     -d, --directory  install directory (only if the installer is launched by a regular user)
      -h, --help       print this message
      -l, --lang       install the language automatically
-     -u, --update     update the current install
-     -r, --remove     remove Voxin
+     -u, --uninstall  uninstall the TTS
+     -U, --update     update the current install
      -v, --verbose    verbose
 END
 }
@@ -74,6 +85,11 @@ uninstall() {
 }
 
 check_distro() {
+    if [ "$SYSTEM_WIDE_INSTALL" != 1 ]; then
+	source common/install-tarballs.inc
+	return 0
+    fi
+    
     local status=0
     local ID=$(awk -F= '/^ID_LIKE=/{print $2}' /etc/os-release | tr -d '"')
     [ -z "$ID" ] && ID=$(awk -F= '/^ID=/{print $2}' /etc/os-release | tr -d '"')
@@ -94,11 +110,30 @@ check_distro() {
     return $status
 }
 
+# return 0 if speech-dispatcher is installed and then set SPEECHD_VER
+# to the version of speech-dispatcher (or unset if no version
+# identified)
+# 
+get_speech_dispatcher_version() {
+    local status=1
+    if [ -e /usr/bin/speech-dispatcher ]; then
+	status=0
+	SPEECHD_VER=$(/usr/bin/speech-dispatcher -v | head -1 | cut -f2 -d" ")
+    fi
+    return $status
+}
+
 # if speech-dispatcher is already installed, check if this installer
 # provides the compatible voxin output module
 check_speech_dispatcher_voxin() {
-	local installedVersion=$(getPackageVersion speech-dispatcher)
-	isVersionGreater "$installedVersion" "$SPEECHD_MIN_VERSION"
+    get_speech_dispatcher_version
+    if [ $? = 0 ]; then
+	#	local installedVersion=$(getPackageVersion speech-dispatcher)
+	# if no version identified, suppose compatibility acquired
+	[ -z "$SPEECHD_VER" ] && return 0
+
+	isVersionGreater "$SPEECHD_VER" "$SPEECHD_MIN_VERSION"
+    fi
 }
 
 # getTarballVersion
@@ -169,13 +204,13 @@ getVoxindTarball() {
 }
 
 postInstViavoiceTarball() {
-	[ $# != 2 ] && return 1
-	[ -z "$1" ] || [ -z "$2" ] && return 1
+	[ $# != 3 ] && return 1
+	[ -z "$1" ] || [ -z "$2" ] || [ -z "$3" ] && return 1
 
 	local rfsdir="$1"
 	local destdir="$2"
+	local newconf="$3"
 	local inidir="$rfsdir/opt/IBM/ibmtts/etc"
-	local newconf="$rfsdir/var/opt/IBM/ibmtts/cfg/eci.ini"
 	local rfs32="$rfsdir/opt/oralux/voxin/rfs32"
 	local LANG
 	local i
@@ -265,9 +300,12 @@ installLang() {
 		fi
 	done
 
-	"$postInstTarball" "$rfsdir" "/"
+	if [ "$WITH_TTS" = viavoice ]; then
+	    local ECI_INI="$TOPDIR/var/opt/IBM/ibmtts/cfg/eci.ini"
+	    "$postInstTarball" "$rfsdir" "$TOPDIR" "$ECI_INI"
+	fi
 	
-    return 0
+	return 0
 }
 
 getArch() {
@@ -290,6 +328,7 @@ getArch() {
     esac
 }
 
+#TODO
 uninstallOldVoxin()
 {	
     echo uninstallOldVoxin >> "$LOG"
@@ -305,6 +344,7 @@ uninstallOldVoxin()
     return 0
 }
 
+#TODO
 installOldVoxin()
 {	
     echo installOldVoxin >> "$LOG"
@@ -338,7 +378,7 @@ uninstallSystem()
 }
 
 is_voxin_conf_installed() {
-    ls -lL /etc/speech-dispatcher/modules/voxin.conf &> /dev/null
+    ls -lL "$TOPDIR"/etc/speech-dispatcher/modules/voxin.conf &> /dev/null
 }
 
 updateSystem() {	
@@ -367,10 +407,10 @@ updateSystem() {
 	done
 
 	# install voxin.ini globally
-	local ref_voxin_ini=/opt/oralux/voxin/share/conf/voxin.ini
-	local global_voxin_ini=/var/opt/oralux/voxin/voxin.ini	
+	local ref_voxin_ini="$TOPDIR"/opt/oralux/voxin/share/conf/voxin.ini
+	local global_voxin_ini="$TOPDIR"/var/opt/oralux/voxin/voxin.ini	
 	[ ! -e $global_voxin_ini ] && install -m 644 -D $ref_voxin_ini $global_voxin_ini
-
+	
 	return "$status"
 }
 
@@ -427,8 +467,8 @@ installSystem() {
 	done
 
 	# install voxin.ini globally
-	local ref_voxin_ini=/opt/oralux/voxin/share/conf/voxin.ini
-	local global_voxin_ini=/var/opt/oralux/voxin/voxin.ini	
+	local ref_voxin_ini="$TOPDIR"/opt/oralux/voxin/share/conf/voxin.ini
+	local global_voxin_ini="$TOPDIR"/var/opt/oralux/voxin/voxin.ini	
 	[ ! -e $global_voxin_ini ] && install -m 644 -D $ref_voxin_ini $global_voxin_ini
 
 	# install voxin package
@@ -438,10 +478,10 @@ installSystem() {
 
 	# install voxin.conf (if not yet installed)
 	if [ "$voxin_conf_installed" = 0 ]; then
-	    local conf_dir=/opt/oralux/voxin/share/speech-dispatcher
+	    local conf_dir="$TOPDIR"/opt/oralux/voxin/share/speech-dispatcher
 	    local conf="$conf_dir/last/voxin.conf"
-	    local ver=$(/usr/bin/speech-dispatcher -v | head -1 | cut -f2 -d" ")	    
-	    [ -n "$ver" ] && [ -e "$conf_dir/$ver/voxin.conf" ] && conf="$conf_dir/$ver/voxin.conf"
+	    get_speech_dispatcher_version
+	    [ -n "$SPEECHD_VER" ] && [ -e "$conf_dir/$SPEECHD_VER/voxin.conf" ] && conf="$conf_dir/$SPEECHD_VER/voxin.conf"
 	    spd_conf_install_voxin_conf "$conf"
 
 	    # install voxin-speechd-conf package

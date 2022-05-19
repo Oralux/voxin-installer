@@ -9,12 +9,12 @@ cd $BASE
 source ./common/init.inc
 source ./common/spdconf.inc
 
-TOPDIR=/
-RFSDIR=opt/oralux/voxin
+DEFAULT_TOPDIR_SYSTEM_WIDE=/
+DEFAULT_TOPDIR_USER="$HOME/.local/share/voxin/rfs"
+VOXDIR=opt/oralux/voxin
 
 NEW_VER=$VOXIN_VERSION
 NEWDIR=opt/oralux/voxin.$NEW_VER
-OLD_VER=$(awk -F= '/tag/{print $2}' "$TOPDIR/$RFSDIR"/share/doc/voxin-installer/sources.ini) 2>/dev/null
 
 _gettext() {
     if [ -n "$GETTEXT" ]; then
@@ -31,16 +31,16 @@ exit_on_error() {
 }
 
 say_ok() {
-    local rfsdir=$1
+    local voxdir=$1
     unset PLAY OPT
     PLAY=$(which aplay 2>/dev/null)
     if [ -z "$PLAY" ]; then
 	PLAY=$(which paplay 2>/dev/null)
     fi
 
-    export LD_LIBRARY_PATH="$rfsdir/lib"
+    export LD_LIBRARY_PATH="$voxdir/lib"
     if [ -n "$PLAY" ]; then
-	"$rfsdir/bin/voxin-say" "Voxin: OK" | "$PLAY" &>> "$LOG"
+	"$voxdir/bin/voxin-say" "Voxin: OK" | "$PLAY" &>> "$LOG"
     fi    
 }
 
@@ -57,7 +57,7 @@ select_version() {
     [ -z "$OLD_VER" ] && { _gettext "Error: no compatible version of voxin installed"; exit_on_error; }
     
     # 2. unselect the current version
-    local DIR=$TOPDIR/$RFSDIR
+    local DIR="$TOPDIR/$VOXDIR"
     if [ -h "$DIR" ]; then
 	unlink "$DIR" || _gettext "Error: can't unlink $DIR" && exit_on_error
     elif [ -d "$DIR" ]; then
@@ -95,18 +95,22 @@ update_version() {
     DESTDIR="$TOPDIR/$NEWDIR"
     [ -e "$DESTDIR" ] && { _gettext "error, if applicable, remove this directory: $DESTDIR"; exit_on_error; }
 
-    tmpdir="$TOPDIR/$RFSDIR/../tmp.voxin.$NEW_VER"
+    tmpdir="$TOPDIR/$VOXDIR/../tmp.voxin.$NEW_VER"
     mkdir -p  "$tmpdir"
     [ -d "$tmpdir" ] || { _gettext "Can't create directory $tmpdir"; exit_on_error; }   
     updateSystem "$tmpdir" || { exit_on_error; }
     installLang "$tmpdir" || { exit_on_error; }
 
-    mv "$tmpdir/$RFSDIR" "$DESTDIR"
+    mv "$tmpdir/$VOXDIR" "$DESTDIR"
     select_version "$NEW_VER"
     rm -rf "$tmpdir"
-    say_ok "$TOPDIR/$RFSDIR"
+    say_ok "$TOPDIR/$VOXDIR"
     _gettext "Voxin updated to version $NEW_VER"
 }
+
+# Entry point
+
+unset TOPDIR
 
 getArch
 
@@ -117,22 +121,7 @@ if [ "$?" = "0" ]; then
     GETTEXT=0
 fi
 
-[ "$UID" != "0" ] && _gettext "Please run voxin-installer as superuser. " && exit 0
-
-check_distro
-if [ "$?" != "0" ]; then
-	_gettext "Sorry, this distribution is not yet supported. "
-	_gettext "For support, email to contact at oralux.org "
-    exit 1
-fi
-
-if [ -h $TOPDIR/opt ]; then
-	_gettext "Sorry, this installer does not expect a symbolic link $TOPDIR/opt"
-	_gettext "For support, email to contact at oralux.org "
-    exit 1
-fi
-
-TEMP=`getopt -o hlruv --long help,lang,remove,update,verbose -- "$@"`
+TEMP=`getopt -o d:hlLuUv --long dir,help,lang,uninstall,update,verbose -- "$@"`
 if [ $? != 0 ] ; then
     usage
     exit 1
@@ -143,27 +132,60 @@ eval set -- "$TEMP"
 with_silent=0
 with_lang=0
 with_update=0
-with_remove=0
+with_uninstall=0
 with_verbose=0
 with_sd=0
+unset with_topdir
 
+echo "args=$1 $2"
 while true ; do   
     case "$1" in
+	-d|--dir) with_topdir=$2; shift 2;;
 	-l|--lang) with_silent=1; with_lang=1; shift;;
-		-u|--update) with_silent=1; with_update=1; shift;;
-		-r|--remove) with_remove=1; shift;;
-		-v|--verbose) with_verbose=1; shift;;
-		--) shift ; break;;
-		*) usage; exit 1;;
+	-U|--update) with_silent=1; with_update=1; shift;;
+	-u|--uninstall) with_uninstall=1; shift;;
+	-v|--verbose) with_verbose=1; shift;;
+	--) shift ; break;;
+	*) usage; exit 1;;
     esac
 done
 
-if [ "$with_update" = 1 ]; then
-    update_version()
-    goodbye    
+#[ "$UID" != "0" ] && _gettext "Please run voxin-installer as superuser. " && exit 0
+SYSTEM_WIDE_INSTALL=$((UID==0?1:0))
+
+if [ -n "$with_topdir" ]; then
+    TOPDIR="$with_topdir"
+elif [ "$SYSTEM_WIDE_INSTALL" = 1 ]; then 
+    TOPDIR="$DEFAULT_TOPDIR_SYSTEM_WIDE"
+else
+    TOPDIR="$DEFAULT_TOPDIR_USER"
+fi 
+
+check_distro
+if [ "$?" != "0" ]; then
+    _gettext "Sorry, this distribution is not yet supported. "
+    _gettext "For support, email to contact at oralux.org "
+    exit 1	
 fi
 
-if [ "$with_remove" = 0 ]; then
+if [ ! -e "$TOPDIR" ]; then
+    mkdir -p "$TOPDIR"
+fi
+
+if [ -h "$TOPDIR"/opt ]; then
+	_gettext "Sorry, this installer does not expect a symbolic link $TOPDIR/opt"
+	_gettext "For support, email to contact at oralux.org "
+    exit 1
+fi
+
+OLD_VER=$(awk -F= '/tag/{print $2}' "$TOPDIR/$VOXDIR"/share/doc/voxin-installer/sources.ini) 2>/dev/null
+
+if [ "$with_update" = 1 ]; then
+    update_version
+    goodbye
+fi
+
+if [ "$with_uninstall" = 0 ]; then
 	with_sd=1
 	check_speech_dispatcher_voxin
 	case $? in
@@ -209,10 +231,8 @@ if [ -z "$GETTEXT" ]; then
     GETTEXT=0
 fi
 
-installDir=$TOPDIR
-
-if [ "$with_remove" = "1" ]; then
-    askUninstall && uninstall "$installDir"
+if [ "$with_uninstall" = "1" ]; then
+    askUninstall && uninstall "$TOPDIR"
     exit 0
 fi
 
@@ -225,22 +245,22 @@ for i in voxind libvoxin libvoxin1; do
 	isPackageInstalled $i && uninstallPackage $i
 done
 
-uninstallOldVoxin "$installDir" || { installOldVoxin "$installDir"; exit_on_error; }
-installSystem "$installDir" || { installOldVoxin "$installDir"; exit_on_error; }
+uninstallOldVoxin "$TOPDIR" || { installOldVoxin "$TOPDIR"; exit_on_error; }
+installSystem "$TOPDIR" || { installOldVoxin "$TOPDIR"; exit_on_error; }
 
 installed=0
 askInstallLang && {
-    installLang "$installDir" || { exit_on_error; }
+    installLang "$TOPDIR" || { exit_on_error; }
     installed=1
 
-    say_ok "$installDir"
+    say_ok "$TOPDIR/$VOXDIR"
 }
 
 [ "$with_sd" = 1 ] && spd_conf_is_update_required && askUpdateConfAuthorization && spd_conf_set voxin
 
 if [ "$installed" = "0" ]; then
     askUninstall && {
-		uninstall "$installDir" || exit_on_error
+		uninstall "$TOPDIR" || exit_on_error
 		exit 0
     }
 fi
