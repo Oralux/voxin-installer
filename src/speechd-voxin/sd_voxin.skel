@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# Speech-dispatcher (>=0.11) can launch a local text-to-speech module
+# stored under the user's account at:
+# ~/.local/libexec/speech-dispatcher-modules
+#
+# Voxin supplies a shell-script as local module which will call the
+# binary module sd_voxin stored in the user's installation directory.
+# The current file is a template of this shell script; the variables
+# between % have just to be replaced.
+
+# TOPDIR: user's installation directory
+TOPDIR=%TOPDIR%
+
+# VER: corresponding speech-dispatcher version (typically 0.11.1)
+VER=%VER%
+
+export LD_LIBRARY_PATH="$TOPDIR"/opt/oralux/voxin/lib
+SD_VOXIN="$TOPDIR"/opt/oralux/voxin/lib/speech-dispatcher-modules/"$VER"/sd_voxin
+
+exec "$SD_VOXIN" "$@"

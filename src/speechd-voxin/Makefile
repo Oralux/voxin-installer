@@ -7,7 +7,7 @@ sd_voxin: $(BIN)
 all: sd_voxin
 
 install:
-	install --target-directory=$(DESTDIR) -D sd_voxin
+	install --target-directory=$(DESTDIR) -D sd_voxin sd_voxin.skel
 
 clean:
 	rm -f sd_voxin *o
