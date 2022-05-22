@@ -25,17 +25,23 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 # - development (master branch)
 #LIBVOXIN_VERSION=
 # - from the last tag instead (+sha512)
-LIBVOXIN_VERSION=1.6.0
-LIBVOXIN_SHA512=157ef39ae9c0b88e48742dc9b9ee8220dcc81b4c24a8971a8f06659bf7c51e6566cf1a1fc7862c2eb19b1717fc58e849ecef2c4f343083931a5b595ad54f996b
+LIBVOXIN_VERSION=1.6.1
+LIBVOXIN_SHA512=7dcb00d453f938a0e8e7745e836842b799926a32a8331691a71425f5044b01682735f90d79ce19a5283cdd3936852b1dfb829e1c9f476d1f80617f5411ec4547
 
 # versions of the speech-dispatcher voxin module(s) which must be
 # built by this script.
 # 
 SPEECHD_VOXIN_ALL_VERSIONS=
+#SPEECHD_VOXIN_ALL_VERSIONS=0.11.1
 #SPEECHD_VOXIN_ALL_VERSIONS=0.10.1
 #SPEECHD_VOXIN_ALL_VERSIONS="0.10.1 0.9.1 0.9.0"
 
-SPEECHD_VOXIN_ARCHIVE_URL=https://github.com/Oralux/speechd/archive
+# voxin modules >= 0.11
+SPEECHD_ARCHIVE_URL=https://github.com/brailcom/speechd/archive/refs/tags
+SPEECHD_GIT_URL=https://github.com/brailcom/speechd.git
+
+# voxin modules < 0.11
+SPEECHD_VOXIN_ARCHIVE_URL=https://github.com/Oralux/speechd/archive/refs/tags
 SPEECHD_VOXIN_GIT_URL=https://github.com/Oralux/speechd.git
 SPEECHD_VOXIN_TAG=voxin3
 SPEECHD_VOXIN_TAG_0_10_1=voxin3_backport_upstream
@@ -57,6 +63,7 @@ sd_voxin_0.9.1-voxin3rc5.x86_64.txz \
 sd_voxin_0.10.1-voxin3_backport_upstream.aarch64.txz \
 sd_voxin_0.10.1-voxin3_backport_upstream.armv7l.txz \
 sd_voxin_0.10.1-voxin3_backport_upstream.x86_64.txz \
+sd_voxin_0.11.1.x86_64.txz \
 "
 
 #"sd_voxin_0.7.1_0.8.8.x86_64.txz sd_voxin_0.9.1-voxin3.x86_64.txz"
@@ -64,8 +71,7 @@ SPEECHD_VOXIN_BIN_SHA512=$BASE/check/$VOXIN_VERSION/sd_voxin.sha512
 
 # VMX86_64: VM where voxin-installer could be built for x86_64 architecture
 # Debian 8 to build binaries compatible with older distros. 
-# Ubuntu 18.04 for sd_voxin 0.9.0 and 0.9.1
-# 
+# Ubuntu 18.04 for sd_voxin 0.9.0, 0.9.1 and 0.11.1
 #VMX86_64=user1@192.168.122.150 # Ubuntu 18.04 (sd_voxin 0.9.0 and 0.9.10)
 VMX86_64=user1@192.168.122.118 # Debian 8 (libvoxin, sd 0.7, 0.8)
 VMVOXDIR=/home/user1/VOXIN
@@ -147,6 +153,12 @@ setSpeechdVoxinVar() {
 
     unset SPEECHD_VOXIN_ARCHIVE SPEECHD_VOXIN_SHA512
     case $version in
+	0.11.1)
+	    SPEECHD_VOXIN_ARCHIVE=$version.tar.gz
+	    SPEECHD_VOXIN_SHA512=9f08f282019e2a3c6abb9d77238ec397ec747ae7fab467e1cf58f8166121d914504d30b21273a58e2986c8235db077f21d24bad0bcc77b6d98714f7ab3efd666
+	    SPEECHD_VOXIN_ARCHIVE_URL=$SPEECHD_ARCHIVE_URL
+	    SPEECHD_VOXIN_GIT_URL=$SPEECHD_GIT_URL
+	    ;;
 	0.10.1)	    
 #	    SPEECHD_VOXIN_ARCHIVE=$version-$SPEECHD_VOXIN_TAG.tar.gz
 	    SPEECHD_VOXIN_ARCHIVE=$version-$SPEECHD_VOXIN_TAG_0_10_1.tar.gz
