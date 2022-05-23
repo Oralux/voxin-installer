@@ -125,7 +125,7 @@ get_speech_dispatcher_version() {
     local status=1
     if [ -e /usr/bin/speech-dispatcher ]; then
 	status=0
-	SPEECHD_VER=$(/usr/bin/speech-dispatcher -v | head -1 | cut -f2 -d" ")
+	SPEECHD_VER=$(LC_ALL=C /usr/bin/speech-dispatcher -v | head -1 | cut -f2 -d" ")
     fi
     return $status
 }
