@@ -178,7 +178,8 @@ if [ -h "$TOPDIR"/opt ]; then
     exit 1
 fi
 
-OLD_VER=$(awk -F= '/tag/{print $2}' "$TOPDIR/$VOXDIR"/share/doc/voxin-installer/sources.ini) 2>/dev/null
+OLD_INI="$TOPDIR/$VOXDIR"/share/doc/voxin-installer/sources.ini
+[ -e "$OLD_INI" ] && OLD_VER=$(awk -F= '/tag/{print $2}' "$OLD_INI")
 
 if [ "$with_update" = 1 ]; then
     update_version
