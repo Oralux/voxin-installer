@@ -58,3 +58,6 @@ uninstallPackage() {
     pacman --noconfirm -R "$package" &>>"$LOG"
 }
 
+postInstSystem() {
+    return 0
+}

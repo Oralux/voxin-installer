@@ -59,3 +59,7 @@ uninstallPackage() {
     local package=$1
     dnf remove -y "$package" &>> "$LOG"	
 }
+
+postInstSystem() {
+    return 0
+}

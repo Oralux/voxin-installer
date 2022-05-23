@@ -61,3 +61,8 @@ uninstallPackage() {
     # not applicable
     return 0
 }
+
+postInstSystem() {
+    mv "$TOPDIR"/usr/doc/* "$TOPDIR"/usr/share/doc/
+    rmdir "$TOPDIR"/usr/doc
+}

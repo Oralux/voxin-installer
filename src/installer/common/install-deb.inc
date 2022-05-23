@@ -58,3 +58,7 @@ uninstallPackage() {
     local package=$1
     apt-get remove --yes --purge "$package" &>> "$LOG"
 }
+
+postInstSystem() {
+    return 0
+}

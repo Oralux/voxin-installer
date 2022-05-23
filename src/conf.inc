@@ -594,13 +594,13 @@ buildVoxinModuleLauncher() {
 	# create symlinks
 	cd "$BUILD_VOXIN_SPEECHD_PKG/rfs"
 	mkdir -p usr/lib/speech-dispatcher-modules
-	ln -s /opt/oralux/voxin/lib/speech-dispatcher-modules/sd_voxin usr/lib/speech-dispatcher-modules/sd_voxin
+	ln -s ../../../opt/oralux/voxin/lib/speech-dispatcher-modules/sd_voxin usr/lib/speech-dispatcher-modules/sd_voxin
 #	mkdir -p usr/{lib/speech-dispatcher-modules,libexec/speech-dispatcher-modules}
 #	ln -s /opt/oralux/voxin/lib/speech-dispatcher-modules/sd_voxin usr/libexec/speech-dispatcher-modules/sd_voxin
 
 	cd "$BUILD_VOXIN_SPEECHD_CONF_PKG/rfs"
 	mkdir -p etc/speech-dispatcher/modules
-	ln -s /opt/oralux/voxin/share/speech-dispatcher/voxin.conf etc/speech-dispatcher/modules/voxin.conf
+	ln -s ../../../opt/oralux/voxin/share/speech-dispatcher/voxin.conf etc/speech-dispatcher/modules/voxin.conf
 
 	# omitted: to avoid to create of a third package...
 	# cd "$BUILD_VOXIN_SPEECHD_CONF2_PKG/rfs"
@@ -619,18 +619,18 @@ getVoxinDoc() {
 
 	cd "$BUILD_VOXIN_PKG/rfs"
 	mkdir -p usr/share/doc/voxin
-	ln -s /opt/oralux/voxin/LICENSE usr/share/doc/voxin/
-	ln -s /opt/oralux/voxin/README usr/share/doc/voxin/
+	ln -s ../../../../opt/oralux/voxin/LICENSE usr/share/doc/voxin/
+	ln -s ../../../../opt/oralux/voxin/README usr/share/doc/voxin/
 	
 	cd "$BUILD_VOXIN_SPEECHD_PKG/rfs"
 	mkdir -p usr/share/doc/voxin-speechd
-	ln -s /opt/oralux/voxin/LICENSE usr/share/doc/voxin-speechd/
-	ln -s /opt/oralux/voxin/README usr/share/doc/voxin-speechd/
+	ln -s ../../../../opt/oralux/voxin/LICENSE usr/share/doc/voxin-speechd/
+	ln -s ../../../../opt/oralux/voxin/README usr/share/doc/voxin-speechd/
 	
 	cd "$BUILD_VOXIN_SPEECHD_CONF_PKG/rfs"
 	mkdir -p usr/share/doc/voxin-speechd-conf
-	ln -s /opt/oralux/voxin/LICENSE usr/share/doc/voxin-speechd-conf/
-	ln -s /opt/oralux/voxin/README usr/share/doc/voxin-speechd-conf/
+	ln -s ../../../../opt/oralux/voxin/LICENSE usr/share/doc/voxin-speechd-conf/
+	ln -s ../../../../opt/oralux/voxin/README usr/share/doc/voxin-speechd-conf/
 	
 	cd "$pwd"
 	return 0

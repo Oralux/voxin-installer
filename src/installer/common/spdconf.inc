@@ -1,6 +1,7 @@
 # $LOG expected to be set
 
-LIST="/home/*/.config/speech-dispatcher/speechd.conf /etc/speech-dispatcher/speechd.conf"
+DEFAULT_LIST_SYSTEM_WIDE="/home/*/.config/speech-dispatcher/speechd.conf /etc/speech-dispatcher/speechd.conf"
+DEFAULT_LIST_USER="/$HOME/.config/speech-dispatcher/speechd.conf"
 
 getDefault() {
     local filename="$1"
@@ -64,19 +65,30 @@ isDefaultModule() {
 # }
 
 function spd_conf_unset() {
-    [ "$SYSTEM_WIDE_INSTALL" != 1 ] && return 1
     local module="$1"
+    local LIST
+    if [ "$SYSTEM_WIDE_INSTALL" = 1 ]; then
+	LIST="$DEFAULT_LIST_SYSTEM_WIDE"
+    else
+	LIST="$DEFAULT_LIST_USER"
+    fi  
+    
     ls -t $LIST 2>>"$LOG" | while read file; do		
-		local newModule=$(grep "^[[:space:]]*#[[:space:]]*voxinadded \(.*\)" "$file" | awk '{print $2}')
-		isAdded "$file" "$module" && removeModule "$file" "$module"		
-	done
+	local newModule=$(grep "^[[:space:]]*#[[:space:]]*voxinadded \(.*\)" "$file" | awk '{print $2}')
+	isAdded "$file" "$module" && removeModule "$file" "$module"		
+    done
 }
 
 function spd_conf_set() {
-    [ "$SYSTEM_WIDE_INSTALL" != 1 ] && return 1
     local module="$1"
     local file
-	
+    local LIST
+    
+    if [ "$SYSTEM_WIDE_INSTALL" = 1 ]; then
+	LIST="$DEFAULT_LIST_SYSTEM_WIDE"
+    else
+	LIST="$DEFAULT_LIST_USER"
+    fi  
     ls -t $LIST 2>>"$LOG" | while read file; do
 		isAnyAdded "$file"
 		if [ "$?" = 0 ]; then

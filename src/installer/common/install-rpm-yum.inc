@@ -59,3 +59,7 @@ uninstallPackage() {
     local package=$1
     yum remove -y "$package" &>> "$LOG"	
 }
+
+postInstSystem() {
+    return 0
+}

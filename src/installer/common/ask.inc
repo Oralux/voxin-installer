@@ -53,6 +53,15 @@ askUninstall()
     return $?
 }
 
+askRemoveDir()
+{
+    _gettext "Do you really want to remove this directory:"
+    echo "$1"
+    _gettext "If you agree please type OK and press the ENTER key.";
+    ok
+    return $?
+}
+
 askLicenseViavoice()
 {
 	local VIAVOICE_ARCHIVE=$(getVoiceAllTarball)

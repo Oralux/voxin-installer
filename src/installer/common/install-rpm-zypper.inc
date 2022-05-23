@@ -68,3 +68,7 @@ uninstallPackage() {
     local package=$1
     zypper remove -y "$package" &>> "$LOG"	
 }
+
+postInstSystem() {
+    return 0
+}

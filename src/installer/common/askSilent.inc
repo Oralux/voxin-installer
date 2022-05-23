@@ -16,5 +16,10 @@ askUninstall()
     return $((! with_uninstall))
 }
 
+askRemoveDir()
+{
+    return $((! with_uninstall))
+}
+
 askLicense=noOp
 

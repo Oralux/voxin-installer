@@ -80,6 +80,13 @@ uninstall() {
     local rfsdir="$1"
     spd_conf_unset voxin	
     uninstallSystem "$rfsdir"
+
+    if [ "$SYSTEM_WIDE_INSTALL" != 1 ]; then
+	local dir1="$HOME/.local/share/voxin"
+	local dir2=$(realpath "$dir1")
+	askRemoveDir "$dir2" && { _gettext "removing install dir:" >> "$LOG"; echo "$dir2" >> $LOG; rm -rf "$dir2"; [ -d "$dir1" ] && rmdir "$dir1"; }
+    fi
+
     _gettext "Operation completed. "
     return 0
 }
@@ -493,6 +500,8 @@ installSystem() {
 	    # install voxin-speechd package
 	    installLocalPackage "$voxinSpeechdPackage"
 	fi
+
+	postInstSystem
 
 	return "$status"
 }

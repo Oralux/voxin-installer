@@ -78,3 +78,6 @@ uninstallPackage() {
     removepkg "$package" &>>"$LOG"
 }
 
+postInstSystem() {
+    return 0
+}

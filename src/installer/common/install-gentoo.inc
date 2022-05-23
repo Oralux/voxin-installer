@@ -83,3 +83,6 @@ uninstallPackage() {
 	cd $pwd
 }
 
+postInstSystem() {
+    return 0
+}
