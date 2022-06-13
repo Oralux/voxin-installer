@@ -25,12 +25,20 @@ esac
 
 rm -f "$LOG"
 
-unset outputArray
-declare -a outputArray
+unset MAJOR
+unset MINOR
+unset MACRO
 
 leave() {
 	echo -e "$1"
 	exit $2
+}
+
+check_bash() {
+    TAR_NO_OVERWRITE="--no-overwrite-dir"
+    if [ $(readlink /bin/bash) = busybox ]; then
+	unset TAR_NO_OVERWRITE
+    fi
 }
 
 init_gettext() {
@@ -127,6 +135,8 @@ check_distro() {
 	slackware*|slint*) source common/install-slackware.inc;;
 	*) status=1;;
     esac
+
+    check_bash
     
     return $status
 }
@@ -291,7 +301,7 @@ installLang() {
 		_gettext "Error: no 'all' tarball" >> "$LOG"
 		return 1
 	fi
-	tar -C "$rfsdir" --no-overwrite-dir -xf "$i"
+	tar -C "$rfsdir" $TAR_NO_OVERWRITE -xf "$i"
 	status=$?
 	if [ "$status" != 0 ]; then
 		_gettext "Error: untar failure ($i)" >> "$LOG"
@@ -304,7 +314,7 @@ installLang() {
 			_gettext "Error: no 'voxind' tarball" >> "$LOG"
 			return 1
 		fi
-		tar -C "$rfsdir" --no-overwrite-dir -xf "$i"
+		tar -C "$rfsdir" $TAR_NO_OVERWRITE -xf "$i"
 		status=$?
 		if [ "$status" != 0 ]; then
 			_gettext "Error: untar failure ($i)" >> "$LOG"
@@ -313,7 +323,7 @@ installLang() {
 	fi
 	
 	getVoiceTarball | while read i; do
-		tar -C "$rfsdir" --no-overwrite-dir -xf "$i"
+		tar -C "$rfsdir" $TAR_NO_OVERWRITE -xf "$i"
 		status=$?
 		if [ "$status" != 0 ]; then
 			_gettext "Error: untar failure ($i)" >> "$LOG"
@@ -330,7 +340,7 @@ installLang() {
 }
 
 getArch() {
-    if [ $# = 1 ]; then
+    if [ $# = 1 ] && [ -n "$1" ]; then
 	ARCH="$1"
     else
 	ARCH=$(uname -m)
@@ -345,7 +355,18 @@ getArch() {
 	    PACMAN_ARCH=armv7h
 	    ;;
 	aarch64)	
+	    # Check if the root filesystem is also in 64 bits
+	    # Test: read byte @0x04 (EI_CLASS) of an ELF header
+	    # if EI_CLASS == 1: 32 bits (if 2: 64 bits)
+	    # Ref: https://refspecs.linuxfoundation.org/elf/gabi4+/ch4.eheader.html
+	    #
 	    DEBIAN_ARCH=arm64
+	    EI_CLASS=$(hexdump -s4 -n1 -e '/1 "%02X"' /bin/bash)
+	    if [ "$EI_CLASS" = "01" ]; then
+		ARCH=armv7l
+		DEBIAN_ARCH=armv7h
+		PACMAN_ARCH=armv7h
+	    fi	    
 	    ;;
 	*)
 	    DEBIAN_ARCH=i386
@@ -530,12 +551,12 @@ install_gettext() {
 }
 
 # getMajorMinorMicro
-# The result is supplied in the outputArray (index 0:major, 1:minor, 2:micro)
+# The result is supplied in $MAJOR, $MINOR, $MICRO
 #
-# major.minor.micro
-# major: n digits
-# minor: n digits
-# micro: n digits (optionally followed by non digits characters which will be filtered)
+# MAJOR.MINOR.MICRO
+# MAJOR: n digits
+# MINOR: n digits
+# MICRO: n digits (optionally followed by non digits characters which will be filtered)
 # e.g.
 # 0.7.1_abce
 # gives major=0, minor=7, micro=1
@@ -547,6 +568,10 @@ getMajorMinorMicro() {
 	local major
 	local minor
 	local micro
+
+	unset MAJOR
+	unset MINOR
+	unset MICRO
 	
 	major=$(echo "$version" | sed -r "s/([0-9]+)\.[0-9]+.*/\1/")	
 	[ "$major" = "$version" ] && return 1
@@ -557,9 +582,9 @@ getMajorMinorMicro() {
 	micro=$(echo "$version" | sed -r "s/[0-9]+\.[0-9]+\.([0-9]+).*/\1/")
 	[ "$micro" = "$version" ] && micro=0
 
-	outputArray[0]=$major
-	outputArray[1]=$minor
-	outputArray[2]=$micro
+	MAJOR=$major
+	MINOR=$minor
+	MICRO=$micro
 	
 	return 0
 }
@@ -575,19 +600,26 @@ isVersionGreater() {
 	[ $# != 2 ] && return 1
 	local ver1=$1
 	local ver2=$2
+	local major
+	local minor
+	local micro
 
 	getMajorMinorMicro "$ver1" || return 2
-	ver1=("${outputArray[@]}") 
+	major1=$MAJOR
+	minor1=$MINOR
+	micro1=$MICRO
 
-	getMajorMinorMicro "$ver2"
-	ver2=("${outputArray[@]}") || return 3
+	getMajorMinorMicro
 
-	i=0
-	while [ "$i" -le 2 ]; do
-		[ "${ver1[$i]}" -gt "${ver2[$i]}" ] && return 0
-		[ "${ver1[$i]}" -lt "${ver2[$i]}" ] && return 1
-	i=$((i+1))	
-	done
+	[ "$major1" -gt "$MAJOR" ] && return 0
+	[ "$major1" -lt "$MAJOR" ] && return 1
+
+	[ "$minor1" -gt "$MINOR" ] && return 0
+	[ "$minor1" -lt "$MINOR" ] && return 1
+	
+	[ "$micro1" -gt "$MICRO" ] && return 0
+	[ "$micro1" -lt "$MICRO" ] && return 1
+		
 	return 0
 }
 

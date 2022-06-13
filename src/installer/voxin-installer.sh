@@ -7,7 +7,12 @@ BASE=$(dirname $(readlink -f $0))
 cd $BASE
 
 source ./common/init.inc
-source ./common/spdconf.inc
+
+if [ $(readlink /bin/bash) = busybox ]; then
+    source ./common/spdconffake.inc
+else
+    source ./common/spdconf.inc
+fi
 
 DEFAULT_TOPDIR_SYSTEM_WIDE=/
 DEFAULT_TOPDIR_USER="$HOME/.local/share/voxin/rfs"
@@ -40,7 +45,7 @@ say_ok() {
 
     export LD_LIBRARY_PATH="$voxdir/lib"
     if [ -n "$PLAY" ]; then
-	"$voxdir/bin/voxin-say" "Voxin: OK" | "$PLAY" &>> "$LOG"
+	"$voxdir/bin/voxin-say" "Voxin: OK" | "$PLAY" >> "$LOG" 2>&1
     fi    
 }
 

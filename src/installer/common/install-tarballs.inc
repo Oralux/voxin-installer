@@ -46,7 +46,7 @@ getPackageFileVersion() {
 installLocalPackage() {
     [ $# != 1 ] || [ -z "$1" ] && return 1
     local package=$1
-    "installLocalPackage $package" &>>"$LOG"
+    "installLocalPackage $package" >> "$LOG" 2>&1
     [ ! -d "$TOPDIR" ] && return 1
     tar -C "$TOPDIR" -xf "$package" && ( cd "$TOPDIR"; . ./install/doinst.sh; rm -rf install/; )
 }
