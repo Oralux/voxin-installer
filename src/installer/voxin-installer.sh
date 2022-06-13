@@ -112,8 +112,6 @@ update_version() {
 
 unset TOPDIR
 
-getArch
-
 unset GETTEXT
 which gettext >> "$LOG"
 if [ "$?" = "0" ]; then
@@ -121,7 +119,7 @@ if [ "$?" = "0" ]; then
     GETTEXT=0
 fi
 
-TEMP=`getopt -o d:hlLuUv --long dir,help,lang,uninstall,update,verbose -- "$@"`
+TEMP=`getopt -o a:d:hlLuUv --long arch,dir,help,lang,uninstall,update,verbose -- "$@"`
 if [ $? != 0 ] ; then
     usage
     exit 1
@@ -135,11 +133,12 @@ with_update=0
 with_uninstall=0
 with_verbose=0
 with_sd=0
+unset with_arch
 unset with_topdir
 
-echo "args=$1 $2"
 while true ; do   
     case "$1" in
+	-a|--arch) with_arch=$2; shift 2;;
 	-d|--dir) with_topdir=$2; shift 2;;
 	-l|--lang) with_silent=1; with_lang=1; shift;;
 	-U|--update) with_silent=1; with_update=1; shift;;
@@ -155,11 +154,16 @@ SYSTEM_WIDE_INSTALL=$((UID==0?1:0))
 
 if [ -n "$with_topdir" ]; then
     TOPDIR="$with_topdir"
+    SYSTEM_WIDE_INSTALL=0
 elif [ "$SYSTEM_WIDE_INSTALL" = 1 ]; then 
     TOPDIR="$DEFAULT_TOPDIR_SYSTEM_WIDE"
 else
     TOPDIR="$DEFAULT_TOPDIR_USER"
-fi 
+fi
+
+[ -n "$with_arch" ] && SYSTEM_WIDE_INSTALL=0
+
+getArch "$with_arch"
 
 check_distro
 if [ "$?" != "0" ]; then

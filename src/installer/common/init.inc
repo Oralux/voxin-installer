@@ -62,11 +62,25 @@ ok() {
 usage () {
     cat >&2 <<END
 Usage: voxin-installer.sh [options]
-Voxin will be installed system-wide if this installer is launched by the superuser, .
-Otherwise it will be installed by default under $DEFAULT_TOPDIR_USER.
+
+Examples:
+- System-wide install
+  Launch as superuser:
+  ./voxin-installer.sh
+
+- Local install
+  Launch as regular user:
+  ./voxin-installer.sh
+
+  installation under $DEFAULT_TOPDIR_USER.
+
+- Local install under custom directory
+  Launch as regular user or superuser:
+  ./voxin-installer.sh -d pathname
 
 Options:
-     -d, --directory  install directory (only if the installer is launched by a regular user)
+     -a, --arch       set the target architecture (either x86_64, armv7l or aarch64)
+     -d, --directory  install directory
      -h, --help       print this message
      -l, --lang       install the language automatically
      -u, --uninstall  uninstall the TTS
@@ -316,7 +330,11 @@ installLang() {
 }
 
 getArch() {
-    ARCH=$(uname -m)
+    if [ $# = 1 ]; then
+	ARCH="$1"
+    else
+	ARCH=$(uname -m)
+    fi
     PACMAN_ARCH=$ARCH
     case "$ARCH" in
 	x86_64|ia64)
