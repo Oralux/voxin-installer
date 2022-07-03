@@ -102,7 +102,11 @@ uninstall() {
     local rfsdir="$1"
     spd_conf_unset voxin	
     uninstallSystem "$rfsdir"
-
+    if [ $? != 0 ]; then
+	_gettext "Error: operation not completed."
+	exit 1
+    fi
+    
     if [ "$SYSTEM_WIDE_INSTALL" != 1 ]; then
 	local dir1="$HOME/.local/share/voxin"
 	local dir2=$(realpath "$dir1")
