@@ -475,7 +475,7 @@ installSystem() {
 	local prevSpeechdModulesTarball=$(getPrevSpeechdModulesTarball) || unset prevSpeechdModulesTarball
 	local voxin_conf_installed=0
 	local sd_voxin_installed=0
-	
+
 	if [ ! -d "$rfsdir" ]; then
 		_gettext "Install directory not found: $rfsdir" >> "$LOG"
 		return 1
@@ -527,9 +527,7 @@ installSystem() {
 	# install voxin.conf (if not yet installed)
 	if [ "$voxin_conf_installed" = 0 ]; then
 	    local conf_dir="$TOPDIR"/opt/oralux/voxin/share/speech-dispatcher
-	    local conf="$conf_dir/last/voxin.conf"
-	    get_speech_dispatcher_version
-	    [ -n "$SPEECHD_VER" ] && [ -e "$conf_dir/$SPEECHD_VER/voxin.conf" ] && conf="$conf_dir/$SPEECHD_VER/voxin.conf"
+	    local conf="$conf_dir/0.10.1/voxin.conf"
 	    spd_conf_install_voxin_conf "$conf"
 
 	    # install voxin-speechd-conf package
