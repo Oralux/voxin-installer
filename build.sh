@@ -1,4 +1,4 @@
-#!/bin/bash -x
+#!/bin/bash
 
 BASE=$(dirname $(realpath "$0"))
 NAME=$(basename "$0")
@@ -17,7 +17,7 @@ Note that a minimal 32 bits root filesystem is needed as input to this
 script (see README.org).
 
 Options: 
--c, --clean clean-up:  delete the build directory and object files (buildroot, 
+-c, --clean            delete the build directory and object files (buildroot, 
                        tarballs,...)
 -h, --help             display this help 
 -b, --buildroot        (optionally) build a 32 bits rootfilesystem using 
@@ -81,9 +81,23 @@ done
 
 [ -n "$HELP" ] && usage && exit 0
 
+
+if [ ! -e "$SPEECHD_VOXIN_BIN_SHA512" ]; then
+    echo "Error: $SPEECHD_VOXIN_BIN_SHA512 not found!"
+fi
+
+getArch
+
 if [ -n "$CLEAN" ]; then
-	rm -rf $BASE/build
+	# build: clean all except .gitignore and the buildroot tarball
+	chmod -R a+w $BASE/build
+	find build -type f,l ! -name $(basename "$BR_PKG") ! -name .gitignore -exec rm {} \;
+	find build -depth -type d -exec rmdir --ignore-fail-on-non-empty {} \;
+
+	# cleanup
 	find $BASE -name "*~" ! -path "*.git*" -exec rm {} \;
+	rm -f $BASE/check/$VOXIN_VERSION/voxin-$VOXIN_VERSION.sha512.ve.$ARCH
+	[ "$ARCH" = "x86_64" ] && rm -f $BASE/check/$VOXIN_VERSION/voxin-$VOXIN_VERSION.sha512.vv
 	exit 0
 fi
 
@@ -123,7 +137,6 @@ checkDep
 init
 [ -n "$BUILDROOT" ] && buildBuildroot
 
-getArch
 case "$ARCH" in
     arm*) ;;
     aarch64) ;;

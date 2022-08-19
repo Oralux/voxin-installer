@@ -8,9 +8,7 @@ if [ "$SYSTEM_WIDE_INSTALL" = 1 ]; then
 else
     SPEECHD_MIN_VERSION=0.11
 fi
-#VOXIN_VERSION=%VERSION%
-#TODO
-VOXIN_VERSION=3.3rc6
+VOXIN_VERSION=%VERSION%
 
 unset WITH_TTS
 ls $BASE/packages/all/voxin-viavoice-all* &> /dev/null && WITH_TTS=viavoice
@@ -36,7 +34,7 @@ leave() {
 
 check_bash() {
     TAR_NO_OVERWRITE="--no-overwrite-dir"
-    if [ $(readlink /bin/bash) = busybox ]; then
+    if [ "$(readlink /bin/bash)" = busybox ]; then
 	unset TAR_NO_OVERWRITE
     fi
 }

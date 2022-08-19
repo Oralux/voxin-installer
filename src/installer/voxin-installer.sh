@@ -8,7 +8,7 @@ cd $BASE
 
 source ./common/init.inc
 
-if [ $(readlink /bin/bash) = busybox ]; then
+if [ "$(readlink /bin/bash)" = busybox ]; then
     source ./common/spdconffake.inc
 else
     source ./common/spdconf.inc
@@ -158,7 +158,8 @@ done
 SYSTEM_WIDE_INSTALL=$((UID==0?1:0))
 
 if [ -n "$with_topdir" ]; then
-    TOPDIR="$with_topdir"
+    TOPDIR=$(realpath "$with_topdir")
+    [ "$TOPDIR" = "/" ] && { usage; exit 1; }
     SYSTEM_WIDE_INSTALL=0
 elif [ "$SYSTEM_WIDE_INSTALL" = 1 ]; then 
     TOPDIR="$DEFAULT_TOPDIR_SYSTEM_WIDE"
@@ -173,6 +174,7 @@ getArch "$with_arch"
 check_distro
 if [ "$?" != "0" ]; then
     _gettext "Sorry, this distribution is not yet supported. "
+    _gettext "You may want to install voxin to a dedicated directory (option -d)"
     _gettext "For support, email to contact at oralux.org "
     exit 1	
 fi
