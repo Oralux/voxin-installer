@@ -1,65 +1,43 @@
-#!/bin/bash -x
-# Helper script to export voxin-installer to the server (VM/board)
+#!/bin/bash -e
+# Build voxin-installer by remote host (VM or external board)
 
 BASE=$(dirname $(realpath "$0"))
+. $BASE/src/host.inc
 . $BASE/src/conf.inc
 
-# usage() {
-# 	echo "usage ./rsync.sh <arch>"
-# 	echo "with <arch>: x86_64, armhf,.."	
-# }
+if [ $# != 1 ]; then
+    echo "usage ./rsync.sh <arch>"
+    echo "<arch>: x86_64, armv7l or aarch64"
+    exit 1
+fi
 
-# case "$1" in
-# 	x86_64)
-ARCH=x86_64
-SERVER=$VMX86_64
+ARCH=$1
+getBuildServer "$ARCH"
+SERVER=$BUILD_USER@$BUILD_HOST
 EXTRA_DIR=voxin-viavoice
-# 		;;
-# 	armhf)
-# 		ARCH=armhf
-# 		SERVER=$BOARD_ARMHF
-# 		unset EXTRA_DIR		   
-# 		;;
-# 	*) usage; exit 1;;
-# esac	
 
-upload_to_server() {
-	#	ssh $SERVER "mv $VMVOXDIR $VMVOXDIR.old.$$; mkdir -p $VMLIBVOXDIR; ln -s $VMLIBVOXDIR/voxind-nve $VMVOXDIR/voxin-nve"
-	ssh $SERVER "rm -rf $VMVOXDIR/voxin-installer/build"	
-	SRC="voxin-installer voxin-installer/build/packages/buildroot_2017.02.9.txz voxin-installer/build/.gitignore"
+upload() {
 	pushd $HOME/VOXIN
-	rsync --exclude build --exclude tmp --delete -aRvz $SRC $SERVER:$VMVOXDIR/
+	rsync --delete -aRvz voxin-installer $SERVER:$VMVOXDIR/
 	rsync --delete -avR voxin-viavoice/build/packages $SERVER:$VMVOXDIR/
 	popd
 }
 
+download() {
+	pushd $HOME/VOXIN
+	rsync  $1 -av $SERVER:$VMVOXDIR/voxin-installer/build/packages/ voxin-installer/sav.voxin_$VOXIN_VERSION
+	rsync  $1 -av $SERVER:$VMVOXDIR/voxin-installer/check/$VOXIN_VERSION voxin-installer/check/
+	popd
+}
+
+build() {
+    [ "$ARCH" = "x86_64" ] && ssh $SERVER "set -e; cd $VMVOXDIR/voxin-installer && ./build.sh -t src/list.vv"
+    ssh $SERVER "set -e; cd $VMVOXDIR/voxin-installer && ./build.sh -t src/list.ve.$ARCH"
+}
+
 echo "Memo: voxind-nve rsynced? (y|N)"
 read a
-echo "Build on VM32 ($VMX86) and VM64 ($SERVER)? (y|N)"
-read a
-case "$a" in
-	y|Y) a=ok;;
-	*) unset a;;
-esac
-if [ -n "$a" ]; then
-	upload_to_server
-	ssh $SERVER "cd $VMVOXDIR/voxin-installer && ./build.sh -u x86"
-	ssh $SERVER "cd $VMVOXDIR/voxin-installer && ./build.sh -d x86 -t src/list.vv"
-	ssh $SERVER "cd $VMVOXDIR/voxin-installer && ./build.sh -d x86 -t src/list.ve"
-else
-	echo "Only build on VM64 ($SERVER)? (Y|n)"
-	read a
-	case "$a" in
-		*) a=ok;;
-		n|N) unset a;;
-	esac	
-	if [ -n "$a" ]; then
-		upload_to_server
-		ssh $SERVER "cd $VMVOXDIR/voxin-installer && ./build.sh -t src/list.vv"
-		ssh $SERVER "cd $VMVOXDIR/voxin-installer && ./build.sh -t src/list.ve.$ARCH"
-		ssh $SERVER "cd $VMVOXDIR/voxin-installer/check/$VOXIN_VERSION && cat *.vv *.ve > voxin-$VOXIN_VERSION.sha512"
-	fi
-fi
 
-./get.sh
-
+upload
+build
+download

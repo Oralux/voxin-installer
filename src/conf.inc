@@ -51,6 +51,9 @@ SPEECHD_SD_MODULE_COPYRIGHT_NB_LINES=24
 
 # pre-built binaries of the speech-dispatcher voxin module(s) to download.
 # Built from sources identified by the sources.ini file inside the tarball.
+# Originally built on:
+# Debian 8 (sd 0.7, 0.8)
+# Ubuntu 18.04 (sd_voxin 0.9.0, 0.9.10, 0.11.1)
 SPEECHD_VOXIN_BIN_URL=http://oralux.org/soft/speech-dispatcher/bin
 SPEECHD_VOXIN_BIN_ARCHIVES=" \
 sd_voxin_0.7.1_0.8.8.x86_64.txz \
@@ -66,22 +69,7 @@ sd_voxin_0.10.1-voxin3_backport_upstream.x86_64.txz \
 sd_voxin_0.11.1.x86_64.txz \
 "
 
-#"sd_voxin_0.7.1_0.8.8.x86_64.txz sd_voxin_0.9.1-voxin3.x86_64.txz"
 SPEECHD_VOXIN_BIN_SHA512=$BASE/check/$VOXIN_VERSION/sd_voxin.sha512
-
-# VMX86_64: VM where voxin-installer could be built for x86_64 architecture
-# Debian 8 to build binaries compatible with older distros. 
-# Ubuntu 18.04 for sd_voxin 0.9.0, 0.9.1 and 0.11.1
-#VMX86_64=user1@192.168.122.150 # Ubuntu 18.04 (sd_voxin 0.9.0 and 0.9.10)
-VMX86_64=user1@192.168.122.118 # Debian 8 (libvoxin, sd 0.7, 0.8)
-VMVOXDIR=/home/user1/VOXIN
-VMLIBVOXDIR=$VMVOXDIR/LIBVOXIN
-
-# VMX86: VM where voxin-installer is built for x86 architecture
-# This VM is currently used to build on a 64 bits machine the
-# speech-dispatcher module for x86
-# 
-VMX86=user1@192.168.122.174
 
 # Dependencies
 # # libstdc++-4.9-dev:i386 (hard coded in function below)
@@ -95,7 +83,7 @@ DEP_PACKAGES="alien build-essential fakeroot rpm rsync"
 
 # bsdtar (for Arch/Gentoo package)
 for i in libarchive-tools bsdtar; do
-    { apt-cache search "$i"| grep -o "^$i "; } && DEP_PACKAGES="$DEP_PACKAGES $i"
+    { apt-cache search "$i"| grep -qo "^$i "; } && DEP_PACKAGES="$DEP_PACKAGES $i"
 done
 
 DEP_PACKAGES_X86="alien libarchive-tools rpm build-essential flite1-dev intltool libao-dev libasound2-dev libaudio-dev libdotconf-dev libespeak-dev libflac-dev libglib2.0-dev libogg-dev libpulse-dev libsndfile1-dev libvorbis-dev libxau-dev pkg-config tex-common x11proto-core-dev xorg-sgml-doctools zlib1g-dev dh-autoreconf libltdl-dev libtool"
@@ -230,7 +218,8 @@ checkDep() {
 init() {
 	local i
 	for i in "$TMPDIR" "$BUILD_VOXIN_PKG" "$BUILD_VOXIN_SPEECHD_PKG" "$BUILD_VOXIN_SPEECHD_CONF_PKG" "$PKGDIR"/voxin* "$PKGDIR"/rfs* "$RFS32"; do
-		rm -rf "$i"
+	    [ -d "$i" ] && chmod -R a+w "$i"
+	    rm -rf "$i"
 	done
 	mkdir -p "$PKGDIR" "$DWLDIR" "$BUILD_VOXIN_PKG"/{rfs,build} "$BUILD_VOXIN_SPEECHD_PKG"/{rfs,build} "$BUILD_VOXIN_SPEECHD_CONF_PKG"/{rfs,build}
 }
@@ -889,7 +878,7 @@ EOF
 		local sha512=$BASE/check/$VOXIN_VERSION/voxin-$VOXIN_VERSION.sha512.vv
 		if [ "$withTTS" = nve ]; then		    
 			buildVoiceTarball update-ve $voxind $all $arch
-			sha512=${sha512%.vv}.ve
+			sha512=${sha512%.vv}.ve.$ARCH
 		fi
 		
 		if [ -e "$sha512" ]; then
