@@ -21,6 +21,8 @@ VOXDIR=opt/oralux/voxin
 NEW_VER=$VOXIN_VERSION
 NEWDIR=opt/oralux/voxin.$NEW_VER
 
+SPEECHD_MODULE_DIR_USER="$HOME/.local/libexec/speech-dispatcher-modules"
+
 _gettext() {
     if [ -n "$GETTEXT" ]; then
 		echo | tee -a "$LOG"; gettext "$1" | tee -a "$LOG"

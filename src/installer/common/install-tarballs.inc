@@ -46,7 +46,7 @@ getPackageFileVersion() {
 installLocalPackage() {
     [ $# != 1 ] || [ -z "$1" ] && return 1
     local package=$1
-    "installLocalPackage $package" >> "$LOG" 2>&1
+    echo "installLocalPackage $package" >> "$LOG" 2>&1
     [ ! -d "$TOPDIR" ] && return 1
     tar -C "$TOPDIR" -xf "$package" && ( cd "$TOPDIR"; . ./install/doinst.sh; rm -rf install/; )
 }
@@ -65,4 +65,19 @@ uninstallPackage() {
 postInstSystem() {
     cp -a "$TOPDIR"/usr/doc/* "$TOPDIR"/usr/share/doc/
     rm -rf "$TOPDIR"/usr/doc
+}
+
+installLocalSpeechdModule() {
+    local module_orig="$TOPDIR"/opt/oralux/voxin/lib/speech-dispatcher-modules/sd_voxin
+    local module="$SPEECHD_MODULE_DIR_USER/sd_voxin"
+    if [ ! -a "$module" ]; then
+	[ -h "$module" ] && unlink "$module"
+	mkdir -p "$SPEECHD_MODULE_DIR_USER"
+	ln -s "$module_orig" "$module"
+    fi
+}
+
+uninstallLocalSpeechdModule() {
+    local module="$SPEECHD_MODULE_DIR_USER/sd_voxin"   
+    [ -h "$module" ] && unlink "$module"
 }

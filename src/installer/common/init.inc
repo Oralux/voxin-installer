@@ -416,6 +416,12 @@ uninstallSystem()
 	isPackageInstalled voxin && { uninstallPackage voxin || return 1; }
 	isPackageInstalled voxin-speechd && { uninstallPackage voxin-speechd || return 1; }
 	isPackageInstalled voxin-speechd-conf && { uninstallPackage voxin-speechd-conf || return 1; }
+
+	if [ "$SYSTEM_WIDE_INSTALL" != 1 ]; then
+	    spd_uninstall_local_conf
+	    uninstallLocalSpeechdModule
+	fi
+
 	for i in "$rfsdir/opt/oralux/voxin" "$rfsdir/opt/oralux/voxin.old" "$rfsdir/var/opt/oralux/voxin" "$rfsdir/opt/IBM/ibmtts" "$rfsdir/var/opt/IBM/ibmtts" "$rfsdir/opt/oralux/nve" ; do
 		rm -rf $i
 	done
@@ -540,6 +546,11 @@ installSystem() {
 	    installLocalPackage "$voxinSpeechdPackage"
 	fi
 
+	if [ "$SYSTEM_WIDE_INSTALL" != 1 ]; then
+	    spd_install_local_conf
+	    installLocalSpeechdModule
+	fi
+	
 	postInstSystem
 
 	return "$status"

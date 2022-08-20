@@ -1,13 +1,26 @@
 # $LOG expected to be set
 
-DEFAULT_LIST_SYSTEM_WIDE="/home/*/.config/speech-dispatcher/speechd.conf /etc/speech-dispatcher/speechd.conf"
-DEFAULT_LIST_USER="/$HOME/.config/speech-dispatcher/speechd.conf"
+SPD_CONF_SYSTEM="/home/*/.config/speech-dispatcher/speechd.conf /etc/speech-dispatcher/speechd.conf"
+SPD_CONF_USER="$HOME/.config/speech-dispatcher/speechd.conf"
+
+SPD_VOXIN_CONF_USER="${SPD_CONF_USER%speechd.conf}modules/voxin.conf"
+
+spd_install_local_conf() {
+    local SPD_VOXIN_CONF_SYSTEM="$TOPDIR"/opt/oralux/voxin/share/speech-dispatcher/voxin.conf
+    if [ -e "$SPD_VOXIN_CONF_SYSTEM" ] && [ ! -e "$SPD_VOXIN_CONF_USER" ] && [ ! -h "$SPD_VOXIN_CONF_USER" ]; then
+	ln -s "$SPD_VOXIN_CONF_SYSTEM" "$SPD_VOXIN_CONF_USER"
+    fi
+}
+
+spd_uninstall_local_conf() {
+    [ -h "$SPD_VOXIN_CONF_USER" ] && unlink "$SPD_VOXIN_CONF_USER"
+}
 
 getList() {
     if [ "$SYSTEM_WIDE_INSTALL" = 1 ]; then
-	LIST="$DEFAULT_LIST_SYSTEM_WIDE"
+	LIST="$SPD_CONF_SYSTEM"
     else
-	LIST="$DEFAULT_LIST_USER"
+	LIST="$SPD_CONF_USER"
     fi
 }
 
@@ -37,7 +50,6 @@ isAnyAdded() {
 }
 
 addModule() {
-    [ "$SYSTEM_WIDE_INSTALL" != 1 ] && return 1
     local filename="$1"
     local module="$2"
 	[ ! -e "$filename" ] && return
@@ -45,7 +57,6 @@ addModule() {
 }
 
 removeModule() {
-    [ "$SYSTEM_WIDE_INSTALL" != 1 ] && return 1
     local filename="$1"
     local module="$2"
 	[ ! -e "$filename" ] && return
@@ -101,7 +112,6 @@ function spd_conf_set() {
 #
 # return 0 if voxin must be added
 function spd_conf_is_update_required() {
-    [ "$SYSTEM_WIDE_INSTALL" != 1 ] && return 0
     local file
     getList
     files=$(ls -t $LIST 2>>"$LOG")

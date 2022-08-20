@@ -216,7 +216,7 @@ static int get_voxin_module(const char *version, char **module) {
   } else if (!strncmp(version, "0.11", 4)) {
     version = "0.11.1";
   }
-  
+
   *path = 0;
   if (!realpath("/proc/self/exe", path)) {
     int res = errno;
@@ -271,6 +271,40 @@ static int get_voxin_module(const char *version, char **module) {
   return err;
 }
 
+// obtain the absolute path of the lib directory
+static int get_library_path(char **library_path) {
+  int err = SD_VOX_UNEXPECTED_DATA;
+  static char path[PATH_MAX];
+
+  ENTER();
+
+  if (!library_path) {
+    err = SD_VOX_ARGS_ERROR;
+    dbg("args error");
+    return err;
+  }
+
+  *library_path = NULL;
+  *path = 0;
+  if (!realpath("/proc/self/exe", path)) {
+    int res = errno;
+    err = SD_VOX_SYS_ERROR;
+    dbg("realpath error: %s", strerror(res));
+  } else {
+    const char *s = "lib/speech-dispatcher-modules/sd_voxin";
+    size_t l = strlen(s);
+    size_t len = strlen(path);
+    if (len > l && !strcmp(path+len-l, s)) {
+      path[len-l+4] = 0;
+      *library_path = path;
+      err = SD_VOX_OK;
+    }
+  }
+
+  dbg("path=%s", path);
+  return err;
+}
+
 int main(int argc, char *argv[])
 {
   ENTER();
@@ -278,6 +312,7 @@ int main(int argc, char *argv[])
   char *module = NULL;
   int err = 0;
   bool last = false;
+  char *library_path = NULL;
 
 #ifdef DEBUG
   {
@@ -307,6 +342,14 @@ int main(int argc, char *argv[])
   
   if (err)
     return err;
+
+  err = get_library_path(&library_path);
+  if (err)
+    return err;
+
+  if (!library_path || !library_path[0] || setenv("LD_LIBRARY_PATH", library_path, 1)) {
+    return SD_VOX_INTERNAL_ERROR;
+  }
 
   { // pass all arguments to the voxin module
     void **arg = calloc(1, (argc+1)*sizeof(*argv));
