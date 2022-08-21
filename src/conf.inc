@@ -324,7 +324,8 @@ getSpeechdVoxinBinTarballs() {
 	cd "$dwldir"
 	for file in $SPEECHD_VOXIN_BIN_ARCHIVES; do
 	    if [ ! -e "$file" ]; then
-		wget "$SPEECHD_VOXIN_BIN_URL/$file"
+		# --no-check-certificate (debian 8 built) but sha512 checksum verified
+		wget --no-check-certificate "$SPEECHD_VOXIN_BIN_URL/$file"
 		if [ ! -e "$file" ]; then
 			leave "$file not found" 1
 		fi

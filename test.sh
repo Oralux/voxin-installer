@@ -6,7 +6,7 @@ BASE=$(dirname $(realpath "$0"))
 . $BASE/src/conf.inc
 
 if [ "$#" != 1 ]; then
-    echo "usage: ./test.sh SERVER (e.g. SERVER=user1@debian10-x86-64.local)"
+    echo "usage: ./test.sh SERVER (e.g. SERVER=user1@debian8-x86-64.local)"
     exit 1
 fi
 SERVER=$1
