@@ -90,7 +90,6 @@ Options:
      -h, --help       print this message
      -l, --lang       install the language automatically
      -u, --uninstall  uninstall the TTS
-     -U, --update     update the current install
      -v, --verbose    verbose
 END
 }
@@ -376,38 +375,6 @@ getArch() {
     esac
 }
 
-#TODO
-uninstallOldVoxin()
-{	
-    echo uninstallOldVoxin >> "$LOG"
-    [ $# != 1 ] || [ -z "$1" ] && return 1
-    local rfsdir="$1"
-    
-    local DIR="$rfsdir/opt/oralux/voxin"
-    if [ -e "$DIR" ]; then
-	rm -rf "$DIR.old"
-	[ -e "$DIR.old" ] && { echo "error: DIR.old=$DIR.old" >> "$LOG"; return 1; }
-	mv "$DIR" "$DIR.old" || { echo "error: DIR=$DIR" >> "$LOG"; return 1; }
-    fi
-    return 0
-}
-
-#TODO
-installOldVoxin()
-{	
-    echo installOldVoxin >> "$LOG"
-    [ $# != 1 ] || [ -z "$1" ] && return 1
-    local rfsdir="$1"
-    local DIR_NEW="$rfsdir/opt/oralux/voxin"
-    local DIR_OLD="$DIR_NEW.old"
-    if [ -e "$DIR_OLD" ]; then
-	rm -rf "$DIR_NEW"
-	[ -e "$DIR_NEW" ] && { echo "error: DIR_NEW=$DIR_NEW" >> "$LOG"; return 1; }
-	mv "$DIR_OLD" "$DIR_NEW"
-    fi
-    return 0
-}
-
 uninstallSystem()
 {	
 	echo uninstallSystem >> "$LOG"
@@ -422,7 +389,7 @@ uninstallSystem()
 	    uninstallLocalSpeechdModule
 	fi
 
-	for i in "$rfsdir/opt/oralux/voxin" "$rfsdir/opt/oralux/voxin.old" "$rfsdir/var/opt/oralux/voxin" "$rfsdir/opt/IBM/ibmtts" "$rfsdir/var/opt/IBM/ibmtts" "$rfsdir/opt/oralux/nve" ; do
+	for i in "$rfsdir/opt/oralux/voxin" "$rfsdir/var/opt/oralux/voxin" "$rfsdir/opt/IBM/ibmtts" "$rfsdir/var/opt/IBM/ibmtts" "$rfsdir/opt/oralux/nve"; do
 		rm -rf $i
 	done
 	for i in "$rfsdir/opt/oralux" "$rfsdir/var/opt/oralux" "$rfsdir/opt/IBM" "$rfsdir/var/opt/IBM"; do
@@ -433,39 +400,6 @@ uninstallSystem()
 
 is_voxin_conf_installed() {
     ls -lL "$TOPDIR"/etc/speech-dispatcher/modules/voxin.conf &> /dev/null
-}
-
-updateSystem() {	
-	echo updateSystem >> "$LOG"
-	[ $# != 1 ] || [ -z "$1" ] && return 1
-	local rfsdir="$1"
-	local status=0
-	local rfsAllTarball=$(getRootfilesystemAllTarball) || return 1
-	local rfsArchTarball=$(getRootfilesystemArchTarball) || return 1
-	local prevSpeechdModulesTarball=$(getPrevSpeechdModulesTarball) || unset prevSpeechdModulesTarball
-	
-	if [ ! -d "$rfsdir" ]; then
-		_gettext "Install directory not found: $rfsdir" >> "$LOG"
-		return 1
-	fi
-	
-	local i
-	for i in $rfsAllTarball $rfsArchTarball $prevSpeechdModulesTarball; do
-	    [ -z "$i" ] && continue
-	    tar -C "$rfsdir" -xf "$i" 
-	    status=$?
-	    if [ "$status" != 0 ]; then
-		_gettext "Error: untar failure ($i)" >> "$LOG"
-		return "$status"
-	    fi	
-	done
-
-	# install voxin.ini globally
-	local ref_voxin_ini="$TOPDIR"/opt/oralux/voxin/share/conf/voxin.ini
-	local global_voxin_ini="$TOPDIR"/var/opt/oralux/voxin/voxin.ini	
-	[ ! -e $global_voxin_ini ] && install -m 644 -D $ref_voxin_ini $global_voxin_ini
-	
-	return "$status"
 }
 
 installSystem() {	

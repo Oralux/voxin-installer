@@ -57,64 +57,6 @@ goodbye() {
     exit 0
 }
 
-select_version() {
-    local NEW_VER=$1
-
-    # 1. check current version
-    [ -z "$OLD_VER" ] && { _gettext "Error: no compatible version of voxin installed"; exit_on_error; }
-    
-    # 2. unselect the current version
-    local DIR="$TOPDIR/$VOXDIR"
-    if [ -h "$DIR" ]; then
-	unlink "$DIR" || _gettext "Error: can't unlink $DIR" && exit_on_error
-    elif [ -d "$DIR" ]; then
-	[ -e "$DIR.$OLD_VER" ] && { _gettext "Error: if applicable remove $DIR.$OLD_VER"; exit_on_error; }
-	mv "$DIR" "$DIR.$OLD_VER" || { _gettext "Error: can't move $DIR to $DIR.$OLD_VER"; exit_on_error; }
-    fi
-
-    [ ! -d "$DIR.$OLD_VER" ] && { _gettext "Error: can't found directory $DIR.$OLD_VER"; exit_on_error; }
-    
-    # 3. select the new version as current version
-    ln -sf "$DIR.$NEW_VER" "$DIR"
-    if [ $? != 0 ]; then
-	_gettext "Error: can't link $DIR.$NEW_VER to $DIR"
-	_gettext "Attempting to restore previous version $OLD_VER"
-	#    || _gettext "select_version: error, can't link $DIR.$NEW_VER $DIR" && exit_on_error
-	ln -sf "$DIR.$OLD_VER" "$DIR" || _gettext "select_version: error, can't link $DIR.$OLD_VER to $DIR" && exit_on_error
-	_gettext "Previous version restored" && exit_on_error
-    fi
-}
-
-update_version() {
-    source common/askSilent.inc
-
-    if [ -z "$GETTEXT" ]; then
-	install_gettext
-	init_gettext "$(pwd)/locale"
-	GETTEXT=0
-    fi
-    
-    [ -z "$OLD_VER" ] && { _gettext "Error: no compatible version of voxin installed"; exit_on_error; }
-    [ "$NEW_VER" = "$OLD_VER" ] && { _gettext "Error: version $NEW_VER already installed"; exit_on_error; }
-    
-    
-#    installDir=/
-    DESTDIR="$TOPDIR/$NEWDIR"
-    [ -e "$DESTDIR" ] && { _gettext "error, if applicable, remove this directory: $DESTDIR"; exit_on_error; }
-
-    tmpdir="$TOPDIR/$VOXDIR/../tmp.voxin.$NEW_VER"
-    mkdir -p  "$tmpdir"
-    [ -d "$tmpdir" ] || { _gettext "Can't create directory $tmpdir"; exit_on_error; }   
-    updateSystem "$tmpdir" || { exit_on_error; }
-    installLang "$tmpdir" || { exit_on_error; }
-
-    mv "$tmpdir/$VOXDIR" "$DESTDIR"
-    select_version "$NEW_VER"
-    rm -rf "$tmpdir"
-    say_ok "$TOPDIR/$VOXDIR"
-    _gettext "Voxin updated to version $NEW_VER"
-}
-
 # Entry point
 
 unset TOPDIR
@@ -126,7 +68,7 @@ if [ "$?" = "0" ]; then
     GETTEXT=0
 fi
 
-TEMP=`getopt -o a:d:hlLuUv --long arch,dir,help,lang,uninstall,update,verbose -- "$@"`
+TEMP=`getopt -o a:d:hlLuUv --long arch,dir,help,lang,uninstall,verbose -- "$@"`
 if [ $? != 0 ] ; then
     usage
     exit 1
@@ -136,7 +78,6 @@ eval set -- "$TEMP"
 
 with_silent=0
 with_lang=0
-with_update=0
 with_uninstall=0
 with_verbose=0
 with_sd=0
@@ -148,7 +89,6 @@ while true ; do
 	-a|--arch) with_arch=$2; shift 2;;
 	-d|--dir) with_topdir=$2; shift 2;;
 	-l|--lang) with_silent=1; with_lang=1; shift;;
-	-U|--update) with_silent=1; with_update=1; shift;;
 	-u|--uninstall) with_uninstall=1; shift;;
 	-v|--verbose) with_verbose=1; shift;;
 	--) shift ; break;;
@@ -193,11 +133,6 @@ fi
 
 OLD_INI="$TOPDIR/$VOXDIR"/share/doc/voxin-installer/sources.ini
 [ -e "$OLD_INI" ] && OLD_VER=$(awk -F= '/tag/{print $2}' "$OLD_INI")
-
-if [ "$with_update" = 1 ]; then
-    update_version
-    goodbye
-fi
 
 if [ "$with_uninstall" = 0 ]; then
 	with_sd=1
@@ -259,8 +194,7 @@ for i in voxind libvoxin libvoxin1; do
 	isPackageInstalled $i && uninstallPackage $i
 done
 
-uninstallOldVoxin "$TOPDIR" || { installOldVoxin "$TOPDIR"; exit_on_error; }
-installSystem "$TOPDIR" || { installOldVoxin "$TOPDIR"; exit_on_error; }
+installSystem "$TOPDIR" || { exit_on_error; }
 
 installed=0
 askInstallLang && {

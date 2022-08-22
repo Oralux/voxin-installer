@@ -129,19 +129,10 @@ function spd_conf_is_update_required() {
     return 1
 }
 
-# Install voxin.conf from the system or otherwise from the new archive
+# Install voxin.conf if not yet provided
 function spd_conf_install_voxin_conf() {
-    local arch_voxin_conf="$1"
-    local conf_dir="$TOPDIR"/opt/oralux/voxin/share/speech-dispatcher
-    local new_voxin_conf=$conf_dir/voxin.conf
-    local prev_voxin_conf="$TOPDIR"/opt/oralux/voxin.old/share/speech-dispatcher/voxin.conf
-    local src
-
-    if [ -e "$prev_voxin_conf" ]; then
-	src="$prev_voxin_conf"
-    else
-	src="$arch_voxin_conf"
-    fi
-    cp -a "$src" "$conf_dir"
-    [ -h "$src" ] && cp $(realpath "$src") "$conf_dir"
+    local src=$1
+    local new_voxin_conf="$TOPDIR"/opt/oralux/voxin/share/speech-dispatcher/voxin.conf
+    [ -h "$new_voxin_conf" ] && unlink "$new_voxin_conf"
+    [ ! -e "$new_voxin_conf" ] && ln -s "$src" "$new_voxin_conf"
 }
