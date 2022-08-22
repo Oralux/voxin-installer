@@ -36,7 +36,13 @@ voxin-update-%VERSION%.tgz: OK
 
 * General Install
 
+Voxin can be installed system-wide as superuser or locally as regular user.
+
+** System-wide install
 Just run voxin-installer.sh as root and answer to the questions.
+The packages corresponding to the distribution will be installed.
+
+
 For example, with voxin-enu-%VERSION% :
 
 #+BEGIN_ASCII
@@ -50,6 +56,16 @@ Or without sudo:
 su --login -c $PWD/voxin-installer.sh
 #+END_ASCII
 
+** Local install
+By default, voxin will be installed in your $HOME/.local
+
+./voxin-installer.sh
+
+The -d option supplies a dedicated installation directory:
+./voxin-installer.sh -d path_to_directory
+
+Note that speech-dispatcher (>= 0.11) automatically calls the local sd_voxin module (in ~/.local/libexec/speech-dispatcher-modules/).
+
 ** Voxin updates
 Your download link is usually permanent and points on the last voxin release.
 
@@ -58,7 +74,7 @@ If you have Vocalizer Embedded and IBM TTS voices, just use one of your Vocalize
 
 The releases are announced in the [[http://voxin.oralux.net/rss.xml][Voxin RSS feed]].
 
-Voxin is released several times a year:
+Voxin is released:
 - to complete the list of compatible distros (usually after user request),
 - to add new features and fixes (libvoxin offers paths of improvement).
 
@@ -66,10 +82,7 @@ Besides the voxin release, a lighter tarball, the voxin update is available and 
 
 ** Speech Dispatcher
 
-The Speech Dispatcher voxin output module is either already provided by your distribution (starting with speech-dispatcher 0.10.2) or otherwise will be installed from the voxin tarball.
-For example, the voxin module is provided in December 2020 by:
-- Arch Linux, speech-dispatcher package
-- Debian Bullseye, speech-dispatcher-voxin package
+The Speech Dispatcher voxin output module, sd_voxin, is either already provided by your distribution or otherwise will be installed from the voxin tarball.
 
 The voxin-installer will install its own voxin-speechd-conf and/or voxin-speechd packages if the voxin module is not already installed in your system.
 
@@ -81,11 +94,11 @@ These two possibilities are described below.
 
 *** spd-conf
 
-spd-conf can be launched as normal user (not root user).
+spd-conf can be launched as normal user (not root user) in a terminal.
 
 Here is an example in Ubuntu 18.04.
 
-spd-conf asks several questions, voxin will be entered as default output module.
+spd-conf asks several questions, type voxin as default output module.
 spd-conf will accept it even if voxin is not yet in its list of known modules.
 
 Note: ENTER is written below when the ENTER key has been pressed.
@@ -204,7 +217,10 @@ module=voxin
 You may want to install speechd-up (interface between Speakup and Speech Dispatcher).
 
 ** How to uninstall Voxin?
+*** System-wide as superuser
+
 Voxin %VERSION% can be uninstalled with this command line:
+
 #+BEGIN_ASCII
 sudo --login $PWD/voxin-installer.sh -u
 #+END_ASCII
@@ -216,25 +232,29 @@ su --login -c "$PWD/voxin-installer.sh -u"
 
 Please note that the text-to-speech files will be removed too (under /opt/IBM/ibmtts or /opt/oralux/nve).
 
+*** Locally as regular user
+
+./voxin-installer.sh -u
+
 * Compatible GNU/Linux Distributions
 ** Voxin %VERSION%
 
 The last checked distributions are listed below.
-Much more should be compatible.
+Much more should be compatible (particularly with a local install).
+Note that the Vocalizer Embedded are compatible with x86_64 and ARM architectures whereas IBM TTS is only compatible with x86_64.
 
 For support or feedback, please send a mail to contact@oralux.org with possibly the log file (log/voxin.log).
 
-|-----------------------------------+-----------------|
-| Distributions                     | Architectures   |
-|-----------------------------------+-----------------|
-| Arch Linux (June 2021)            | x86_64          |
-| Debian 10, 11 (sid)               | x86_64          |
-| Gentoo (December 2020)            | x86_64          |
-| openSUSE Tumbleweed (June 2021)   | x86_64          |
-| Raspberry Pi OS (June 2021)       | armv7l, aarch64 |
-| Slint64-14.2.1.2 (June 2021)      | x86_64          |
-| Ubuntu 18.04, 20.04, 21.04        | x86_64          |
-|-----------------------------------+-----------------|
+|------------------------------+-----------------|
+| Distributions                | Architectures   |
+|------------------------------+-----------------|
+| Arch Linux (August 2022)     | x86_64          |
+| Debian 8, 10, 11 (testing)   | x86_64          |
+| LibreELEC 10.0/Raspberry Pi  | armv7l          |
+| Raspbian GNU/Linux 11        | armv7l, aarch64 |
+| Slint64-14.2.1 (August 2022) | x86_64          |
+| Ubuntu 20.04, 22.04          | x86_64          |
+|------------------------------+-----------------|
 
 * voxin.ini configuration file
 The user may now define the default value of several parameters.
@@ -253,11 +273,11 @@ calling software.
 
 voxin.ini is expected to be present locally at:
 $HOME/.config/voxin/voxin.ini
-or if not found, available globally at:
-/var/opt/oralux/voxin/voxin.ini
+or if not found, available under the installation directory at:
+var/opt/oralux/voxin/voxin.ini
 
 The installer creates a writable default file in
-/var/opt/oralux/voxin/voxin.ini if none exists.
+var/opt/oralux/voxin/voxin.ini if none exists.
 
 Brief Example:
 
@@ -271,7 +291,7 @@ useAbbreviation=no
 
 * Dictionaries
 User dictionaries are currently only available for IBM TTS.
-They are enabled by default by speech-dispatcher: in voxin.conf (or ibmtts.conf), the IbmttsDictionaryFolder variable is set to /var/opt/IBM/ibmtts/dict.
+They are enabled by default by speech-dispatcher: in voxin.conf (or ibmtts.conf), the IbmttsDictionaryFolder variable is set to /var/opt/IBM/ibmtts/dict in case of global installation.
 
 Examples of dictionaries are included in this archive under:
 dictionary/var/opt/IBM/ibmtts/dict

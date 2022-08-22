@@ -26,7 +26,7 @@ for tarball in $LIST; do tar -xf \$tarball; done
 cd "\$DESTDIR"
 for dir in voxin*; do
   pushd "\$dir"
-  ./voxin-installer.sh -d INSTALL
+  ./voxin-installer.sh
   popd
 done
 

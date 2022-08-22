@@ -1,24 +1,34 @@
-The voxin installer installs voxin and its dependencies on various GNU/Linux distributions (e.g. Arch Linux, CentOS, Debian, Fedora, Gentoo, openSUSE, Slackware, Slint, Ubuntu,...). 
+The voxin installer installs voxin and its dependencies on various GNU/Linux distributions either system-wide or as a regular user (more details in src/installer/README.org)
 
 The current goal is to provide:
-- distribution-independent tarballs (installed under /opt), 
-- a minimal package providing symlinks to /opt for various package managers, 
+- distribution-independent tarballs (installed under /opt or locally), 
+- in case of system-wide install, minimal packages providing symlinks to /opt for various package managers, 
 - no dependencies on foreign architectures (the x86_64 binaries won't require multi-arch support from the distribution for x86 binaries).
-
-This git repository has been initially copied from libvoxin-debian and replaces it.
 
 The standard 32 bits libraries are built by [[https://buildroot.org][Buildroot]] .
 
 * Build
-By default, libvoxin is built, and installed into the local opt/oralux/voxin directory.
-A minimal 32 bits rootfilesystem is supposed to be already available (see paragraph "minimal 32 bits rootfilesystem"). 
-The build.sh script expects a Debian 8 based distro (mostly due to the libstdc++ dependency of puncfilter) or Ubuntu 1804 (to build sd_voxin 0.9.x). 
-See rsync.sh to export voxin-installer to an x86_64 VM (and get.sh to retrieve the built tarballs thereafter).
+build.sh is the script used by Oralux.org to build voxin-installer and its free software dependencies on a Debian based system.
 
-** Command
+Libvoxin requires a minimal pre-built 32 bits rootfilesystem (see paragraph "minimal 32 bits rootfilesystem"). 
+
+The rsync.sh script builds voxin-installer on a remote host and calls build.sh.
+It  can build voxin-installer on x86_64, armv7l or aarch64 (see hosts in src/host.inc).
+
+** Build on remote host
+#+BEGIN_SRC shell
+./rsync.sh arch
+#+END_SRC
+
+arch: x86_64, armv7l, aarch64
+
+** Build locally
 #+BEGIN_SRC shell
 # build all
 cd voxin-installer
+# clean up
+./build.sh -c
+
 ./build.sh
 #+END_SRC
 
@@ -36,10 +46,10 @@ $HOME/VOXIN/voxin-viavoice/build/packages/voxin-viavoice-all_6.7-1.0-1.txz
 $HOME/VOXIN/voxin-viavoice/build/packages/voxin-viavoice-enu_6.7-1.0-1.txz
 $HOME/VOXIN/voxin-viavoice/build/packages/voxin-viavoice-fra_6.7-1.0-1.txz
 
-# build all, extract and merge the tarballs in list.ve
-./build.sh -t src/list.ve
-$HOME/VOXIN/voxin-nve/build/packages/voxind-nve_1.4.0.x86_64.txz
+# build all, extract and merge the tarballs in list.ve.x86_64
+./build.sh -t src/list.ve.x86_64
 $HOME/VOXIN/voxin-nve/build/packages/voxin-nve-all_3.3.0-1.txz
+$HOME/VOXIN/voxin-nve/voices/packages/voxind-nve_1.6.1.x86_64.txz
 
 #+END_SRC
 
@@ -48,6 +58,8 @@ Sequence followed:
 - extract files from the minimal 32 bits rfs
 - download libstdc++2.10-glibc2.2 from archive.debian.org
 - build [[https://github.com/Oralux/libvoxin][libvoxin]] 
+- build [[https://github.com/Oralux/libinote][libinote]]
+- download the sd_voxin pre-built tarballs (see link in src/conf.inc)
 
 ** Minimal 32 bits rootfilesystem
 The buildroot tarball is expected to be found in build/packages/buildroot_2017.02.9.txz .
@@ -89,4 +101,4 @@ rfs32
 #+END_SRC
 
 * Memo: version 
-The program version is stored in src/conf.inc (VOXIN_VER)
+The program version is stored in src/conf.inc (VOXIN_VERSION)

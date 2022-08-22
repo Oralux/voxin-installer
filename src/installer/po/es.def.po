@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: voxin-installer 3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-08-18 13:03+0200\n"
-"PO-Revision-Date: 2022-08-18 13:06+0200\n"
+"POT-Creation-Date: 2022-08-19 20:02+0200\n"
+"PO-Revision-Date: 2022-08-19 20:07+0200\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -38,7 +38,7 @@ msgid "Do you authorize the update of the configuration files (speechd.conf)?"
 msgstr ""
 "¿Autoriza la actualización de los archivos de configuración (speechd.conf)?"
 
-#: ../common/ask.inc:17 ../voxin-installer.sh:206 ../voxin-installer.sh:218
+#: ../common/ask.inc:17 ../voxin-installer.sh:207 ../voxin-installer.sh:219
 msgid "Do you really want to continue?"
 msgstr "¿De verdad quieres continuar?"
 
@@ -54,27 +54,27 @@ msgstr "¿Quieres instalar un nuevo idioma?"
 msgid "Do you want to uninstall the TTS?"
 msgstr "¿Quieres desinstalar el TTS"
 
-#: ../common/init.inc:305
+#: ../common/init.inc:303
 msgid "Error: no 'all' tarball"
-msgstr "Error: no 'all' tarball"
+msgstr "Error: no hay archivo 'all'"
 
-#: ../common/init.inc:318
+#: ../common/init.inc:316
 msgid "Error: no 'voxind' tarball"
-msgstr "Error: no 'voxind' tarball"
+msgstr "Error: no hay archivo 'voxind'"
 
-#: ../common/init.inc:106
+#: ../common/init.inc:104
 msgid "Error: operation not completed."
 msgstr "Error: operación no completada."
 
-#: ../voxin-installer.sh:34 ../voxin-installer.sh:177 ../voxin-installer.sh:187
+#: ../voxin-installer.sh:34 ../voxin-installer.sh:178 ../voxin-installer.sh:188
 msgid "For support, email to contact at oralux.org "
 msgstr "Para soporte, mande un correo electrónico a contact at oralux.org"
 
-#: ../voxin-installer.sh:54 ../voxin-installer.sh:210 ../voxin-installer.sh:222
+#: ../voxin-installer.sh:54 ../voxin-installer.sh:211 ../voxin-installer.sh:223
 msgid "Good Bye. "
 msgstr "Adiós. "
 
-#: ../common/ask.inc:16 ../voxin-installer.sh:205
+#: ../common/ask.inc:16 ../voxin-installer.sh:206
 msgid ""
 "If the installation continues, orca will not be able to use voxin, but "
 "emacspeak will"
@@ -84,7 +84,7 @@ msgstr ""
 #: ../common/ask.inc:18 ../common/ask.inc:32 ../common/ask.inc:84
 #: ../common/ask.inc:88 ../common/ask.inc:109 ../common/ask.inc:121
 #: ../common/ask.inc:153 ../common/ask.inc:157 ../common/ask.inc:173
-#: ../voxin-installer.sh:207 ../voxin-installer.sh:219
+#: ../voxin-installer.sh:208 ../voxin-installer.sh:220
 msgid "If yes, press the ENTER key."
 msgstr "Si está de acuerdo, pulse la tecla Entrar."
 
@@ -106,15 +106,15 @@ msgstr ""
 msgid "If you agree to the LGPL license, press the ENTER key"
 msgstr "Si está de acuerdo con la licencia LGPL, pulse la tecla Entrar."
 
-#: ../voxin-installer.sh:251
+#: ../voxin-installer.sh:252
 msgid "Initialization; please wait... "
 msgstr "inicialización; por favor espera... "
 
-#: ../voxin-installer.sh:250
+#: ../voxin-installer.sh:251
 msgid "Logs written in log/voxin.log"
 msgstr "Logs escritos en log/voxin.log"
 
-#: ../common/init.inc:116
+#: ../common/init.inc:114
 msgid "Operation completed. "
 msgstr "Operación completada. "
 
@@ -122,7 +122,7 @@ msgstr "Operación completada. "
 msgid "Please use the space bar to scroll through the document."
 msgstr "Utilice la barra espaciadora para desplazarse por el documento."
 
-#: ../common/init.inc:63
+#: ../common/init.inc:61
 msgid "Please wait..."
 msgstr "Por favor espera..."
 
@@ -130,7 +130,7 @@ msgstr "Por favor espera..."
 msgid "Previous version restored"
 msgstr "Versión anterior restaurada"
 
-#: ../voxin-installer.sh:175
+#: ../voxin-installer.sh:176
 msgid "Sorry, this distribution is not yet supported. "
 msgstr "Lo sentimos, la distribución de Linux aún no es compatible. "
 
@@ -142,30 +142,31 @@ msgstr "Los cambios se tendrán en cuenta en el siguiente inicio. "
 msgid "The voxin module must be added to the configuration files"
 msgstr "El módulo Voxin debe agregarse a los archivos de configuración"
 
-#: ../common/init.inc:65
+#: ../common/init.inc:63
 msgid "You do not authorize the installer to perform this operation"
 msgstr "no autoriza al instalador a realizar esta operación"
 
-#: ../voxin-installer.sh:176
+#: ../voxin-installer.sh:177
 msgid "You may want to install voxin to a dedicated directory (option -d)"
-msgstr "Es posible que desee instalar voxin en un directorio dedicado (opción -d)"
+msgstr ""
+"Es posible que desee instalar voxin en un directorio dedicado (opción -d)"
 
-#: ../voxin-installer.sh:216
+#: ../voxin-installer.sh:217
 msgid "Your version of speech-dispatcher has not been recognized."
 msgstr "Su versión de speech-dispatcher no ha sido reconocida."
 
-#: ../common/init.inc:196 ../common/init.inc:207
+#: ../common/init.inc:194 ../common/init.inc:205
 msgid "rfs all tarball not found!"
 msgstr "rfs all tarball no encontrado!"
 
-#: ../common/init.inc:487
+#: ../common/init.inc:485
 msgid "voxin package not found!"
 msgstr "voxin paquete no encontrado!"
 
-#: ../common/init.inc:492
+#: ../common/init.inc:490
 msgid "voxin-speechd package not found!"
 msgstr "voxin-speechd paquete no encontrado!"
 
-#: ../common/init.inc:497
+#: ../common/init.inc:495
 msgid "voxin-speechd-conf package not found!"
 msgstr "voxin-speechd-conf paquete no encontrado!"

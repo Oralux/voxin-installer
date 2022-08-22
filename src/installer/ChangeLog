@@ -1,3 +1,17 @@
+2022-08-22 Gilles Casse <gcasse@oralux.org>
+	release 3.3rc6:
+
+	- Include voxin module for Speech Dispatcher 0.11, built from sources (0.11.1).
+	- Possibility to install voxin as regular user.
+	For example, a voice can be installed under the user's account as
+	well as its speech dispatcher module (speech-dispatcher >= 0.11).
+
+	- Compatibility with LibreELEC and its screen reader (service.xbmc.tts)
+
+	For Voxin+Vocalizer Embedded:
+	- Fix erroneous speed increase when switching to another speech-dispatcher client.
+	- New management of inserted indexes and pronunciation of single character.
+
 2021-06-27 Gilles Casse <gcasse@oralux.org>
 	release 3.3rc5:
 
