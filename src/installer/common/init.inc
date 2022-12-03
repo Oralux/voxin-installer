@@ -462,7 +462,7 @@ installSystem() {
 	# install voxin package
 	installLocalPackage "$voxinPackage"
 	status=$?
-	[ "$status" != 0 ] && { _gettext "Error: package install failure ($voxinPackage)!" >> "$LOG"; return '$status'; }	
+	[ "$status" != 0 ] && { _gettext "Error: package install failure ($voxinPackage)!" >> "$LOG"; return $status; }
 
 	# install voxin.conf (if not yet installed)
 	if [ "$voxin_conf_installed" = 0 ]; then
