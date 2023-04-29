@@ -3,6 +3,13 @@
 # 2007-2022, Gilles Casse <gcasse@oralux.org>
 #
 
+# terminate with a new line 
+display_newline() {
+    [ -n "$GETTEXT" ] && echo
+}
+
+trap display_newline EXIT
+
 BASE=$(dirname $(readlink -f $0))
 cd $BASE
 
