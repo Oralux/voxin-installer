@@ -1,6 +1,6 @@
 # THE BASE variable should be set before including this file
 #
-VOXIN_VERSION=3.3rc6
+VOXIN_VERSION=3.3rc7
 
 VOXIN_INSTALLER_GIT_URL=https://github.com/Oralux/voxin-installer.git
 VOXIN_INSTALLER_TAG=$VOXIN_VERSION
@@ -25,8 +25,8 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 # - development (master branch)
 #LIBVOXIN_VERSION=
 # - from the last tag instead (+sha512)
-LIBVOXIN_VERSION=1.6.1
-LIBVOXIN_SHA512=7dcb00d453f938a0e8e7745e836842b799926a32a8331691a71425f5044b01682735f90d79ce19a5283cdd3936852b1dfb829e1c9f476d1f80617f5411ec4547
+LIBVOXIN_VERSION=1.6.2
+LIBVOXIN_SHA512=8118c446a60ac38de8364e8a02141c00c3b97f976f06e539f6dc15a69206394ea601b45549b8a7c52515b52001a9ba0999ad3c7b309adaa6b05696e219f6448e
 
 # versions of the speech-dispatcher voxin module(s) which must be
 # built by this script.
