@@ -1,6 +1,6 @@
 #!/bin/bash
 # This file is under the LGPL license
-# 2007-2022, Gilles Casse <gcasse@oralux.org>
+# 2007-2023, Gilles Casse <gcasse@oralux.org>
 #
 
 # terminate with a new line 

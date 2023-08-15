@@ -5,7 +5,7 @@ Source: https://github.com/Oralux/libvoxin
 Comment: builder/installer: voxin-installer (https://github.com/Oralux/voxin-installer)
 
 Files: /opt/oralux/voxin/*
-Copyright: 2007-2022 Gilles Casse
+Copyright: 2007-2023 Gilles Casse
 License: LGPL-2.1+
 
 #Source: https://buildroot.org/downloads/buildroot-2017.02.9.tar.gz
