@@ -288,6 +288,68 @@ postInstViavoiceTarball() {
 	return 0
 }
 
+installVoxinNve() {
+	[ $# != 1 ] || [ -z "$1" ] && return 1
+	local rfsdir="$1"
+	local langdir=opt/oralux/nve/share/vop2/languages
+	local start="<datapackagename>"
+	local end="</datapackagename>"
+	local tarball=$(ls packages/all/voxin-ve-*.txz)
+	[ -f "$tarball" ] || { _gettext "[ivn] Error: no voxin-ve tarball"; return 1; }
+
+	local line=$(tar -f "$tarball" --wildcards -x "$langdir/*/speech/ve/*.hdr" -O | grep "$start")  || { _gettext "[ivn] Error: extract voxin-ve: $i"; return 1; }
+	echo "line=$line" >> "$LOG"
+
+	line=$(echo "$line" | grep -Po "(?<=$start)(.*)(?=$end)")
+	echo "line=$line" >> "$LOG"
+
+	[ -n "$line" ] || { _gettext "[ivn] Error: no start/end found"; return 1; }
+
+	read -r lang name quality ver< <(echo "$line" | sed 's|/| |g')
+	echo "lang=$lang name=$name quality=$quality ver=$ver" >> "$LOG"
+	[ -n "$lang" ] && [ -n "$name" ] && [ -n "$quality" ] && [ -n "$ver" ] || { _gettext "[ivn] Error: ve fields not found"; return 1; }
+
+	IFS=$(echo -en "\n\b")
+	# temporary backup of the previously installed voice
+	local tmp_dat=$(ls "$rfsdir"/"$langdir"/"$lang"/speech/components/"$lang"_"$name"_"$quality"_*.dat  2>/dev/null)
+	local tmp_hdr=$(ls "$rfsdir"/"$langdir"/"$lang"/speech/ve/ve_pipeline_"$lang"_"$name"_22_"$quality"_*.hdr  2>/dev/null)
+	local i
+	local dir
+	local previous_voice
+	[ -n "$tmp_hdr" ] && previous_voice=1
+	if [ -n "$previous_voice" ]; then
+		for i in $tmp_dat $tmp_hdr; do
+			# temporary backup of the previously installed voice 
+			[ -f "$i" ] || { _gettext "[ivn] Error: unexpected entry: $i"; return 1; }
+			cp -a "$i" "$i.tmp" || { dir=$(dirname "$i"); rm "$dir"/*.tmp; _gettext "[ivn] Error: failure to backup file ($i)"; return 1; }
+		done
+
+		# suppress the previously installed voice (having the same language, name and quality as the voice to install)
+		for i in $tmp_hdr $tmp_dat; do
+			rm "$i" || { _gettext "[ivn] Error: failure to remove file: $i"; return 1; }
+		done
+	fi
+
+	# install the voice tarball
+	getVoiceTarball | while read i; do
+		tar -C "$rfsdir" $TAR_NO_OVERWRITE -xf "$i"
+		status=$?
+		if [ "$status" != 0 ]; then
+			_gettext "[ivn] Error: untar failure ($i)" >> "$LOG"
+			return $status
+		fi
+	done
+
+	if [ -n "$previous_voice" ]; then
+		# remove the temporary backup
+		for i in $tmp_hdr $tmp_dat; do
+			dir=$(dirname "$i"); rm "$dir"/*.tmp 2>/dev/null || :
+		done
+	fi
+
+	return 0
+}
+
 installLang() {
 	echo installLang >> "$LOG"
 	[ $# != 1 ] || [ -z "$1" ] && return 1
@@ -295,9 +357,10 @@ installLang() {
 	local status
 	local i
 
-    "$askLicense" || return 1
+	"$askLicense" || return 1
 
 	i=$(getVoiceAllTarball)
+
 	if [ -z "$i" ]; then
 		_gettext "Error: no 'all' tarball" >> "$LOG"
 		return 1
@@ -321,20 +384,24 @@ installLang() {
 			_gettext "Error: untar failure ($i)" >> "$LOG"
 			return $status
 		fi
-	fi
-	
-	getVoiceTarball | while read i; do
-		tar -C "$rfsdir" $TAR_NO_OVERWRITE -xf "$i"
-		status=$?
-		if [ "$status" != 0 ]; then
-			_gettext "Error: untar failure ($i)" >> "$LOG"
-			return $status
-		fi
-	done
 
-	if [ "$WITH_TTS" = viavoice ]; then
-	    local ECI_INI="$TOPDIR/var/opt/IBM/ibmtts/cfg/eci.ini"
-	    "$postInstTarball" "$rfsdir" "$TOPDIR" "$ECI_INI"
+		local OIFS=$IFS
+		installVoxinNve "$rfsdir"
+		IFS=$OIFS
+
+		status=$?
+	elif [ "$WITH_TTS" = viavoice ]; then
+		# install the voice tarball
+ 		getVoiceTarball | while read i; do
+			tar -C "$rfsdir" $TAR_NO_OVERWRITE -xf "$i"
+			status=$?
+			if [ "$status" != 0 ]; then
+				_gettext "Error: untar failure ($i)" >> "$LOG"
+				return $status
+			fi
+		done
+		local ECI_INI="$TOPDIR/var/opt/IBM/ibmtts/cfg/eci.ini"
+		"$postInstTarball" "$rfsdir" "$TOPDIR" "$ECI_INI"
 	fi
 	
 	return 0
