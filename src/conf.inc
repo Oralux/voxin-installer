@@ -1,6 +1,6 @@
 # THE BASE variable should be set before including this file
 #
-VOXIN_VERSION=3.3rc7
+VOXIN_VERSION=3.4
 
 VOXIN_INSTALLER_GIT_URL=https://github.com/Oralux/voxin-installer.git
 VOXIN_INSTALLER_TAG=$VOXIN_VERSION

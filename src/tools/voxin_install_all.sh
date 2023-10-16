@@ -1,6 +1,6 @@
 #!/bin/bash
 
-VERSION=3.3rc6
+VERSION=3.4
 
 BUILD_DIR="$HOME"/.local/share/voxin.build
 

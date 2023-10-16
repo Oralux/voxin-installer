@@ -3,36 +3,26 @@
 
 For support or feedback, please send a mail to contact@oralux.org with possibly the log file (log/voxin.log).
 
-* Installing Voxin without typing command lines
-This release simply provides a Debian package which should help to
-install Voxin in a graphical desktop.  
-
-Tested on Ubuntu 18.04, via Firefox or the file browser, by selecting
-the Voxin package in the Downloads directory.
-
-This 'graphical installer' can be downloaded with your usual download
-link appended with the two characters "&g" (that is the ampersand
-character and g for graphical).
-
 * Check the voxin archive
 
 Before any install, you may want to check that your voxin archive (the .tgz file) has a correct checksum.
 
-The checksum file can be downloaded from [[https://raw.githubusercontent.com/Oralux/voxin-installer/master/check/%VERSION%/voxin-%VERSION%.sha512][GitHub under the Oralux account]] .
+The checksum file can be downloaded from GitHub under the Oralux account:
+#+BEGIN_EXPORT ascii
+https://raw.githubusercontent.com/Oralux/voxin-installer/master/check/%VERSION%/SHA512SUM_%VERSION%
+#+END_EXPORT
 
-In the following example, our voxin archive (voxin-update-%VERSION%.tgz) is checked against the checksum file (voxin-%VERSION%.sha512).
+In the following example, our voxin archive (voxin-update-%VERSION%.tgz) is checked against the checksum file (SHA512SUM_%VERSION%). These two files have been copied in the same directory.
 
-These two files have been copied in the same directory.
 In a console, change/cd to this directory; then type:
+#+BEGIN_EXPORT ascii
+sha512sum --ignore-missing --check SHA512SUM_%VERSION%
+#+END_EXPORT
 
-#+BEGIN_ASCII
-sha512sum --ignore-missing --check voxin-%VERSION%.sha512
-#+END_ASCII
-
-This command must return "OK"
-#+BEGIN_ASCII
+The previous command must return "OK":
+#+BEGIN_EXPORT ascii
 voxin-update-%VERSION%.tgz: OK
-#+END_ASCII
+#+END_EXPORT
 
 * General Install
 
@@ -45,16 +35,16 @@ The packages corresponding to the distribution will be installed.
 
 For example, with voxin-enu-%VERSION% :
 
-#+BEGIN_ASCII
+#+BEGIN_EXPORT ascii
 cd voxin-%VERSION%
 cd voxin-enu-%VERSION%
 sudo --login $PWD/voxin-installer.sh
-#+END_ASCII
+#+END_EXPORT
 
 Or without sudo:
-#+BEGIN_ASCII
+#+BEGIN_EXPORT ascii
 su --login -c $PWD/voxin-installer.sh
-#+END_ASCII
+#+END_EXPORT
 
 ** Local install
 By default, voxin will be installed in your $HOME/.local
@@ -70,7 +60,7 @@ Note that speech-dispatcher (>= 0.11) automatically calls the local sd_voxin mod
 Your download link is usually permanent and points on the last voxin release.
 
 To update Voxin, use one of your download links to get the last version.
-If you have Vocalizer Embedded and IBM TTS voices, just use one of your Vocalizer Embedded link to update Voxin.
+If you have Cerence TTS Embedded and IBM TTS voices, just use one of your Cerence TTS Embedded link to update Voxin.
 
 The releases are announced in the [[http://voxin.oralux.net/rss.xml][Voxin RSS feed]].
 
@@ -103,7 +93,7 @@ spd-conf will accept it even if voxin is not yet in its list of known modules.
 
 Note: ENTER is written below when the ENTER key has been pressed.
 
-#+BEGIN_ASCII
+#+BEGIN_EXPORT ascii
 $ spd-conf
 
 Speech Dispatcher configuration tool
@@ -161,7 +151,7 @@ Speech Dispatcher works. Do you want to skip other tests? [yes] :
 Diagnostics results:
 Speech Dispatcher is working
 End of diagnostics results
-#+END_ASCII
+#+END_EXPORT
  
 *** Editing speechd.conf
 
@@ -221,14 +211,14 @@ You may want to install speechd-up (interface between Speakup and Speech Dispatc
 
 Voxin %VERSION% can be uninstalled with this command line:
 
-#+BEGIN_ASCII
+#+BEGIN_EXPORT ascii
 sudo --login $PWD/voxin-installer.sh -u
-#+END_ASCII
+#+END_EXPORT
 
 Or without sudo:
-#+BEGIN_ASCII
+#+BEGIN_EXPORT ascii
 su --login -c "$PWD/voxin-installer.sh -u"
-#+END_ASCII
+#+END_EXPORT
 
 Please note that the text-to-speech files will be removed too (under /opt/IBM/ibmtts or /opt/oralux/nve).
 
@@ -241,20 +231,20 @@ Please note that the text-to-speech files will be removed too (under /opt/IBM/ib
 
 The last checked distributions are listed below.
 Much more should be compatible (particularly with a local install).
-Note that the Vocalizer Embedded are compatible with x86_64 and ARM architectures whereas IBM TTS is only compatible with x86_64.
+Note that the Cerence TTS Embedded are compatible with x86_64 and ARM architectures whereas IBM TTS is only compatible with x86_64.
 
 For support or feedback, please send a mail to contact@oralux.org with possibly the log file (log/voxin.log).
 
-|------------------------------+-----------------|
-| Distributions                | Architectures   |
-|------------------------------+-----------------|
-| Arch Linux (August 2022)     | x86_64          |
-| Debian 8, 10, 11 (testing)   | x86_64          |
-| LibreELEC 10.0/Raspberry Pi  | armv7l          |
-| Raspbian GNU/Linux 11        | armv7l, aarch64 |
-| Slint64-14.2.1 (August 2022) | x86_64          |
-| Ubuntu 20.04, 22.04          | x86_64          |
-|------------------------------+-----------------|
+|---------------------------+-----------------|
+| Distributions             | Architectures   |
+|---------------------------+-----------------|
+| Arch Linux (October 2023) | x86_64          |
+| Debian 13 (testing)       | x86_64          |
+| Fedora 39 (beta)          | x86_64          |
+| Raspberry Pi OS           | armv7l, aarch64 |
+| Slint64-15.0              | x86_64          |
+| Ubuntu 23.10              | x86_64          |
+|---------------------------+-----------------|
 
 * voxin.ini configuration file
 The user may now define the default value of several parameters.
@@ -300,7 +290,7 @@ dictionary/var/opt/IBM/ibmtts/dict
 
 voxin-say is a command which converts text to speech.
 
-#+BEGIN_ASCII
+#+BEGIN_EXPORT ascii
 EXAMPLES :
 
 # Say 'hello world' and redirect output to an external audio player:
@@ -316,5 +306,5 @@ voxin-say "Hello all"
 # Correct command to read a file in French at 500 words per minute, use 4 jobs to speed up conversion
 voxin-say -f file.txt -l fr -s 500 -j 4 -w audio.wav
 
-#+END_ASCII
+#+END_EXPORT
 

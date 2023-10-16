@@ -1,3 +1,14 @@
+2023-10-15 Gilles Casse <gcasse@oralux.org>
+	release 3.4:
+	- Vocalizer Embedded voices upgraded to Cerence TTS Embedded 23.03.
+	- Fix unexpected cases of a 'lower than' character in SSML mode;
+	this issue led to 100% cpu usage; fix provided by libvoxin 1.6.3 (libinote 1.1.4).
+	- Fix for text between backquotes (Voxin+Vocalizer Embedded).
+	- Installer: upgrade voice.
+	- Installer: add a newline to the last message, fix for root install using incomplete env variables.
+	- Installer: fix for Debian ARM 32 bits.
+	- sd_voxin and voxin.conf: from speech-dispatcher 0.11.5 (for x86_64, armv7l, aarch64).
+
 2022-08-22 Gilles Casse <gcasse@oralux.org>
 	release 3.3rc6:
 
