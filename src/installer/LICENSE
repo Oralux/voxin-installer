@@ -50,10 +50,10 @@ Copyright: 2004,2007 Brailcom, o.p.s.
 License: LGPL-2.1+
 
 #Source: https://voxin.oralux.net
-#Upstream-Name: Nuance Vocalizer Embedded
+#Upstream-Name: Cerence TTS Embedded
 Files: /opt/oralux/nve/*
-Copyright: Nuance
-License: Nuance Vocalizer Embedded
+Copyright: Cerence, Inc.
+License: Cerence TTS Embedded
 Comment: optional software
 
 License: BSD-3-CLAUSE-IBM
