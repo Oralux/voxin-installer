@@ -25,13 +25,14 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 # - development (master branch)
 #LIBVOXIN_VERSION=
 # - from the last tag instead (+sha512)
-LIBVOXIN_VERSION=1.6.2
-LIBVOXIN_SHA512=8118c446a60ac38de8364e8a02141c00c3b97f976f06e539f6dc15a69206394ea601b45549b8a7c52515b52001a9ba0999ad3c7b309adaa6b05696e219f6448e
+LIBVOXIN_VERSION=1.6.3
+LIBVOXIN_SHA512=d49f0a363db36ceb50e7425847197185d903a50cf190ab66b92debadbf9f7748c27c1831fb56780531c625a248435d7facaf2459468a3e7ae09e19df3d35e481
 
 # versions of the speech-dispatcher voxin module(s) which must be
 # built by this script.
 # 
 SPEECHD_VOXIN_ALL_VERSIONS=
+#SPEECHD_VOXIN_ALL_VERSIONS=0.11.5
 #SPEECHD_VOXIN_ALL_VERSIONS=0.11.1
 #SPEECHD_VOXIN_ALL_VERSIONS=0.10.1
 #SPEECHD_VOXIN_ALL_VERSIONS="0.10.1 0.9.1 0.9.0"
@@ -54,6 +55,7 @@ SPEECHD_SD_MODULE_COPYRIGHT_NB_LINES=24
 # Originally built on:
 # Debian 8 (sd 0.7, 0.8)
 # Ubuntu 18.04 (sd_voxin 0.9.0, 0.9.10, 0.11.1)
+# Debian 10 (sd_voxin 0.11.5)
 SPEECHD_VOXIN_BIN_URL=http://oralux.org/soft/speech-dispatcher/bin
 SPEECHD_VOXIN_BIN_ARCHIVES=" \
 sd_voxin_0.7.1_0.8.8.x86_64.txz \
@@ -67,6 +69,9 @@ sd_voxin_0.10.1-voxin3_backport_upstream.aarch64.txz \
 sd_voxin_0.10.1-voxin3_backport_upstream.armv7l.txz \
 sd_voxin_0.10.1-voxin3_backport_upstream.x86_64.txz \
 sd_voxin_0.11.1.x86_64.txz \
+sd_voxin_0.11.5.aarch64.txz \
+sd_voxin_0.11.5.armv7l.txz \
+sd_voxin_0.11.5.x86_64.txz \
 "
 
 SPEECHD_VOXIN_BIN_SHA512=$BASE/check/$VOXIN_VERSION/sd_voxin.sha512
@@ -141,6 +146,12 @@ setSpeechdVoxinVar() {
 
     unset SPEECHD_VOXIN_ARCHIVE SPEECHD_VOXIN_SHA512
     case $version in
+	0.11.5)
+	    SPEECHD_VOXIN_ARCHIVE=$version.tar.gz
+	    SPEECHD_VOXIN_SHA512=b08dcce98ed6d6a953b4e31c515c19a8142fb0d769f4e485ecf5b1471bb2f17818dd09765b4367cad8a2fb2e7cf0f50da45cbcab8715b07168c9541858ac3ba1
+	    SPEECHD_VOXIN_ARCHIVE_URL=$SPEECHD_ARCHIVE_URL
+	    SPEECHD_VOXIN_GIT_URL=$SPEECHD_GIT_URL
+	    ;;
 	0.11.1)
 	    SPEECHD_VOXIN_ARCHIVE=$version.tar.gz
 	    SPEECHD_VOXIN_SHA512=9f08f282019e2a3c6abb9d77238ec397ec747ae7fab467e1cf58f8166121d914504d30b21273a58e2986c8235db077f21d24bad0bcc77b6d98714f7ab3efd666
@@ -527,6 +538,8 @@ EOF
 	fakeroot bash -c "\
 tar -C \"$rfsdir\" \
 	   -Jcf \"$tarball\" opt/oralux/voxin/share/doc/speech-dispatcher-voxin/$version opt/oralux/voxin/lib/speech-dispatcher-modules/$version opt/oralux/voxin/share/speech-dispatcher/$version" leave "can't create tarball into ${tarball%/*}" 1
+
+	echo "[OK] getSpeechDispatcherVoxin: $tarball"
 
 	rm -rf $modulesDir $confDir $docDir
 	cd "$pwd"

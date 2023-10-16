@@ -25,7 +25,7 @@ Options:
                        see its configuration in src/buildroot/
 -t, --tarballs <file>  extracts the list of supplied tarballs 
                        (voxin-viavoice-all.txz,...) into the root filesystem.
-                       <file> contains one tarball per line (full pathname) 
+                       <file> contains one tarball per line (full pathname)
 -d, --download <arch>  download voxin-installer from a remote machine.
                        <arch> = x86
                        useful to download the 32 bits voxin-installer built on 
@@ -152,6 +152,7 @@ if [ -n "$SPEECHD_VOXIN_ALL_VERSIONS" ]; then
     for i in $SPEECHD_VOXIN_ALL_VERSIONS; do
 	getSpeechDispatcherVoxin "$ARCH" "$getLibvoxinRes" $i || leave "Error: can't build sd_voxin" 1
     done
+    exit 0
 fi
 
 buildVoxinModuleLauncher
