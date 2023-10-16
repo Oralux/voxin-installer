@@ -33,6 +33,7 @@ download() {
 build() {
     [ "$ARCH" = "x86_64" ] && ssh $SERVER "set -e; cd $VMVOXDIR/voxin-installer && ./build.sh -t src/list.vv"
     ssh $SERVER "set -e; cd $VMVOXDIR/voxin-installer && ./build.sh -t src/list.ve.$ARCH"
+    rsync -av $SERVER:$VMVOXDIR/voxin-installer/build/tmp/voxin-installer_$VOXIN_VERSION/packages/all/ sd_voxin_tarballs/
 }
 
 echo "Memo: voxind-nve rsynced? (y|N)"

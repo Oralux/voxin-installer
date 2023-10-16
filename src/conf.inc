@@ -417,8 +417,10 @@ getLibvoxin() {
 	else
 		local a=$(sha512sum "$archivep" | cut -f1 -d" ")
 		if [ "$a" != "$LIBVOXIN_SHA512" ]; then
-			echo "$archivep: sha512 mismatch !"
-			exit 1
+		    echo "libvoxin $archivep: sha512 mismatch !"
+		    echo "current: $a"
+		    echo "expected: $LIBVOXIN_SHA512"
+		    exit 1
 		fi
 		[ ! -d libvoxin-$version ] && tar -zxf "$archivep" || true
 	fi	
@@ -485,7 +487,12 @@ getSpeechDispatcherVoxin() {
 
 	if [ -n "$sha512" ]; then
 	    local a=$(sha512sum "$archivep" | cut -f1 -d" ")
-	    [ "$a" != "$sha512" ] && leave "$archivep: sha512 mismatch !" 1
+	    if [ "$a" != "$sha512" ]; then
+		    echo "speech-dispatcher $archivep: sha512 mismatch !"
+		    echo "current: $a"
+		    echo "expected: $sha512"
+		    exit 1
+	    fi
 	fi
 
 	if [ ! -d speechd_voxin-$version ]; then
