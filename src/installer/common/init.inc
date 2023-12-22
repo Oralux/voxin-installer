@@ -432,7 +432,7 @@ getArch() {
 	    EI_CLASS=$(hexdump -s4 -n1 -e '/1 "%02X"' /bin/bash)
 	    if [ "$EI_CLASS" = "01" ]; then
 		ARCH=armv7l
-		DEBIAN_ARCH=armv7h
+		DEBIAN_ARCH=armhf
 		PACMAN_ARCH=armv7h
 	    fi	    
 	    ;;
