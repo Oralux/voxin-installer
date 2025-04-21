@@ -290,6 +290,8 @@ dictionary/var/opt/IBM/ibmtts/dict
 
 voxin-say is a command which converts text to speech.
 
+** System-wide install
+
 #+BEGIN_EXPORT ascii
 EXAMPLES :
 
@@ -308,3 +310,13 @@ voxin-say -f file.txt -l fr -s 500 -j 4 -w audio.wav
 
 #+END_EXPORT
 
+** Local install
+
+Add the following function to your .bashrc to make the previous examples work with the local voxin installation.
+
+#+BEGIN_EXPORT ascii
+voxin-say() {
+  local DIR=$HOME/.local/share/voxin/rfs/opt/oralux/voxin
+  LD_LIBRARY_PATH=$DIR/lib $DIR/bin/voxin-say $@
+}
+#+END_EXPORT
