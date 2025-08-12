@@ -1270,10 +1270,3 @@ uploadToX86VM() {
 	ssh $VMX86 'cd voxin-installer && ./build.sh -t src/list.ve'
 	cd "$pwd"
 }
-
-getx86Arch() {
-	local TARBALL="$DWLX86/voxin-update-$VOXIN_VERSION.tgz"
-	if [ -e "$TARBALL" ]; then
-		tar -C "$INSTALLDIR" --exclude rfs_$VOXIN_VERSION.all.txz --strip-components=2 -xf "$TARBALL" voxin-$VOXIN_VERSION/voxin-update-$VOXIN_VERSION/packages		
-	fi
-}

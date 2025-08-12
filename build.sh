@@ -26,12 +26,6 @@ Options:
 -t, --tarballs <file>  extracts the list of supplied tarballs 
                        (voxin-viavoice-all.txz,...) into the root filesystem.
                        <file> contains one tarball per line (full pathname)
--d, --download <arch>  download voxin-installer from a remote machine.
-                       <arch> = x86
-                       useful to download the 32 bits voxin-installer built on 
-                       a remote x86 VM.
-                       remote address = variable VMX86 in src/conf.inc
-                       (current value = $VMX86)
 -u, --upload <arch>    upload voxin-installer to a remote machine and build it.
                        Useful to build the 32 bits voxin-installer on an x86 VM.
                        <arch> = x86
@@ -59,9 +53,9 @@ Examples:
 
 }
 
-unset CLEAN DOWNLOAD HELP BUILDROOT TARBALLS UPLOAD WITH_TTS
+unset CLEAN HELP BUILDROOT TARBALLS UPLOAD WITH_TTS
 
-OPTIONS=`getopt -o cd:hbt:u: --long clean,download:,help,buildroot,tarballs:,upload: \
+OPTIONS=`getopt -o chbt:u: --long clean,help,buildroot,tarballs:,upload: \
              -n "$NAME" -- "$@"`
 [ $? != 0 ] && usage && exit 1
 eval set -- "$OPTIONS"
@@ -70,7 +64,6 @@ while true; do
   case "$1" in
     -b|--buildroot) BUILDROOT=1; shift;;
     -c|--clean) CLEAN=1; shift;;
-    -d|--download) DOWNLOAD=$2; shift 2;;
     -h|--help) HELP=1; shift;;
     -t|--tarballs) TARBALLS=$2; shift 2;;
     -u|--upload) UPLOAD=$2; shift 2;;
@@ -123,15 +116,6 @@ if [ -n "$UPLOAD" ]; then
 	exit 0
 fi
 
-if [ -n "$DOWNLOAD" ]; then
-	unset STATUS
-	case $DOWNLOAD in
-		x86) downloadVoxinUpdateFromX86VM && STATUS=0;;
-		*) ;;
-	esac
-	[ -z "$STATUS" ] && leave "Error: can't download voxin-installer from $VMX86" 1
-fi
-
 checkForeignArch
 checkDep
 init
@@ -160,8 +144,6 @@ getVoxinDoc
 buildVoxinPackage "$ARCH" || leave "Error: can't build packages" 1
 buildVoxinSpeechdPackage "$ARCH" || leave "Error: can't build packages" 1
 buildVoxinSpeechdConfPackage "$ARCH" || leave "Error: can't build packages" 1
-
-[ "$ARCH" = x86_64 ] && getx86Arch
 
 if [ -n "$TARBALLS" ]; then
     buildReleaseTarball "$TARBALLS" "$ARCH" "$WITH_TTS" || leave "Error: can't build release tarball" 1
