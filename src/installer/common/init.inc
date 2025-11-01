@@ -407,11 +407,32 @@ installLang() {
 	return 0
 }
 
+# Get Rootfs architecture
+# Determine the root filesystem architecture instead of kernel architecture
+# (e.g. case of the Raspberry PI with its rfs in ARM 32 bits (EABI5)
+# and kernel in ARM 64 bits (aarch64))
+getRootfsArch() {
+    local arch
+    local err=0
+    unset ARCH
+    a=$(file -e elf -L /bin/sh)
+    case "$a" in
+	*80386*) arch=i686;;
+	*EABI5*) arch=armv7l;;
+	*aarch64*) arch=aarch64;;
+	*x86-64*) arch=x86_64;;
+	*) err=1; echo "[KO] unexpected os architecture: $a";;
+    esac
+
+    [ err = 1 ] || ARCH=$arch;;
+    return $err
+}
+
 getArch() {
     if [ $# = 1 ] && [ -n "$1" ]; then
 	ARCH="$1"
     else
-	ARCH=$(uname -m)
+        getRootfsArch || {_gettext "Error: operation not completed."; exit 1; }
     fi
     PACMAN_ARCH=$ARCH
     case "$ARCH" in
