@@ -131,13 +131,30 @@ DOC=$VOXINDIR/usr/share/doc
 # gnupg key used to sign packages
 SIGNING_KEY=AED093E5
 
-getArch() {
-    ARCH=$(uname -m)
-    case "$ARCH" in
-        x86|i386|i586|i686) ARCH=i686;;
-#        armv7l) ;;
-#        aarch64) ;;
+# Get Rootfs architecture
+# Determine the root filesystem architecture instead of kernel architecture
+# (e.g. case of the Raspberry PI with its rfs in ARM 32 bits (EABI5)
+# and kernel in ARM 64 bits (aarch64))
+getRootfsArch() {
+    local arch
+    local err=0
+    unset ARCH
+    a=$(file -e elf -L /bin/sh)
+    case "$a" in
+	*80386*) arch=i686;;
+	*EABI5*) arch=armv7l;;
+	*aarch64*) arch=aarch64;;
+	*x86-64*) arch=x86_64;;
+	*) err=1; echo "[KO] unexpected os architecture: $a";;
     esac
+
+    [ err = 1 ] || ARCH=$arch;;
+    return $err
+}
+
+getArch() {
+    getRootfsArch
+    return $?
 }
 
 # set the variables describing the speech-dispatcher voxin archive
