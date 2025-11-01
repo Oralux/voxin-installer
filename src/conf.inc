@@ -25,8 +25,8 @@ LIBVOXIN_URL=https://github.com/Oralux/libvoxin/archive
 # - development (master branch)
 #LIBVOXIN_VERSION=
 # - from the last tag instead (+sha512)
-LIBVOXIN_VERSION=1.6.3
-LIBVOXIN_SHA512=d49f0a363db36ceb50e7425847197185d903a50cf190ab66b92debadbf9f7748c27c1831fb56780531c625a248435d7facaf2459468a3e7ae09e19df3d35e481
+LIBVOXIN_VERSION=1.6.4
+LIBVOXIN_SHA512=0613fe6f73d8731dbabbfad055dd5d6585a78ba161de8f63fc605c4b65f27f77c332100fbe2b7fb45dd69317c74b1aecb5d5900ed2f3dfdc09a53fb13e2cdab8
 
 # versions of the speech-dispatcher voxin module(s) which must be
 # built by this script.
