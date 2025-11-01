@@ -23,6 +23,8 @@ Options:
 -b, --buildroot        (optionally) build a 32 bits rootfilesystem using 
                        buildroot (https://buildroot.org). 
                        see its configuration in src/buildroot/
+-d, --debug            (optionally) set -x (print commands) and their arguments 
+                       as they are executed)
 -t, --tarballs <file>  extracts the list of supplied tarballs 
                        (voxin-viavoice-all.txz,...) into the root filesystem.
                        <file> contains one tarball per line (full pathname)
@@ -45,17 +47,13 @@ Examples:
 # upload voxin-installer to the X86 VM ($VMX86) and build it
  $0 -u x86
 
-# download the 32 bits voxin-installer from the X86 VM
-# and build the resulting installer (x86_64 + x86)
- $0 -d x86 -t src/list.vv
-
 " 
 
 }
 
-unset CLEAN HELP BUILDROOT TARBALLS UPLOAD WITH_TTS
+unset CLEAN DEBUG HELP BUILDROOT TARBALLS UPLOAD WITH_TTS
 
-OPTIONS=`getopt -o chbt:u: --long clean,help,buildroot,tarballs:,upload: \
+OPTIONS=`getopt -o chbdt:u: --long clean,debug,help,buildroot,tarballs:,upload: \
              -n "$NAME" -- "$@"`
 [ $? != 0 ] && usage && exit 1
 eval set -- "$OPTIONS"
@@ -64,6 +62,7 @@ while true; do
   case "$1" in
     -b|--buildroot) BUILDROOT=1; shift;;
     -c|--clean) CLEAN=1; shift;;
+    -d|--debug) DEBUG=1; shift;;
     -h|--help) HELP=1; shift;;
     -t|--tarballs) TARBALLS=$2; shift 2;;
     -u|--upload) UPLOAD=$2; shift 2;;
@@ -73,6 +72,7 @@ while true; do
 done
 
 [ -n "$HELP" ] && usage && exit 0
+[ -z "$DEBUG" ] || { set -x; PS4='(${FUNCNAME[0]} $LINENO) + '; }
 
 
 if [ ! -e "$SPEECHD_VOXIN_BIN_SHA512" ]; then
@@ -99,7 +99,7 @@ if [ -n "$TARBALLS" ]; then
 	grep voxin-viavoice-all "$t" && WITH_TTS=viavoice
 	grep voxin-nve-all "$t"
 	if [ $? = 0 ]; then
-	    grep -o "voxind-nve_${LIBVOXIN_VERSION}.*txz" "$t" || leave "Error: the tarballs file does not match libvoxin ${LIBVOXIN_VERSION}" 1
+	    grep -o "voxind-nve_${LIBVOXIN_VERSION}.*txz" "$t" || leave "Error: the tarballs file does not match libvoxin ${LIBVOXIN_VERSION} (tarballs file: $TARBALLS)" 1
 	    WITH_TTS=nve
 	fi
 	[ -n "$WITH_TTS" ] || leave "Error: the tarballs file does not include text-to-speech tarballs (-t $TARBALLS)" 1
